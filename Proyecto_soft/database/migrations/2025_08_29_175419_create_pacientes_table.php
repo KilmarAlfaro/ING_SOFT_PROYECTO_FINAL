@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('pacientes', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre');
+            $table->string('apellido');
+            $table->date('fecha_nacimiento');
+            $table->enum('sexo', ['M', 'F']); // O puedes usar string si quieres más opciones
+            $table->string('correo')->unique();
+            $table->string('telefono')->nullable();
+            $table->string('direccion')->nullable();
+            $table->string('password_hash');
+            $table->timestamp('fecha_creacion')->useCurrent();
             $table->timestamps();
         });
     }
