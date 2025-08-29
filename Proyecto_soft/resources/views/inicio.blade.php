@@ -12,15 +12,18 @@
     <h1 class="titulo">Bienvenido a <span class="empresa">MedTech HUB</span></h1>
 
     <div class="botones">
-      <a class="card" href="{{ route('login', ['tipo' => 'paciente']) }}">
-        <img src="https://cdn2.iconfinder.com/data/icons/virus-15/512/cough_sneeze_medical_illness_healthcare_sickness_pacient_-512.png" alt="Paciente">
-        <span>Soy Paciente</span>
-      </a>
+      <!-- Botón Soy Paciente -->
+<a href="{{ route('loginPac') }}" class="card">
+  <img src="https://cdn2.iconfinder.com/data/icons/virus-15/512/cough_sneeze_medical_illness_healthcare_sickness_pacient_-512.png" alt="Paciente">
+  <span>Soy Paciente</span>
+</a>
 
-      <a class="card" href="{{ route('login', ['tipo' => 'doctor']) }}">
-        <img src="https://cdn2.iconfinder.com/data/icons/covid-19-2/64/30-Doctor-1024.png" alt="Doctor">
-        <span>Soy Doctor</span>
-      </a>
+<!-- Botón Soy Doctor -->
+<a href="{{ route('loginDoc') }}" class="card">
+  <img src="https://cdn2.iconfinder.com/data/icons/covid-19-2/64/30-Doctor-1024.png" alt="Doctor">
+  <span>Soy Doctor</span>
+</a>
+
     </div>
   </div>
 </body>
