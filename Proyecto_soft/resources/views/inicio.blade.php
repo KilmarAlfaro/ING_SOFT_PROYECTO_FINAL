@@ -6,6 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Hola</h1>
+    <h1>Bienvenido a "Nombre empresa"</h1>
+
+
+    selecione su categoria - Paciente - Doctor
 </body>
 </html>
