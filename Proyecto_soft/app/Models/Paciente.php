@@ -19,7 +19,6 @@ class Paciente extends Model
         'correo',
         'telefono',
         'direccion',
-        'usuario',
         'password_hash',
         'fecha_creacion',
     ];

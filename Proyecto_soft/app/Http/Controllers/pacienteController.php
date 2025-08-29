@@ -28,7 +28,6 @@ class pacienteController extends Controller
             'correo' => 'required|email|unique:pacientes,correo',
             'telefono' => 'required|string|max:15',
             'direccion' => 'required|string|max:255',
-            'usuario' => 'required|string|max:50|unique:pacientes,usuario',
             'password' => 'required|string|min:6',   
         ]);
 
@@ -40,7 +39,6 @@ class pacienteController extends Controller
             'correo' => $request->correo,
             'telefono' => $request->telefono,
             'direccion' => $request->direccion,
-            'usuario' => $request->usuario,
             'password_hash' => Hash::make($request->password),
             'fecha_creacion' => now(),
         ]);
@@ -68,7 +66,6 @@ class pacienteController extends Controller
             'correo' => 'required|email|unique:pacientes,correo,' . $paciente->id,
             'telefono' => 'required|string|max:15',
             'direccion' => 'required|string|max:255',
-            'usuario' => 'required|string|max:50|unique:pacientes,usuario,' . $paciente->id,
             'password' => 'nullable|string|min:6',   
         ]);
 
@@ -80,7 +77,6 @@ class pacienteController extends Controller
             'correo' => $request->correo,
             'telefono' => $request->telefono,
             'direccion' => $request->direccion,
-            'usuario' => $request->usuario,
             'password_hash' => $request->password ? Hash::make($request->password) : $paciente->password_hash,
         ]);
         return redirect()->route('paciente.index')->with('success', 'Paciente actualizado correctamente');
