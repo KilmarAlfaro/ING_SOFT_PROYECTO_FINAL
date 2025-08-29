@@ -19,7 +19,7 @@ body {
   border-radius: 18px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
   text-align: center;
-  max-width: 600px;
+  max-width: 900px;
   margin-bottom: 250px;
   width: 90%;
 }
@@ -69,4 +69,82 @@ body {
   font-size: 1.05rem;
   font-weight: 700;
   color: #2d3436;
+}
+
+
+/* Contenedor del login */
+.login-contenedor {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+/* Formulario */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formulario label {
+  text-align: left;
+  font-weight: bold;
+  color: #2d3436;
+}
+
+.formulario input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  font-size: 1rem;
+  transition: border 0.2s ease;
+}
+
+.formulario input:focus {
+  border-color: #0984e3;
+}
+
+/* Botones */
+.acciones {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-primario {
+  background: #0984e3;
+  color: white;
+}
+
+.btn-primario:hover {
+  background: #074ea3;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.btn-secundario {
+  background: #dfe6e9;
+  color: #2d3436;
+}
+
+.btn-secundario:hover {
+  background: #b2bec3;
+  transform: translateY(-3px);
 }
