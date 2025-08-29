@@ -1,14 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio</title>
+  <!-- Enlaza el CSS desde public/css/estilos.css -->
+  <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
 </head>
 <body>
-    <h1>Bienvenido a "Nombre empresa"</h1>
+  <div class="inicio-contenedor">
+    <h1 class="titulo">Bienvenido a <span class="empresa">MedTech HUB</span></h1>
 
+    <div class="botones">
+      <a class="card" href="{{ route('login', ['tipo' => 'paciente']) }}">
+        <img src="https://cdn2.iconfinder.com/data/icons/virus-15/512/cough_sneeze_medical_illness_healthcare_sickness_pacient_-512.png" alt="Paciente">
+        <span>Soy Paciente</span>
+      </a>
 
-    selecione su categoria - Paciente - Doctor
+      <a class="card" href="{{ route('login', ['tipo' => 'doctor']) }}">
+        <img src="https://cdn2.iconfinder.com/data/icons/covid-19-2/64/30-Doctor-1024.png" alt="Doctor">
+        <span>Soy Doctor</span>
+      </a>
+    </div>
+  </div>
 </body>
 </html>
+
+
+
+
