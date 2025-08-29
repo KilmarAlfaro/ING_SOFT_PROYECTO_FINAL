@@ -7,5 +7,82 @@ use Illuminate\Http\Request;
 
 class doctorController extends Controller
 {
-    //
+    // LISTAR DOCTORES
+    public function index()
+    {
+        $doctores = Doctor::all();
+        return view('doctores.index', compact('doctores'));
+    }
+
+    // FORMULARIO DE REGISTRO
+    public function create()
+    {
+        return view('doctores.create'); // Mejor usar naming consistente
+    }
+
+    // GUARDAR DOCTOR
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required',
+            'apellido' => 'required',
+            'correo' => 'required|email|unique:doctores,correo',
+            'telefono' => 'required',
+            'especialidad' => 'required',
+            'numero_colegiado' => 'required',
+            'usuario' => 'required|unique:doctores,usuario',
+            'password' => 'required',
+            'direccion_clinica' => 'required',
+            'estado' => 'required',
+        ]);
+
+        $validated['password_hash'] = Hash::make($validated['password']);
+        $validated['fecha_creacion'] = now();
+        $validated['ultimo_login'] = null;
+
+        unset($validated['password']); // Quitamos el password plain
+
+        $doctor = Doctor::create($validated);
+
+        return redirect()->route('doctores.show', $doctor)->with('success', 'Doctor registrado correctamente');
+    }
+
+    // MOSTRAR PERFIL
+    public function show(Doctor $doctor)
+    {
+        return view('doctores.show', compact('doctor'));
+    }
+
+    // FORMULARIO DE EDICIÓN
+    public function edit(Doctor $doctor)
+    {
+        return view('doctores.edit', compact('doctor'));
+    }
+
+    // ACTUALIZAR DOCTOR
+    public function update(Request $request, Doctor $doctor)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required',
+            'apellido' => 'required',
+            'correo' => 'required|email|unique:doctores,correo,' . $doctor->id,
+            'telefono' => 'required',
+            'especialidad' => 'required',
+            'numero_colegiado' => 'required',
+            'usuario' => 'required|unique:doctores,usuario,' . $doctor->id,
+            'direccion_clinica' => 'required',
+            'estado' => 'required',
+        ]);
+
+        $doctor->update($validated);
+
+        return redirect()->route('doctores.show', $doctor)->with('success', 'Doctor actualizado correctamente');
+    }
+
+    // ELIMINAR DOCTOR
+    public function destroy(Doctor $doctor)
+    {
+        $doctor->delete();
+        return redirect()->route('doctores.index')->with('success', 'Doctor eliminado correctamente');
+    }
 }
