@@ -1,0 +1,96 @@
+/* Contenedor principal */
+.registro-contenedor {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+  max-width: 500px;
+  margin: 40px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Título principal */
+.titulo {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2d3436;
+}
+
+/* Subtítulos secciones */
+.subtitulo {
+  font-size: 1.5rem;
+  margin: 20px 0 10px 0;
+  color: #0984e3;
+  border-bottom: 2px solid #0984e3;
+  padding-bottom: 5px;
+}
+
+/* Formulario */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formulario label {
+  font-weight: bold;
+  color: #2d3436;
+}
+
+.formulario input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  font-size: 1rem;
+  transition: border 0.2s ease;
+}
+
+.formulario input:focus {
+  border-color: #0984e3;
+}
+
+/* Password container */
+.password-container {
+  position: relative;
+}
+
+.password-container img {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+}
+
+/* Botón */
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  margin-top: 10px;
+}
+
+.btn-primario {
+  background: #0984e3;
+  color: white;
+}
+
+.btn-primario:hover {
+  background: #074ea3;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* Mensajes de error */
+.mensaje-error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: -5px;
+}
