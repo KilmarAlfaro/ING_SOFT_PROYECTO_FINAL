@@ -35,8 +35,7 @@
       <label for="email">Correo electrónico</label>
       <input type="email" id="email" name="email" placeholder="ejemplo@mail.com" />
 
-      <label for="medicamentos">Medicamentos actuales</label>
-      <input type="text" id="medicamentos" name="medicamentos" placeholder="Paracetamol, etc." />
+    
 
       <button type="submit" class="btn-submit">Registrar</button>
     </form>
