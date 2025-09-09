@@ -32,3 +32,14 @@ Route::post('/login/paciente', [App\Http\Controllers\LoginController::class, 'lo
 // Procesar login Doctor
 Route::post('/login/doctor', [App\Http\Controllers\LoginController::class, 'loginDoc'])->name('loginDoc.submit');
 
+// Login
+Route::post('/login/paciente', [LoginRegistroController::class, 'loginPac'])->name('loginPac.submit');
+Route::post('/login/doctor', [LoginRegistroController::class, 'loginDoc'])->name('loginDoc.submit');
+
+// Registro
+Route::post('/registro/paciente', [LoginRegistroController::class, 'registroPac'])->name('registroPac.submit');
+Route::post('/registro/doctor', [LoginRegistroController::class, 'registroDoc'])->name('registroDoc.submit');
+
+Route::get('/main/doctor', function() {
+    return view('mainDoc');
+})->name('mainDoc');
