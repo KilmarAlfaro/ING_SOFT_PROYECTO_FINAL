@@ -56,3 +56,6 @@ Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 
 
 //resourses
 //Route::resource('paciente', App\Http\Controllers\pacienteController::class);
+Route::get('/perfil-doc', function () {
+    return view('perfilDoc');
+})->name('perfilDoc');
