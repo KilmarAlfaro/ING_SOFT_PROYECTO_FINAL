@@ -54,13 +54,24 @@
 /* Password container */
 .password-container {
   position: relative;
+  width: 100%;
+}
+
+.password-container input {
+  padding: 14px 45px 14px 14px; 
+  width: 70%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  user-select: none;        
+  caret-color: transparent; 
 }
 
 .password-container img {
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-55%);
   cursor: pointer;
   width: 24px;
   height: 24px;
@@ -86,6 +97,12 @@
   background: #074ea3;
   transform: translateY(-3px);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.btn-secundario {
+  color: #0984e3;
+  text-decoration: none;
+  margin-left: 15px;
 }
 
 /* Mensajes de error */

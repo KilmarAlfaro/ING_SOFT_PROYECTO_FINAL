@@ -43,3 +43,5 @@ Route::post('/registro/doctor', [LoginRegistroController::class, 'registroDoc'])
 Route::get('/main/doctor', function() {
     return view('mainDoc');
 })->name('mainDoc');
+
+

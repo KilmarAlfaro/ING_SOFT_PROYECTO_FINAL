@@ -83,6 +83,16 @@ body {
   width: 90%;
 }
 
+.password-container input {
+  padding: 14px 45px 14px 14px; /* más espacio a la derecha */
+  width: 70%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  user-select: none;        /* evita selección */
+  caret-color: transparent; /* oculta el cursor "|" */
+}
+
 /* Formulario */
 .formulario {
   display: flex;

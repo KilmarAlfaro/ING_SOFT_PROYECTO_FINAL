@@ -40,22 +40,23 @@
         <span class="mensaje-error">Este correo ya está registrado</span>
       @endif
 
-      <label for="password">Contraseña:</label>
-      <div class="password-container">
-        <input type="password" id="password" name="password" placeholder="********" required autocomplete="new-password">
-        <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePassword">
-      </div>
+   <label for="password">Contraseña:</label>
+    <div class="password-container">
+      <input type="password" id="password" name="password" placeholder="********" required autocomplete="new-password">
+      <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePassword">
+    </div>
 
-      <label for="password_confirmation">Confirmar contraseña:</label>
+    <label for="password_confirmation">Confirmar contraseña:</label>
       <div class="password-container">
         <input type="password" id="password_confirmation" name="password_confirmation" placeholder="********" required autocomplete="new-password">
+        <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePasswordConfirm">
+    </div>
 
-      </div>
 
       <!-- BOTONES -->
       <div class="acciones">
         <button type="submit" class="btn btn-primario">Registrarse</button>
-        <a href="{{ url('/') }}" class="btn btn-secundario">Regresar</a>
+        <a href="{{ url('/login/doctor') }}" class="btn btn-secundario">Regresar</a>
       </div>
     </form>
   </div>
