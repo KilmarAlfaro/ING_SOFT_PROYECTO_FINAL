@@ -20,6 +20,8 @@ class pacienteController extends Controller
 
     public function store(Request $request)
     {
+        // Debug: ver qué datos llegan
+        //dd($request->all());
         $request->validate([
             'nombre' => 'required|string|max:100',
             'apellido'  => 'required|string|max:100',

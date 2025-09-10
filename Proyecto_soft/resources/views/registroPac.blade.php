@@ -9,14 +9,18 @@
 </head>
 <body>
   <main class="form-container">
-    <form action="procesar_registro.php" method="post" class="form-paciente">
+    <form action="{{ route('paciente.store') }}" method="post" class="form-paciente">
+      @csrf
       <h1>Registro de Paciente</h1>
 
-      <label for="nombre">Nombre completo</label>
-      <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez" required />
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" placeholder="Juan" required />
 
-      <label for="fecha_nac">Fecha de nacimiento</label>
-      <input type="date" id="fecha_nac" name="fecha_nac" required />
+      <label for="apellido">Apellido</label>
+      <input type="text" id="apellido" name="apellido" placeholder="Pérez" required />
+
+      <label for="fecha_nacimiento">Fecha de nacimiento</label>
+      <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required />
 
       <label for="sexo">Sexo</label>
       <select id="sexo" name="sexo" required>
@@ -32,8 +36,11 @@
       <label for="telefono">Teléfono</label>
       <input type="tel" id="telefono" name="telefono" placeholder="+503 1234 5678" />
 
-      <label for="email">Correo electrónico</label>
-      <input type="email" id="email" name="email" placeholder="ejemplo@mail.com" />
+      <label for="correo">Correo electrónico</label>
+      <input type="email" id="correo" name="correo" placeholder="ejemplo@mail.com" />
+
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" name="password" required />
 
     
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\pacienteController;
 
 Route::get('/', function () {
     return view('inicio');
@@ -43,3 +44,12 @@ Route::post('/registro/doctor', [LoginRegistroController::class, 'registroDoc'])
 Route::get('/main/doctor', function() {
     return view('mainDoc');
 })->name('mainDoc');
+
+// Ruta stores
+//Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');
+
+// ruta para crear
+//Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 'create'])->name('paciente.create');
+
+//resourses
+Route::resource('paciente', App\Http\Controllers\pacienteController::class);
