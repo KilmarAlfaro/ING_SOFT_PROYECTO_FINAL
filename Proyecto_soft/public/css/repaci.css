@@ -1,0 +1,91 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Fondo y centrado */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #6c63ff, #3f3cbb);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+}
+
+.form-container {
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.2);
+  max-width: 400px;
+  width: 90%;
+  margin-top: 3rem; /* margen superior para separar del borde */
+}
+
+form.form-paciente h1 {
+  text-align: center;
+  margin-top: 2rem; /* espacio desde arriba */
+  margin-bottom: 1.5rem;
+  color: #3f3cbb;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="tel"],
+input[type="email"],
+select {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.2rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="tel"]:focus,
+input[type="email"]:focus,
+select:focus {
+  border-color: #6c63ff;
+  outline: none;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.9rem;
+  background-color: #6c63ff;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #524fd1;
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 1.5rem 1.5rem;
+    margin-top: 2rem;
+  }
+}
