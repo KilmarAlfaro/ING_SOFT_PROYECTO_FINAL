@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\pacienteController;
+use App\Http\Controllers\LoginRegistroController;
+use App\Http\Controllers\loginController;
+use App\Http\Controllers\doctorController;
 
 Route::get('/', function () {
     return view('inicio');
@@ -28,10 +31,10 @@ Route::get('/registro/doctor', function () {
 })->name('registroDoc');
 
 // Procesar login Paciente
-Route::post('/login/paciente', [App\Http\Controllers\LoginController::class, 'loginPac'])->name('loginPac.submit');
+Route::post('/login/paciente', [App\Http\Controllers\loginController::class, 'loginPac'])->name('loginPac.submit');
 
 // Procesar login Doctor
-Route::post('/login/doctor', [App\Http\Controllers\LoginController::class, 'loginDoc'])->name('loginDoc.submit');
+Route::post('/login/doctor', [App\Http\Controllers\loginController::class, 'loginDoc'])->name('loginDoc.submit');
 
 // Login
 Route::post('/login/paciente', [LoginRegistroController::class, 'loginPac'])->name('loginPac.submit');
@@ -46,10 +49,10 @@ Route::get('/main/doctor', function() {
 })->name('mainDoc');
 
 // Ruta stores
-//Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');
+Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');
 
 // ruta para crear
-//Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 'create'])->name('paciente.create');
+Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 'create'])->name('paciente.create');
 
 //resourses
-Route::resource('paciente', App\Http\Controllers\pacienteController::class);
+//Route::resource('paciente', App\Http\Controllers\pacienteController::class);

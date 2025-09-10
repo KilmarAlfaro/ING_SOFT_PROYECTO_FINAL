@@ -15,13 +15,11 @@ class pacienteController extends Controller
 
     public function create()
     {
-        return view('registroPaciente');
+        return view('registroPac');
     }
 
     public function store(Request $request)
     {
-        // Debug: ver qué datos llegan
-        //dd($request->all());
         $request->validate([
             'nombre' => 'required|string|max:100',
             'apellido'  => 'required|string|max:100',
@@ -30,7 +28,7 @@ class pacienteController extends Controller
             'correo' => 'required|email|unique:pacientes,correo',
             'telefono' => 'required|string|max:15',
             'direccion' => 'required|string|max:255',
-            'password' => 'required|string|min:6',   
+            'password' => 'required|string|min:6|confirmed',   
         ]);
 
         Paciente::create([
