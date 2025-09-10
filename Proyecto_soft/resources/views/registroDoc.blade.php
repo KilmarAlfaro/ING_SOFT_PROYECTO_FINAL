@@ -17,7 +17,7 @@
       <h2 class="subtitulo">Datos personales</h2>
 
       <label for="nombre">Nombre completo:</label>
-      <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez" required autocomplete="off">
+      <input type="text" id="nombre" name="nombre" placeholder="Juan" required autocomplete="off">
 
       <label for="telefono">Número de teléfono:</label>
       <input type="text" id="telefono" name="telefono" placeholder="1234-5678" required autocomplete="off">
