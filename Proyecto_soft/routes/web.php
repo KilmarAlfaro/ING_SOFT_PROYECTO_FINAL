@@ -45,3 +45,6 @@ Route::get('/main/doctor', function() {
 })->name('mainDoc');
 
 
+Route::get('/perfil-doc', function () {
+    return view('perfilDoc');
+})->name('perfilDoc');
