@@ -10,47 +10,43 @@
 
     <!-- NAVBAR -->
     <nav>
-        <h1>Panel Doctor</h1>
-        <a href="{{ route('perfilDoc') }}">
-            <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
-        </a>
+        <h1>Página Doctor</h1>
+
+        <div class="nav-right">
+            <!-- Botón Cerrar Sesión -->
+            <button type="button" class="logout-btn" onclick="openModal()">Cerrar sesión</button>
+
+            <!-- Icono Perfil -->
+            <a href="{{ route('perfilDoc') }}">
+                <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
+            </a>
+        </div>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <div class="main-container">
-        <!-- IZQUIERDA: Lista de consultas -->
-        <div class="left-panel">
-            <h2>Consultas Pendientes</h2>
-            <ul>
-                <li class="consulta" onclick="mostrarDetalle('Consulta 1')">Consulta 1</li>
-                <li class="consulta" onclick="mostrarDetalle('Consulta 2')">Consulta 2</li>
-                <li class="consulta" onclick="mostrarDetalle('Consulta 3')">Consulta 3</li>
-            </ul>
-        </div>
-
-        <!-- CENTRO: Detalle de la consulta -->
-        <div class="center-panel">
-            <h2>Detalle de la Consulta</h2>
-            <div id="detalleConsulta">
-                <p>Selecciona una consulta pendiente para ver sus detalles.</p>
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>¿Estás seguro que quieres cerrar sesión?</h2>
+            <div class="modal-actions">
+                <form id="logoutForm" action="{{ route('inicio') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="confirm-btn">Sí</button>
+                </form>
+                <button type="button" class="cancel-btn" onclick="closeModal()">No</button>
             </div>
-        </div>
-
-        <!-- DERECHA: Notas de la consulta -->
-        <div class="right-panel">
-            <h2>Notas de la Consulta</h2>
-            <textarea placeholder="Escribe tus notas aquí..."></textarea>
         </div>
     </div>
 
     <script>
-        function mostrarDetalle(consulta) {
-            document.getElementById('detalleConsulta').innerHTML = `
-                <h3>${consulta}</h3>
-                <p>Detalles completos de ${consulta} aparecerán aquí.</p>
-            `;
+        function openModal() {
+            document.getElementById("logoutModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("logoutModal").style.display = "none";
         }
     </script>
 
 </body>
 </html>
+
