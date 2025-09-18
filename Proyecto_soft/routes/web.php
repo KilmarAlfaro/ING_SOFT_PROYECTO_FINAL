@@ -47,9 +47,14 @@ Route::post('/login', [loginController::class, 'login']);
 Route::post('/registro/paciente', [LoginRegistroController::class, 'registroPac'])->name('registroPac.submit');
 Route::post('/registro/doctor', [LoginRegistroController::class, 'registroDoc'])->name('registroDoc.submit');
 
+// Rutas main
 Route::get('/main/doctor', function() {
     return view('mainDoc');
 })->name('mainDoc');
+
+Route::get('/main/paciente', function() {
+    return view('mainPac');
+})->name('mainPac');
 
 // Ruta stores
 Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');

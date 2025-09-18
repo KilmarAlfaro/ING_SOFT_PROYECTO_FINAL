@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Paciente;
+use App\Models\Doctor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class LoginRegistroController extends Controller
 {
@@ -14,27 +17,29 @@ class LoginRegistroController extends Controller
        ============================== */
     public function loginPac(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        // Intentar autenticación SOLO si es paciente
-        if (Auth::attempt(array_merge($credentials, ['role' => 'paciente']))) {
-            $request->session()->regenerate();
-            return redirect()->route('mainPac');
+        // Buscar paciente por correo
+        $paciente = Paciente::where('correo', $request->email)->first();
+
+        if (!$paciente) {
+            return back()->with('email_no_registrado', true);
         }
 
-        // Revisar si el correo existe
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return back()->with('email_no_registrado', true);
-        } elseif ($user->role === 'paciente') {
+        // Verificar contraseña
+        if (!Hash::check($request->password, $paciente->password_hash)) {
             return back()->with('password_incorrecta', true);
         }
 
-        return back()->withErrors(['email' => 'No tiene acceso como paciente.']);
+        // Guardar sesión
+        Session::put('paciente_id', $paciente->id);
+        Session::put('paciente_nombre', $paciente->nombre);
+
+        // Redirigir a dashboard
+        return redirect()->route('mainPac');
     }
 
     /* ==============================
@@ -54,7 +59,7 @@ class LoginRegistroController extends Controller
         }
 
         // Revisar si el correo existe
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('correo', $request->email)->first();
 
         if (!$user) {
             return back()->with('email_no_registrado', true);
