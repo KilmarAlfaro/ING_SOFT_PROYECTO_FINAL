@@ -14,7 +14,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/'); // Cambia '/' por tu ruta principal
+            return redirect()->intended(route('inicio')); // redirige al inicio
         }
         return back()->withErrors(['email' => 'Credenciales incorrectas.']);
     }
@@ -32,7 +32,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
         Auth::login($user);
-        return redirect('/');
+        return redirect()->route('inicio');
     }
 
     public function logout(Request $request)
@@ -40,6 +40,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect()->route('inicio'); // aquí lo enviamos al inicio
     }
 }

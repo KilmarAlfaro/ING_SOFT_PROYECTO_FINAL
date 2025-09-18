@@ -70,3 +70,5 @@ use App\Http\Controllers\AuthController;
 
 // Logout Doctor/Paciente
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
