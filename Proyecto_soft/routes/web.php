@@ -40,6 +40,9 @@ Route::post('/login/doctor', [App\Http\Controllers\loginController::class, 'logi
 Route::post('/login/paciente', [LoginRegistroController::class, 'loginPac'])->name('loginPac.submit');
 Route::post('/login/doctor', [LoginRegistroController::class, 'loginDoc'])->name('loginDoc.submit');
 
+// Ruta para procesar el login
+Route::post('/login', [loginController::class, 'login']);
+
 // Registro
 Route::post('/registro/paciente', [LoginRegistroController::class, 'registroPac'])->name('registroPac.submit');
 Route::post('/registro/doctor', [LoginRegistroController::class, 'registroDoc'])->name('registroDoc.submit');
