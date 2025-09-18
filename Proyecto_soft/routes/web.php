@@ -10,6 +10,10 @@ Route::get('/', function () {
     return view('inicio');
 })->name('inicio');
 
+Route::get('/mainpage', function () {
+    return view('mainpage');
+})->name('mainpage');
+
 /* LOGIN Paciente */
 Route::get('/login/paciente', function () {
     return view('loginPac');
