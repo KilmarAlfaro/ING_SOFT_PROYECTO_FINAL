@@ -65,7 +65,7 @@ Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 
 Route::get('/doctores/create', [App\Http\Controllers\doctorController::class, 'create'])->name('doctores.create');
 
 // show
-Route::get('/paciente/{paciente}', [App\Http\Controllers\pacienteController::class, 'show'])->name('paciente.show');
+//Route::get('/paciente/{paciente}', [App\Http\Controllers\pacienteController::class, 'show'])->name('paciente.show');
 Route::get('/doctores/{doctor}', [App\Http\Controllers\doctorController::class, 'show'])->name('doctores.show');
 
 //resourses

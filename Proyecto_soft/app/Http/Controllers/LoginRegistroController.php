@@ -47,27 +47,29 @@ class LoginRegistroController extends Controller
        ============================== */
     public function loginDoc(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        // Intentar autenticación SOLO si es doctor
-        if (Auth::attempt(array_merge($credentials, ['role' => 'doctor']))) {
-            $request->session()->regenerate();
-            return redirect()->route('mainDoc');
+        // Buscar doctor por correo
+        $doctor = Doctor::where('correo', $request->email)->first();
+
+        if (!$doctor) {
+            return back()->with('email_no_registrado', true);
         }
 
-        // Revisar si el correo existe
-        $user = User::where('correo', $request->email)->first();
-
-        if (!$user) {
-            return back()->with('email_no_registrado', true);
-        } elseif ($user->role === 'doctor') {
+        // Verificar contraseña
+        if (!Hash::check($request->password, $doctor->password_hash)) {
             return back()->with('password_incorrecta', true);
         }
 
-        return back()->withErrors(['email' => 'No tiene acceso como doctor.']);
+        // Guardar sesión
+        Session::put('doctor_id', $doctor->id);
+        Session::put('doctor_nombre', $doctor->nombre);
+
+        // Redirigir al dashboard del doctor
+        return redirect()->route('mainDoc');
     }
 
     /* ==============================
