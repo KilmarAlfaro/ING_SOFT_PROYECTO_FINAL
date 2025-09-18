@@ -72,8 +72,3 @@ use App\Http\Controllers\AuthController;
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-
-use App\Http\Controllers\AuthController;
-
-
-Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
