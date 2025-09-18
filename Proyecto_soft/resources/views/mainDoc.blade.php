@@ -21,6 +21,17 @@
                 <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
             </a>
         </div>
+        <h1>Página Doctor</h1>
+
+        <div class="nav-right">
+            <!-- Botón Cerrar Sesión -->
+            <button type="button" class="logout-btn" onclick="openModal()">Cerrar sesión</button>
+
+            <!-- Icono Perfil -->
+            <a href="{{ route('perfilDoc') }}">
+                <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
+            </a>
+        </div>
     </nav>
 
     <!-- CONTENEDOR PRINCIPAL -->
@@ -106,3 +117,4 @@
 
 </body>
 </html>
+
