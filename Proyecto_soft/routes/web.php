@@ -68,5 +68,5 @@ Route::get('/perfil-doc', function () {
 
 use App\Http\Controllers\AuthController;
 
-// Logout Doctor/Paciente
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');

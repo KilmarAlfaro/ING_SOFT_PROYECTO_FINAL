@@ -28,7 +28,8 @@
         <div class="modal-content">
             <h2>¿Estás seguro que quieres cerrar sesión?</h2>
             <div class="modal-actions">
-                <form id="logoutForm" action="{{ route('inicio') }}" method="POST">
+                <!-- ✅ Aquí corregimos el action -->
+                <form id="logoutForm" action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="confirm-btn">Sí</button>
                 </form>
@@ -49,4 +50,3 @@
 
 </body>
 </html>
-
