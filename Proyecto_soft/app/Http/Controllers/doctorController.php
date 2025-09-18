@@ -26,11 +26,11 @@ class doctorController extends Controller
         $validated = $request->validate([
             'nombre' => 'required',
             'apellido' => 'required',
-            'correo' => 'required|email|unique:doctores,correo',
+            'correo' => 'required|email|unique:doctors,correo',
             'telefono' => 'required',
             'especialidad' => 'required',
             'numero_colegiado' => 'required',
-            'usuario' => 'required|unique:doctores,usuario',
+            'usuario' => 'required|unique:doctors,usuario',
             'password' => 'required',
             'direccion_clinica' => 'required',
             'estado' => 'required',

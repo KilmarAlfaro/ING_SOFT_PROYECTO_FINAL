@@ -53,11 +53,15 @@ Route::get('/main/doctor', function() {
 
 // Ruta stores
 Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');
-Route::post('/doctor', [App\Http\Controllers\doctorController::class, 'store'])->name('doctor.store');
+Route::post('/doctores', [App\Http\Controllers\doctorController::class, 'store'])->name('doctores.store');
 
 // ruta para crear
 Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 'create'])->name('paciente.create');
-Route::get('/doctor/create', [App\Http\Controllers\doctorController::class, 'create'])->name('doctor.create');
+Route::get('/doctores/create', [App\Http\Controllers\doctorController::class, 'create'])->name('doctores.create');
+
+// show
+Route::get('/paciente/{paciente}', [App\Http\Controllers\pacienteController::class, 'show'])->name('paciente.show');
+Route::get('/doctores/{doctor}', [App\Http\Controllers\doctorController::class, 'show'])->name('doctores.show');
 
 //resourses
 //Route::resource('paciente', App\Http\Controllers\pacienteController::class);
