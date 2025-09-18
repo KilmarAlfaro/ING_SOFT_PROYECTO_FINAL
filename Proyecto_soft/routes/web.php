@@ -40,6 +40,9 @@ Route::post('/login/doctor', [App\Http\Controllers\loginController::class, 'logi
 Route::post('/login/paciente', [LoginRegistroController::class, 'loginPac'])->name('loginPac.submit');
 Route::post('/login/doctor', [LoginRegistroController::class, 'loginDoc'])->name('loginDoc.submit');
 
+// Ruta para procesar el login
+Route::post('/login', [loginController::class, 'login']);
+
 // Registro
 Route::post('/registro/paciente', [LoginRegistroController::class, 'registroPac'])->name('registroPac.submit');
 Route::post('/registro/doctor', [LoginRegistroController::class, 'registroDoc'])->name('registroDoc.submit');
@@ -50,9 +53,11 @@ Route::get('/main/doctor', function() {
 
 // Ruta stores
 Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');
+Route::post('/doctor', [App\Http\Controllers\doctorController::class, 'store'])->name('doctor.store');
 
 // ruta para crear
 Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 'create'])->name('paciente.create');
+Route::get('/doctor/create', [App\Http\Controllers\doctorController::class, 'create'])->name('doctor.create');
 
 //resourses
 //Route::resource('paciente', App\Http\Controllers\pacienteController::class);
