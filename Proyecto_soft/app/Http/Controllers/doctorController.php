@@ -17,7 +17,7 @@ class doctorController extends Controller
     // FORMULARIO DE REGISTRO
     public function create()
     {
-        return view('doctores.create'); // Mejor usar naming consistente
+        return view('registroDoc'); // Mejor usar naming consistente
     }
 
     // GUARDAR DOCTOR
@@ -44,7 +44,7 @@ class doctorController extends Controller
 
         $doctor = Doctor::create($validated);
 
-        return redirect()->route('doctores.show', $doctor)->with('success', 'Doctor registrado correctamente');
+        return redirect()->route('doctores.create', $doctor)->with('success', 'Doctor registrado correctamente');
     }
 
     // MOSTRAR PERFIL
