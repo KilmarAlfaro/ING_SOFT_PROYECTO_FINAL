@@ -1,0 +1,28 @@
+.titu{
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 40PX;
+    color: white;
+}
+
+.container{
+    border: 5px;
+    padding: 10px;
+    border-style: solid;
+    background-color: aqua;
+    width: 400px;
+    height: 600px;
+    border-color: white ;
+    font-family: sans-serif;
+    font-size: 28px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+
+}
+
+body{
+    background-color: rgb(27, 210, 185);
+    
+}
