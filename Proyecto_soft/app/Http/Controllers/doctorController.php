@@ -52,7 +52,8 @@ class DoctorController extends Controller
     // MOSTRAR PERFIL (por id)
     public function show(Doctor $doctor)
     {
-        return view('doctores.show', compact('doctor'));
+        $doctor = \App\Models\Doctor::where('user_id', \Auth::id())->firstOrFail();
+        return view('perfilDoc', compact('doctor'));
     }
 
     // FORMULARIO DE EDICIÓN (por id)

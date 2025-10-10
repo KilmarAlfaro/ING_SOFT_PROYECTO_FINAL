@@ -98,8 +98,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])
         ->name('perfil.doctor.update');
     
-        //$doctor = Doctor::where('user_id', Auth::id())->firstOrFail();
-        //return view('perfilDoc', compact('doctor'));
+    //$doctor = Doctor::where('user_id', Auth::id())->firstOrFail();
+    //return view('perfilDoc', compact('doctor'));
 
 });
 

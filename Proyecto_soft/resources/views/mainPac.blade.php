@@ -9,6 +9,12 @@
 
 </head>
 <body>
+    <div>
+    </div>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Buscar Doctores</h1>
+    </div>
+
     <form method="GET" action="{{ route('buscar.doctor') }}" class="input-group mb-3">
         <input type="text" name="query" class="form-control" placeholder="Buscar doctor por nombre o especialidad">
         <button class="btn btn-primary" type="submit">Buscar</button>
@@ -32,6 +38,8 @@
             <p class="text-center">No se encontraron doctores.</p>
         @endif
     </div>
+
+
 
 
 </body>
