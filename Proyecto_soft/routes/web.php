@@ -103,6 +103,25 @@ Route::middleware('auth')->group(function () {
 
 });
 
+// Rutas para el perfil del paciente
+
+Route::get('/perfil-pac', function () {
+    return view('parfilPac');
+})->name('parfilPac');
+
+Route::middleware('auth')->group(function () {
+
+    // Mostrar perfil del doctor autenticado
+    Route::get('/perfil-pac', [PerfilDoctorController::class, 'show'])
+        ->name('perfil.paciente');
+
+    // Actualizar perfil del doctor autenticado
+    Route::post('/perfil-pac', [PerfilDoctorController::class, 'update'])
+        ->name('perfil.paciente.update');
+    
+});
+
+
 
 // buscar doctor
 Route::get('/buscar-doctor', [doctorController::class, 'buscar'])->name('buscar.doctor');
