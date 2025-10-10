@@ -85,4 +85,15 @@ class doctorController extends Controller
         $doctor->delete();
         return redirect()->route('doctores.index')->with('success', 'Doctor eliminado correctamente');
     }
+
+    // BUSCADOR PARA DOCTORES DOCTOR
+    public function buscar(Request $request)
+    {
+        $query = $request->input('query');
+        $doctores = Doctor::where('nombre', 'LIKE', "%$query%")
+            ->orWhere('especialidad', 'LIKE', "%$query%")
+            ->get();
+
+        return view('mainPac', compact('doctores'));
+    }
 }

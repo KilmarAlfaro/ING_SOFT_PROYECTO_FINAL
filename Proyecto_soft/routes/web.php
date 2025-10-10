@@ -85,3 +85,6 @@ use App\Http\Controllers\AuthController;
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
+// buscar doctor
+Route::get('/buscar-doctor', [doctorController::class, 'buscar'])->name('buscar.doctor');
+
