@@ -105,3 +105,6 @@ Route::middleware('auth')->group(function () {
 
 
 
+// buscar doctor
+Route::get('/buscar-doctor', [doctorController::class, 'buscar'])->name('buscar.doctor');
+

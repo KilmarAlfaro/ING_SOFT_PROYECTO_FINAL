@@ -88,54 +88,14 @@ class DoctorController extends Controller
         return redirect()->route('doctores.index')->with('success', 'Doctor eliminado correctamente');
     }
 
-    // ==============================
-    // PERFIL DEL DOCTOR AUTENTICADO
-    // ==============================
-
-    public function showProfile()
+    // BUSCADOR PARA DOCTORES DOCTOR
+    public function buscar(Request $request)
     {
-        $doctor = Auth::user()->doctor;
+        $query = $request->input('query');
+        $doctores = Doctor::where('nombre', 'LIKE', "%$query%")
+            ->orWhere('especialidad', 'LIKE', "%$query%")
+            ->get();
 
-        if (!$doctor) {
-            return redirect()->back()->with('error', 'No se encontró la información del doctor.');
-        }
-
-        return view('perfilDoc', compact('doctor'));
+        return view('mainPac', compact('doctores'));
     }
-
-    public function updateProfile(Request $request)
-    {
-        $doctor = Auth::user()->doctor;
-
-        if (!$doctor) {
-            return redirect()->back()->with('error', 'No se encontró el registro del doctor.');
-        }
-
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'telefono' => 'required|string|max:20',
-            'especialidad' => 'required|string|max:255',
-            'numero_colegiado' => 'required|string|max:100',
-            'direccion_clinica' => 'required|string|max:255',
-            'correo' => 'required|email|max:255',
-            'usuario' => 'required|string|max:100',
-        ]);
-
-        $doctor->update($validated);
-
-        return redirect()->route('perfil.doctor')->with('success', 'Datos actualizados correctamente.');
-    }
-    // PERFIL INDIVIDUAL (sin autenticación)
-        public function perfil($id)
-            {
-             $doctor = Doctor::find($id);
-
-                if (!$doctor) {
-                 return redirect()->route('doctores.index')->with('error', 'Doctor no encontrado.');
-    }
-
-            return view('perfilDoc', compact('doctor'));
-            }
-
 }
