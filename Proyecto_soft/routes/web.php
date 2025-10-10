@@ -5,6 +5,7 @@ use App\Http\Controllers\pacienteController;
 use App\Http\Controllers\LoginRegistroController;
 use App\Http\Controllers\loginController;
 use App\Http\Controllers\doctorController;
+use App\Http\Controllers\PerfilDoctorController;
 
 Route::get('/', function () {
     return view('inicio');
@@ -86,7 +87,6 @@ use App\Http\Controllers\AuthController;
 // Logout Doctor/Paciente
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-use App\Http\Controllers\PerfilDoctorController;
 
 Route::middleware('auth')->group(function () {
 
@@ -97,12 +97,11 @@ Route::middleware('auth')->group(function () {
     // Actualizar perfil del doctor autenticado
     Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])
         ->name('perfil.doctor.update');
+    
+        //$doctor = Doctor::where('user_id', Auth::id())->firstOrFail();
+        //return view('perfilDoc', compact('doctor'));
 
 });
-        $doctor = Doctor::where('user_id', Auth::id())->firstOrFail();
-        return view('perfilDoc', compact('doctor'));
-
-
 
 
 // buscar doctor
