@@ -45,4 +45,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relación: un usuario tiene un doctor asociado.
+     */
+    public function doctor()
+    {
+        return $this->hasOne(Doctor::class);
+    }
 }

@@ -74,6 +74,8 @@ Route::get('/doctores/{doctor}', [App\Http\Controllers\doctorController::class, 
 
 //resourses
 //Route::resource('paciente', App\Http\Controllers\pacienteController::class);
+
+
 Route::get('/perfil-doc', function () {
     return view('perfilDoc');
 })->name('perfilDoc');
@@ -83,5 +85,23 @@ use App\Http\Controllers\AuthController;
 
 // Logout Doctor/Paciente
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+use App\Http\Controllers\PerfilDoctorController;
+
+Route::middleware('auth')->group(function () {
+
+    // Mostrar perfil del doctor autenticado
+    Route::get('/perfil-doc', [PerfilDoctorController::class, 'show'])
+        ->name('perfil.doctor');
+
+    // Actualizar perfil del doctor autenticado
+    Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])
+        ->name('perfil.doctor.update');
+
+});
+        $doctor = Doctor::where('user_id', Auth::id())->firstOrFail();
+        return view('perfilDoc', compact('doctor'));
+
+
 
 
