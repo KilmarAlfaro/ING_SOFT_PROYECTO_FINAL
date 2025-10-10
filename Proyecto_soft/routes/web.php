@@ -5,7 +5,6 @@ use App\Http\Controllers\pacienteController;
 use App\Http\Controllers\LoginRegistroController;
 use App\Http\Controllers\loginController;
 use App\Http\Controllers\doctorController;
-use App\Http\Controllers\PerfilDoctorController;
 
 Route::get('/', function () {
     return view('inicio');
