@@ -18,7 +18,7 @@
             <button type="button" class="logout-btn" onclick="openModal()">Cerrar sesión</button>
 
             <!-- Icono Perfil -->
-            <a href="{{ route('perfilDoc') }}">
+            <a href="{{ route('perfil.doctor') }}">
                 <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
             </a>
         </div>
