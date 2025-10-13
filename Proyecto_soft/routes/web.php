@@ -102,6 +102,9 @@ Route::middleware('auth')->group(function () {
 
 
 
+Route::get('/login', function () {
+    return view('inicio');
+})->name('login');
 
 
 
