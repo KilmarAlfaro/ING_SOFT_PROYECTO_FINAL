@@ -23,7 +23,7 @@
                             <h5 class="card-title">{{ $doctor->nombre }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ $doctor->especialidad }}</h6>
                             <p class="card-text">{{ $doctor->descripcion }}</p>
-                            <a href="{{ route('perfil.doctor', $doctor->id) }}" class="btn btn-success">Hacer Consulta</a>
+                            <a href="{{ route('consulta.doctor', $doctor->id) }}" class="btn btn-success">Hacer Consulta</a>
                         </div>
                     </div>
                 </div>

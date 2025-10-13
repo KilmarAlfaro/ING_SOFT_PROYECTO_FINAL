@@ -88,3 +88,5 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // buscar doctor
 Route::get('/buscar-doctor', [doctorController::class, 'buscar'])->name('buscar.doctor');
 
+//consulta
+Route::get('/consulta-doctor/{id}', [doctorController::class, 'consulta'])->name('consulta.doctor');

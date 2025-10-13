@@ -96,4 +96,12 @@ class doctorController extends Controller
 
         return view('mainPac', compact('doctores'));
     }
+
+    // GESTIONAR CONSULTA
+        public function consulta($id)
+    {
+        $doctor = Doctor::findOrFail($id);
+        // Aquí puedes manejar la lógica para realizar la consulta
+        return view('consulta', compact('doctores'));
+    }
 }
