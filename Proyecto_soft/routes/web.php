@@ -40,9 +40,7 @@ Route::post('/login/paciente', [App\Http\Controllers\loginController::class, 'lo
 // Procesar login Doctor
 Route::post('/login/doctor', [App\Http\Controllers\loginController::class, 'loginDoc'])->name('loginDoc.submit');
 
-// Login
-Route::post('/login/paciente', [LoginRegistroController::class, 'loginPac'])->name('loginPac.submit');
-Route::post('/login/doctor', [LoginRegistroController::class, 'loginDoc'])->name('loginDoc.submit');
+// NOTE: login POST routes are handled by App\Http\Controllers\loginController to use Laravel Auth
 
 // Ruta para procesar el login
 Route::post('/login', [loginController::class, 'login']);
@@ -76,9 +74,7 @@ Route::get('/doctores/{doctor}', [App\Http\Controllers\doctorController::class, 
 //Route::resource('paciente', App\Http\Controllers\pacienteController::class);
 
 
-Route::get('/perfil-doc', function () {
-    return view('perfilDoc');
-})->name('perfilDoc');
+// Perfil doctor (mostrado/actualizado por controlador)
 
 
 use App\Http\Controllers\AuthController;
@@ -88,17 +84,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\PerfilDoctorController;
 
-Route::middleware('auth')->group(function () {
 
-    // Mostrar perfil del doctor autenticado
-    Route::get('/perfil-doc', [PerfilDoctorController::class, 'show'])
-        ->name('perfil.doctor');
+// Mostrar perfil del doctor autenticado
+Route::get('/perfil-doc', [PerfilDoctorController::class, 'show'])
+    ->name('perfil.doctor');
 
-    // Actualizar perfil del doctor autenticado
-    Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])
-        ->name('perfil.doctor.update');
-   
-});
+// Actualizar perfil del doctor autenticado
+Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])
+    ->name('perfil.doctor.update');
 
 
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 
 class Doctor extends Model
 {
@@ -12,6 +13,7 @@ class Doctor extends Model
     protected $table = 'doctors';
 
     protected $fillable = [
+        'user_id',
         'nombre',
         'apellido',
         'correo',
@@ -25,4 +27,12 @@ class Doctor extends Model
         'fecha_creacion',
         'ultimo_login',
     ];
+
+    /**
+     * Relacion: doctor pertenece a un usuario (auth)
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
