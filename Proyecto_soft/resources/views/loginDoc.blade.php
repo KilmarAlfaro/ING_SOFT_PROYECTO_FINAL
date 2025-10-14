@@ -40,7 +40,7 @@
       @csrf
 
       <label for="email">Correo electrónico:</label>
-      <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required autocomplete="off">
+      <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required autocomplete="on">
 
       @if(session('email_no_registrado'))
         <div class="mensaje-registro">

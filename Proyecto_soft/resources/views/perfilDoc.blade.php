@@ -7,59 +7,83 @@
     <link rel="stylesheet" href="{{ asset('css/perfilDoc.css') }}">
 </head>
 <body>
-    <div class="perfil-container">
-        <h1>Perfil del Doctor</h1>
+    <div class="container">
+        <div class="meta mb-8">
+            <a href="{{ route('mainDoc') }}" class="btn secondary" title="Volver al inicio">◀ Volver</a>
+            <h1>Mi perfil</h1>
+        </div>
 
         @if(session('success'))
-            <div class="alert-success">
-                {{ session('success') }}
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
-        <form action="{{ route('perfil.doctor.update') }}" method="POST" autocomplete="off">
+        <form action="{{ route('perfil.doctor.update') }}" method="POST">
             @csrf
 
-            <h2>Datos personales</h2>
+            <div class="grid">
+                <div class="form-row">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $doctor->nombre ?? '') }}" required>
+                </div>
 
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $doctors->nombre) }}" required>
-            @error('nombre') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" value="{{ old('apellido', $doctor->apellido ?? '') }}" required>
+                </div>
 
-            <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" value="{{ old('apellido', $doctors->apellido) }}" required>
-            @error('apellido') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row">
+                    <label for="correo">Correo</label>
+                    <input type="email" id="correo" name="correo" value="{{ old('correo', $doctor->correo ?? '') }}" required>
+                </div>
 
-            <label for="telefono">Número de teléfono:</label>
-            <input type="text" id="telefono" name="telefono" value="{{ old('telefono', $doctors->telefono) }}" required>
-            @error('telefono') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row">
+                    <label for="telefono">Teléfono</label>
+                    <input type="text" id="telefono" name="telefono" value="{{ old('telefono', $doctor->telefono ?? '') }}" required>
+                </div>
 
-            <label for="especialidad">Especialidad:</label>
-            <input type="text" id="especialidad" name="especialidad" value="{{ old('especialidad', $doctors->especialidad) }}" required>
-            @error('especialidad') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row">
+                    <label for="especialidad">Especialidad</label>
+                    <input type="text" id="especialidad" name="especialidad" value="{{ old('especialidad', $doctor->especialidad ?? '') }}" required>
+                </div>
 
-            <label for="numero_colegiado">Número colegiado:</label>
-            <input type="text" id="numero_colegiado" name="numero_colegiado" value="{{ old('numero_colegiado', $doctors->numero_colegiado) }}" required>
-            @error('numero_colegiado') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row">
+                    <label for="numero_colegiado">Número de colegiado</label>
+                    <input type="text" id="numero_colegiado" name="numero_colegiado" value="{{ old('numero_colegiado', $doctor->numero_colegiado ?? '') }}" required>
+                </div>
 
-            <label for="direccion_clinica">Dirección de la clínica:</label>
-            <input type="text" id="direccion_clinica" name="direccion_clinica" value="{{ old('direccion_clinica', $doctors->direccion_clinica) }}" required>
-            @error('direccion_clinica') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row full-width">
+                    <label for="direccion_clinica">Dirección de la clínica</label>
+                    <input type="text" id="direccion_clinica" name="direccion_clinica" value="{{ old('direccion_clinica', $doctor->direccion_clinica ?? '') }}" required>
+                </div>
 
-            <h2>Credenciales</h2>
+                <div class="full-width"><hr></div>
 
-            <label for="correo">Correo electrónico:</label>
-            <input type="email" id="correo" name="correo" value="{{ old('correo', Auth::user()->email) }}" required>
-            @error('correo') <span class="error">{{ $message }}</span> @enderror
+                <div class="full-width"><h2>Datos de cuenta</h2></div>
 
-            <label for="usuario">Usuario:</label>
-            <input type="text" id="usuario" name="usuario" value="{{ old('usuario', Auth::user()->name) }}" required>
-            @error('usuario') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row">
+                    <label for="usuario">Usuario</label>
+                    <input type="text" id="usuario" name="usuario" value="{{ old('usuario', optional($doctor->user)->name ?? $doctor->usuario ?? '') }}" required>
+                </div>
 
-            <label for="password">Nueva contraseña (opcional):</label>
-            <input type="password" id="password" name="password">
-            @error('password') <span class="error">{{ $message }}</span> @enderror
+                <div class="form-row">
+                    <label for="password">Nueva contraseña (opcional)</label>
+                    <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar">
+                </div>
 
-            <button type="submit">Actualizar Perfil</button>
+                <div class="full-width footer-actions">
+                    <button type="submit" class="btn">Actualizar perfil</button>
+                </div>
+            </div>
         </form>
     </div>
 </body>

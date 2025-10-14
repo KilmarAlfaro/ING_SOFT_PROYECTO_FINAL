@@ -1,3 +1,149 @@
+/* perfilDoc.css
+   Professional, clean, responsive styles for the Doctor profile edit page.
+*/
+#root{
+    --bg:#f6f8fb;
+}
+:root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --accent:#0ea5a4; /* teal */
+    --accent-dark:#0b8b89;
+    --danger:#ef4444;
+    --radius:10px;
+    --max-width:1080px; /* increased to fit wider forms */
+}
+
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, var(--bg) 0%, #eef2f6 100%);
+    color:#111827;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+}
+
+.container{
+    max-width:var(--max-width);
+    margin:40px auto;
+    padding:28px 34px;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 8px 24px rgba(15,23,42,0.08);
+}
+
+.btn{
+    display:inline-block;
+    padding:10px 16px;
+    border-radius:10px;
+    border:0;
+    background:var(--accent);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(14,165,164,0.14);
+    transition:transform .08s ease, box-shadow .12s ease, background .12s;
+}
+.btn:hover{ transform:translateY(-1px); background:var(--accent-dark) }
+
+/* secondary button variant (used for back link) */
+.btn.secondary{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid #e6eef0;
+    box-shadow:none;
+    padding:8px 12px;
+    margin-right:12px;
+}
+.btn.secondary:hover{ background:#f8fafb; color:var(--accent-dark) }
+
+.alert{
+    padding:10px 14px;
+    border-radius:8px;
+    margin:14px 0;
+    font-size:14px;
+}
+.alert-success{ background:#ecfdf5; color:#065f46; border:1px solid rgba(6,95,70,0.08); }
+.alert-danger{ background:#fff1f2; color:var(--danger); border:1px solid rgba(239,68,68,0.08); }
+
+form{ margin-top:18px }
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px 20px;
+}
+
+/* two columns on larger screens */
+@media(min-width:760px){
+    .grid{ grid-template-columns:1fr 1fr; }
+}
+
+label{
+    display:block;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:6px;
+}
+
+input[type="text"], input[type="email"], input[type="password"], textarea{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #e6e9ee;
+    background:linear-gradient(180deg,#fff,#fbfdff);
+    font-size:14px;
+    color:#0f172a;
+    transition:box-shadow .12s, border-color .12s;
+}
+
+input:focus{ outline:none; border-color:var(--accent); box-shadow:0 4px 16px rgba(14,165,164,0.12); }
+
+.full-width{ grid-column:1 / -1 }
+
+hr{ border:none; height:1px; background:#f1f5f9; margin:18px 0 }
+
+.btn{
+    display:inline-block;
+    padding:10px 16px;
+    border-radius:10px;
+    border:0;
+    background:var(--accent);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(14,165,164,0.14);
+    transition:transform .08s ease, box-shadow .12s ease, background .12s;
+}
+.btn:hover{ transform:translateY(-1px); background:var(--accent-dark) }
+
+.form-row{ display:flex; flex-direction:column }
+.form-row .help{ font-size:12px; color:#94a3b8; margin-top:6px }
+
+.meta{ display:flex; gap:12px; align-items:center; margin-bottom:12px }
+.avatar{
+    width:72px; height:72px; border-radius:999px; background:linear-gradient(135deg,#e6f6f5,#eaf7ff);
+    display:flex; align-items:center; justify-content:center; color:var(--accent-dark); font-weight:700; font-size:20px;
+    border:1px solid rgba(14,165,164,0.06)
+}
+
+/* small screens adjustments */
+@media(max-width:420px){
+    .container{ padding:18px; margin:18px; }
+}
+
+.note{ font-size:13px; color:var(--muted); margin-top:6px }
+
+.footer-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:18px }
+
+/* accessibility: focus-visible */
+input:focus-visible{ outline:3px solid rgba(14,165,164,0.12) }
+
+/* utility */
+.mb-8{ margin-bottom:8px }
+.mt-4{ margin-top:4px }
 .titu{
     text-align: center;
     font-family: sans-serif;

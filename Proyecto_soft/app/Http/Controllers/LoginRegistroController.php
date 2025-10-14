@@ -34,9 +34,15 @@ class LoginRegistroController extends Controller
             return back()->with('password_incorrecta', true);
         }
 
-        // Guardar sesión
-        Session::put('paciente_id', $paciente->id);
-        Session::put('paciente_nombre', $paciente->nombre);
+        // Si existe un usuario en la tabla users con este correo, autenticar con Laravel Auth
+        $user = User::where('email', $request->email)->where('role', 'paciente')->first();
+        if ($user) {
+            Auth::login($user);
+        } else {
+            // Fallback a la sesi3n antigua
+            Session::put('paciente_id', $paciente->id);
+            Session::put('paciente_nombre', $paciente->nombre);
+        }
 
         // Redirigir a dashboard
         return redirect()->route('mainPac');
@@ -64,9 +70,15 @@ class LoginRegistroController extends Controller
             return back()->with('password_incorrecta', true);
         }
 
-        // Guardar sesión
-        Session::put('doctor_id', $doctor->id);
-        Session::put('doctor_nombre', $doctor->nombre);
+        // Si existe un usuario en la tabla users con este correo, autenticar con Laravel Auth
+        $user = User::where('email', $request->email)->where('role', 'doctor')->first();
+        if ($user) {
+            Auth::login($user);
+        } else {
+            // Fallback a la sesi3n antigua
+            Session::put('doctor_id', $doctor->id);
+            Session::put('doctor_nombre', $doctor->nombre);
+        }
 
         // Redirigir al dashboard del doctor
         return redirect()->route('mainDoc');
@@ -128,6 +140,22 @@ class LoginRegistroController extends Controller
         ]);
 
         Auth::login($user);
+
+        // Crear registro en tabla doctors y vincular con el usuario creado.
+        // Rellenamos los campos mínimos para que la migración no falle; campos faltantes pueden completarse desde el perfil.
+        Doctor::create([
+            'user_id' => $user->id,
+            'nombre' => $request->nombre,
+            'apellido' => $request->apellido ?? '',
+            'correo' => $request->email,
+            'telefono' => $request->telefono ?? '',
+            'especialidad' => $request->especialidad ?? 'General',
+            'numero_colegiado' => $request->numero_colegiado ?? 'N/A',
+            'usuario' => $user->name,
+            'password_hash' => Hash::make($request->password),
+            'direccion_clinica' => $request->direccion ?? '',
+            'estado' => 'activo',
+        ]);
 
         return redirect()->route('mainDoc');
     }
