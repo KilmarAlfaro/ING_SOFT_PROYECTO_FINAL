@@ -33,8 +33,8 @@
       <label for="sexo">Sexo</label>
       <select id="sexo" name="sexo" required style="padding:10px; border-radius:8px; border:2px solid #e2e8f0;">
         <option value="" disabled selected>Seleccione</option>
-        <option value="Masculino">Masculino</option>
-        <option value="Femenino">Femenino</option>
+        <option value="Masculino" {{ old('sexo') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+        <option value="Femenino" {{ old('sexo') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
       </select>
 
       <h2 class="subtitulo">Credenciales</h2>
