@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\Doctor;
+use Illuminate\Support\Facades\Storage;
 
 class PerfilDoctorController extends Controller
 {
@@ -49,6 +50,7 @@ class PerfilDoctorController extends Controller
             'correo' => 'required|email',
             'usuario' => 'required|string|max:100',
             'password' => 'nullable|string|min:6',
+            'profile_image' => 'nullable|image|max:4096',
         ]);
 
         // Actualiza los datos personales en tabla doctors
@@ -64,6 +66,17 @@ class PerfilDoctorController extends Controller
         // Actualizar password solo si fue enviado
         if ($request->filled('password')) {
             $doctor->password_hash = bcrypt($request->password);
+        }
+
+        // manejar imagen de perfil
+        if ($request->hasFile('profile_image')) {
+            // eliminar anterior si existe
+            if ($doctor->foto_perfil && Storage::disk('public')->exists('profile_pics/' . $doctor->foto_perfil)) {
+                Storage::disk('public')->delete('profile_pics/' . $doctor->foto_perfil);
+            }
+
+            $path = $request->file('profile_image')->store('profile_pics', 'public');
+            $doctor->foto_perfil = basename($path);
         }
 
         $doctor->save();

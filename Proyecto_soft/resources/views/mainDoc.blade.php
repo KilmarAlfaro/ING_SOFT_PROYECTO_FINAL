@@ -19,7 +19,21 @@
 
             <!-- Icono Perfil -->
             <a href="{{ route('perfil.doctor') }}">
-                <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
+                @php
+                    $doctorId = session('doctor_id');
+                    $foto = null;
+                    if ($doctorId) {
+                        $d = \App\Models\Doctor::find($doctorId);
+                        if ($d && !empty($d->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $d->foto_perfil))) {
+                            $foto = asset('storage/profile_pics/' . $d->foto_perfil);
+                        }
+                    }
+                @endphp
+                @if($foto)
+                    <img src="{{ $foto }}" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
+                @else
+                    <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
+                @endif
             </a>
         </div>
     </nav>

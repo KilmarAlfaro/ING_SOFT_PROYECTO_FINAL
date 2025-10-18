@@ -24,6 +24,7 @@ class Doctor extends Model
         'password_hash',
         'direccion_clinica',
         'estado',
+        'foto_perfil',
         'fecha_creacion',
         'ultimo_login',
     ];

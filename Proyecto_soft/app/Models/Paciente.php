@@ -21,5 +21,6 @@ class Paciente extends Model
         'direccion',
         'password_hash',
         'fecha_creacion',
+        'foto_perfil',
     ];
 }
