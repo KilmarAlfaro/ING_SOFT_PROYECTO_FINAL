@@ -89,22 +89,33 @@
 }
 
 .btn-primario {
-  background: #0984e3;
+  background-color: #3498db;
   color: white;
+  transition: background-color 0.3s ease;
 }
 
 .btn-primario:hover {
-  background: #074ea3;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+  background-color: #00ffd5;
 }
 
 .btn-secundario {
-  color: #0984e3;
+  background-color: #4709f1;
+  color: #ddd7d7;
+  transition: background-color 0.3s ease;
   text-decoration: none;
-  margin-left: 15px;
+  line-height: 38px;
+  font-weight: bold; /* para alinear vertical */
 }
 
+.btn-secundario:hover {
+  background-color: #ee6e05;
+}
+.acciones {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+}
 /* Mensajes de error */
 .mensaje-error {
   color: red;

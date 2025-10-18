@@ -119,19 +119,20 @@ input[type="date"]:focus {
 }
 
 .btn-primario:hover {
-  background-color: #2980b9;
+  background-color: #00ffd5;
 }
 
 .btn-secundario {
-  background-color: #ecf0f1;
-  color: #7f8c8d;
+  background-color: #4709f1;
+  color: #ddd7d7;
   transition: background-color 0.3s ease;
   text-decoration: none;
-  line-height: 38px; /* para alinear vertical */
+  line-height: 38px;
+  font-weight: bold; /* para alinear vertical */
 }
 
 .btn-secundario:hover {
-  background-color: #bdc3c7;
+  background-color: #ee6e05;
 }
 
 select {

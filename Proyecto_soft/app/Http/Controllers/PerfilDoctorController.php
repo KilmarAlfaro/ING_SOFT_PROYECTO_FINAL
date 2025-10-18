@@ -40,6 +40,11 @@ class PerfilDoctorController extends Controller
             abort(403);
         }
 
+        $messages = [
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+        ];
+
         $request->validate([
             'nombre' => 'required|string|max:100',
             'apellido' => 'required|string|max:100',
@@ -48,9 +53,9 @@ class PerfilDoctorController extends Controller
             'numero_colegiado' => 'required|string|max:50',
             'direccion_clinica' => 'required|string|max:255',
             'correo' => 'required|email',
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:6|confirmed',
             'profile_image' => 'nullable|image|max:4096',
-        ]);
+        ], $messages);
 
         // Actualiza los datos personales en tabla doctors
         $doctor->nombre = $request->nombre;

@@ -10,16 +10,16 @@
   <div class="registro-contenedor">
     <h1 class="titulo">Registro de Paciente</h1>
 
-    <form action="{{ route('paciente.store') }}" method="POST" autocomplete="off">
+    <form action="{{ route('registroPac.submit') }}" method="POST" autocomplete="off">
       @csrf
 
       <h2 class="subtitulo">Datos personales</h2>
 
       <label for="nombre">Nombre completo:</label>
-      <input type="text" id="nombre" name="nombre" placeholder="María Estela" required autocomplete="off" />
+      <input type="text" id="nombre" name="nombre" required autocomplete="off" />
 
       <label for="apellido">Apellido completo:</label>
-      <input type="text" id="apellido" name="apellido" placeholder="López Gomez" required autocomplete="off" />
+      <input type="text" id="apellido" name="apellido" required autocomplete="off" />
 
       <label for="telefono">Número de teléfono:</label>
       <input type="text" id="telefono" name="telefono" placeholder="1234-5678" required autocomplete="off" />
@@ -58,7 +58,7 @@
       </div>
 
       <div class="acciones" style="gap:12px;">
-        <button type="submit" class="btn btn-primario" style="background:linear-gradient(90deg,#0ea5a4,#06b6d4); padding:12px 20px; border-radius:12px; box-shadow:0 6px 18px rgba(14,165,164,0.12); color:#fff; border:none;">Registrarse</button>
+        <button type="submit" class="btn btn-primario">Registrarse</button>
         <a href="{{ url('/') }}" class="btn btn-secundario">Regresar</a>
       </div>
     </form>

@@ -20,8 +20,7 @@ class Doctor extends Model
         'telefono',
         'especialidad',
         'numero_colegiado',
-        // 'usuario' is no longer required at registration but keep column if present
-        'usuario',
+        // 'usuario' was removed from the schema; avoid writing to it
         'password_hash',
         'direccion_clinica',
         'estado',

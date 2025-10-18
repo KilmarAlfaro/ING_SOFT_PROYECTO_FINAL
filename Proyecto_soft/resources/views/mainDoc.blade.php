@@ -53,7 +53,25 @@
         <!-- Columna Central -->
         <main id="mainContent" class="main-content full-width">
             <div id="contenido-principal">
-                <h1>Bienvenido Dr. Juan Pérez</h1>
+                @php
+                    $displayName = session('doctor_nombre');
+                    $sexo = null;
+                    // Prefer legacy session id
+                    if (session()->has('doctor_id')) {
+                        $d = \App\Models\Doctor::find(session('doctor_id'));
+                        if ($d) { $displayName = $d->nombre . ($d->apellido ? ' ' . $d->apellido : ''); $sexo = $d->sexo ?? null; }
+                    } elseif (Auth::check()) {
+                        $d = \App\Models\Doctor::where('user_id', Auth::id())->first();
+                        if ($d) { $displayName = $d->nombre . ($d->apellido ? ' ' . $d->apellido : ''); $sexo = $d->sexo ?? null; }
+                    }
+                    // Normalize
+                    $sexo = $sexo ? strtolower($sexo) : null;
+                    $title = 'Bienvenido';
+                    if ($sexo === 'femenino') { $title = 'Bienvenida'; $prefix = 'Dra.'; }
+                    else { $title = 'Bienvenido'; $prefix = 'Dr.'; }
+                @endphp
+
+                <h1>{{ $title }} {{ $prefix }} {{ $displayName }}</h1>
                 <p>Seleccione una consulta en la columna izquierda para ver los detalles.</p>
             </div>
         </main>

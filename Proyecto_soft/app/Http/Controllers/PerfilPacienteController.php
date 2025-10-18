@@ -38,6 +38,11 @@ class PerfilPacienteController extends Controller
         $pacienteId = Session::get('paciente_id');
         $paciente = Paciente::find($pacienteId);
 
+        $messages = [
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+        ];
+
         $request->validate([
             'nombre' => 'nullable|string|max:255',
             'apellido' => 'nullable|string|max:255',
@@ -47,7 +52,7 @@ class PerfilPacienteController extends Controller
             'password' => 'nullable|string|min:6|confirmed',
             'descripcion' => 'nullable|string|max:1000',
             'profile_image' => 'nullable|image|max:4096',
-        ]);
+        ], $messages);
 
         if (! $paciente) {
             return redirect()->route('mainPac')->with('error', 'Paciente no encontrado.');

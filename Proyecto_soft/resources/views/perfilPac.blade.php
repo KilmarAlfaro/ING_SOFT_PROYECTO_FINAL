@@ -68,17 +68,7 @@
             @error('telefono') <div class="message" style="color:red">{{ $message }}</div> @enderror
         </div>
 
-        <div class="form-group">
-            <label for="direccion">Dirección:</label>
-            <input 
-                type="text" 
-                id="direccion" 
-                name="direccion" 
-                value="{{ old('direccion', $paciente->direccion ?? '') }}" 
-                placeholder="Col. Centro, San Miguel"
-            >
-            @error('direccion') <div class="message" style="color:red">{{ $message }}</div> @enderror
-        </div>
+        {{-- Dirección eliminada por petición: ya no es parte del perfil editable en registro --}}
 
         <div class="form-group">
             <label for="correo">Correo electrónico (login):</label>
@@ -106,11 +96,16 @@
             <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Repite la nueva contraseña" autocomplete="new-password" value="">
         </div>
 
-        <div class="acciones" style="gap:8px;">
-            <button type="button" id="discardPaciente" class="btn btn-secundario">Descartar cambios</button>
-            <button type="submit" class="btn btn-primario">Actualizar Perfil</button>
-            <a href="{{ route('mainPac') }}" class="btn btn-secundario">Regresar</a>
+        <div class="actions-row">
+            <div class="left">
+                <button type="button" id="discardPaciente" class="btn btn-descartar">Descartar cambios</button>
+            </div>
+            <div class="right">
+                <button type="submit" class="btn btn-primario">Actualizar Perfil</button>
+            </div>
         </div>
+
+        <a href="{{ route('mainPac') }}" class="btn-regresar-full">Regresar</a>
     </form>
 </div>
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\doctorController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PerfilDoctorController;
 use App\Http\Controllers\PerfilPacienteController;
+use App\Http\Middleware\RequireSessionOrAuth;
 
 /* Rutas públicas */
 Route::get('/', function () {
@@ -51,32 +52,45 @@ Route::post('/login', [loginController::class, 'login']);
 Route::post('/registro/paciente', [LoginRegistroController::class, 'registroPac'])->name('registroPac.submit');
 Route::post('/registro/doctor', [LoginRegistroController::class, 'registroDoc'])->name('registroDoc.submit');
 
-// Rutas main
-Route::get('/main/doctor', function() {
-    return view('mainDoc');
-})->name('mainDoc');
+// Protected routes: require session or auth
+Route::middleware([RequireSessionOrAuth::class])->group(function () {
+    // Rutas main
+    Route::get('/main/doctor', function() {
+        return view('mainDoc');
+    })->name('mainDoc');
 
-Route::get('/main/paciente', function() {
-    return view('mainPac');
-})->name('mainPac');
+    Route::get('/main/paciente', function() {
+        return view('mainPac');
+    })->name('mainPac');
 
-// Ruta stores
-Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');
-Route::post('/doctores', [App\Http\Controllers\doctorController::class, 'store'])->name('doctores.store');
+    // Ruta stores
+    Route::post('/paciente', [App\Http\Controllers\pacienteController::class, 'store'])->name('paciente.store');
+    Route::post('/doctores', [App\Http\Controllers\doctorController::class, 'store'])->name('doctores.store');
 
-// ruta para crear
-Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 'create'])->name('paciente.create');
-Route::get('/doctores/create', [App\Http\Controllers\doctorController::class, 'create'])->name('doctores.create');
+    // ruta para crear
+    Route::get('/paciente/create', [App\Http\Controllers\pacienteController::class, 'create'])->name('paciente.create');
+    Route::get('/doctores/create', [App\Http\Controllers\doctorController::class, 'create'])->name('doctores.create');
 
-// show
-Route::get('/doctores/{doctor}', [App\Http\Controllers\doctorController::class, 'show'])->name('doctores.show');
+    // show
+    Route::get('/doctores/{doctor}', [App\Http\Controllers\doctorController::class, 'show'])->name('doctores.show');
 
-// Logout Doctor/Paciente
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Logout Doctor/Paciente
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Perfil doctor (no se toca)
-Route::get('/perfil-doc', [PerfilDoctorController::class, 'show'])->name('perfil.doctor');
-Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])->name('perfil.doctor.update');
+    // Perfil doctor
+    Route::get('/perfil-doc', [PerfilDoctorController::class, 'show'])->name('perfil.doctor');
+    Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])->name('perfil.doctor.update');
+
+    // buscar doctor
+    Route::get('/buscar-doctor', [doctorController::class, 'buscar'])->name('buscar.doctor');
+
+    // consulta
+    Route::get('/consulta-doctor/{id}', [doctorController::class, 'consulta'])->name('consulta.doctor');
+
+    // RUTAS PERFIL PACIENTE
+    Route::get('/perfil/paciente', [PerfilPacienteController::class, 'edit'])->name('perfil.paciente');
+    Route::post('/perfil/paciente', [PerfilPacienteController::class, 'update'])->name('perfil.paciente.update');
+});
 
 // Asegura que /login redirija a la pantalla de login de paciente
 Route::get('/login', function () {

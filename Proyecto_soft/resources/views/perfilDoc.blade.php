@@ -18,15 +18,7 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        {{-- Mostrar errores inline junto a cada campo (se manejan más abajo) --}}
 
         <form id="doctorForm" action="{{ route('perfil.doctor.update') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
             @csrf
@@ -85,19 +77,31 @@
 
                 <!-- Campo 'usuario' eliminado: login por correo -->
 
+                {{-- dummy field to discourage browser autofill for passwords --}}
+                <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="position:absolute; left:-9999px; top:auto; width:1px; height:1px;" autocomplete="off">
+
                 <div class="form-row">
                     <label for="password">Nueva contraseña (opcional)</label>
-                    <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar">
+                    <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar" autocomplete="new-password" value="">
+                    @error('password') <div class="message" style="color:red">{{ $message }}</div> @enderror
                 </div>
 
-                <div class="full-width footer-actions">
-                    <div style="margin-right:auto;">
-                        <button type="button" id="discardBtn" class="btn btn-secundario">Descartar cambios</button>
+                <div class="form-row">
+                    <label for="password_confirmation">Confirmar nueva contraseña</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Repite la nueva contraseña" autocomplete="new-password" value="">
+                    @error('password_confirmation') <div class="message" style="color:red">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="actions-row full-width">
+                    <div class="left">
+                        <button type="button" id="discardBtn" class="btn btn-descartar">Descartar cambios</button>
                     </div>
-                    <div style="display:flex;gap:8px;">
+                    <div class="right">
                         <button type="submit" class="btn btn-primario">Actualizar perfil</button>
                     </div>
                 </div>
+
+                <a href="{{ route('mainDoc') }}" class="btn-regresar-full">Regresar</a>
             </div>
         </form>
     </div>

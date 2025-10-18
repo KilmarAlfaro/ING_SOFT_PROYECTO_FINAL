@@ -104,18 +104,52 @@ input:focus, textarea:focus {
 }
 
 /* ===== Botón ===== */
-button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    background-color: #28a745;
-    color: white;
+/* Button base: use .btn for flexible sizing in profile pages */
+.btn {
+    display: inline-block;
+    padding: 10px 14px;
+    font-size: 15px;
+    color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 
-button:hover {
-    background-color: #1e7e34;
+/* Specific variants */
+.btn-primario { background-color: #16a34a; /* green */ }
+.btn-primario:hover { background-color: #15803d; transform: translateY(-1px); }
+
+.btn-descartar { background-color: #f97316; /* orange */ }
+.btn-descartar:hover { background-color: #ea580c; transform: translateY(-1px); }
+
+.btn-regresar { background-color: #2563eb; /* blue */ }
+.btn-regresar:hover { background-color: #1e40af; transform: translateY(-1px); }
+
+/* Action row: left (discard) and right (save + regresar) */
+.actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
 }
+.actions-row .left { flex: 0 0 auto; }
+.actions-row .right { display:flex; gap:10px; align-items:center; }
+
+/* ensure file upload label remains a nice button */
+.file-upload-label { display: inline-block; }
+
+/* Regresar botón: full width below the action row */
+.btn-regresar-full {
+    display:block;
+    max-width: calc(100% - 40px); /* leave equal margin on both sides */
+    margin: 12px auto 0; /* centered with top margin */
+    padding: 12px 14px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none; /* remove link underline */
+    color: #fff;
+    background-color: #2563eb;
+}
+.btn-regresar-full:hover{ background-color: #1e40af; transform: translateY(-1px); }

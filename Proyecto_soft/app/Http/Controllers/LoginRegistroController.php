@@ -42,6 +42,7 @@ class LoginRegistroController extends Controller
             // Fallback a la sesi3n antigua
             Session::put('paciente_id', $paciente->id);
             Session::put('paciente_nombre', $paciente->nombre);
+            Session::put('paciente_sexo', $paciente->sexo ?? null);
         }
 
         // Redirigir a dashboard
@@ -78,6 +79,7 @@ class LoginRegistroController extends Controller
             // Fallback a la sesi3n antigua
             Session::put('doctor_id', $doctor->id);
             Session::put('doctor_nombre', $doctor->nombre);
+            Session::put('doctor_sexo', $doctor->sexo ?? null);
         }
 
         // Redirigir al dashboard del doctor
@@ -91,24 +93,54 @@ class LoginRegistroController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
+            'apellido' => 'nullable|string|max:255',
             'telefono' => 'required|string|max:20',
-            'dui' => 'required|string|max:20',
-            'direccion' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'fecha_nacimiento' => 'nullable|date',
+            'numero_dui' => 'required|string|max:20',
+            'sexo' => 'nullable|string|in:Masculino,Femenino',
+            'correo' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $request->nombre,
+            'name' => $request->nombre . ($request->apellido ? ' ' . $request->apellido : ''),
             'telefono' => $request->telefono,
-            'dui' => $request->dui,
-            'direccion' => $request->direccion,
-            'email' => $request->email,
+            'dui' => $request->numero_dui,
+            'direccion' => $request->direccion ?? null,
+            'email' => $request->correo,
             'password' => Hash::make($request->password),
             'role' => 'paciente',
         ]);
 
         Auth::login($user);
+
+        // Optionally create a Paciente record so legacy session flows can use it later
+        $paciente = null;
+        try {
+            $paciente = \App\Models\Paciente::create([
+                'nombre' => $request->nombre,
+                'apellido' => $request->apellido ?? '',
+                'correo' => $request->correo,
+                'telefono' => $request->telefono,
+                'numero_dui' => $request->numero_dui ?? null,
+                'fecha_nacimiento' => $request->fecha_nacimiento ?? null,
+                'sexo' => $request->sexo ?? null,
+                'password_hash' => Hash::make($request->password),
+            ]);
+        } catch (\Exception $e) {
+            // ignore failures creating paciente record; user account exists and can proceed
+        }
+
+        // Populate legacy session keys to support views that rely on them
+        if ($paciente) {
+            Session::put('paciente_id', $paciente->id);
+            Session::put('paciente_nombre', $paciente->nombre);
+            Session::put('paciente_sexo', $paciente->sexo ?? null);
+        } else {
+            // fallback to the Auth user name so UI still has a name
+            Session::put('paciente_nombre', $user->name);
+            Session::put('paciente_sexo', $request->sexo ?? null);
+        }
 
         return redirect()->route('mainPac');
     }
@@ -120,21 +152,23 @@ class LoginRegistroController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
+            'apellido' => 'nullable|string|max:255',
             'telefono' => 'required|string|max:20',
-            'dui' => 'required|string|max:20',
+            'numero_dui' => 'required|string|max:20',
+            'fecha_nacimiento' => 'nullable|date',
+            'sexo' => 'nullable|string|in:Masculino,Femenino',
             'especialidad' => 'required|string|max:255',
-            'direccion' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'direccion_clinica' => 'required|string|max:255',
+            'correo' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $request->nombre,
+            'name' => $request->nombre . ($request->apellido ? ' ' . $request->apellido : ''),
             'telefono' => $request->telefono,
-            'dui' => $request->dui,
-            'especialidad' => $request->especialidad,
-            'direccion' => $request->direccion,
-            'email' => $request->email,
+            'dui' => $request->numero_dui,
+            'direccion' => $request->direccion_clinica ?? null,
+            'email' => $request->correo,
             'password' => Hash::make($request->password),
             'role' => 'doctor',
         ]);
@@ -142,20 +176,31 @@ class LoginRegistroController extends Controller
         Auth::login($user);
 
         // Crear registro en tabla doctors y vincular con el usuario creado.
-        // Rellenamos los campos mínimos para que la migración no falle; campos faltantes pueden completarse desde el perfil.
-        Doctor::create([
+        $doctor = Doctor::create([
             'user_id' => $user->id,
             'nombre' => $request->nombre,
             'apellido' => $request->apellido ?? '',
-            'correo' => $request->email,
+            'correo' => $request->correo,
             'telefono' => $request->telefono ?? '',
             'especialidad' => $request->especialidad ?? 'General',
             'numero_colegiado' => $request->numero_colegiado ?? 'N/A',
-            'usuario' => $user->name,
             'password_hash' => Hash::make($request->password),
-            'direccion_clinica' => $request->direccion ?? '',
+            'direccion_clinica' => $request->direccion_clinica ?? '',
             'estado' => 'activo',
+            'sexo' => $request->sexo ?? null,
+            'numero_dui' => $request->numero_dui ?? null,
+            'fecha_nacimiento' => $request->fecha_nacimiento ?? null,
         ]);
+
+        // Populate legacy session keys for UI that relies on them
+        if ($doctor) {
+            Session::put('doctor_id', $doctor->id);
+            Session::put('doctor_nombre', $doctor->nombre);
+            Session::put('doctor_sexo', $doctor->sexo ?? null);
+        } else {
+            Session::put('doctor_nombre', $user->name);
+            Session::put('doctor_sexo', $request->sexo ?? null);
+        }
 
         return redirect()->route('mainDoc');
     }

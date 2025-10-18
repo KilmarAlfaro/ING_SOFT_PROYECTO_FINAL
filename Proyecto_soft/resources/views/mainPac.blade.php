@@ -47,7 +47,22 @@
     </div>
 
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Buscar Doctores</h1>
+        @php
+            $displayName = session('paciente_nombre');
+            $sexo = null;
+            if (session()->has('paciente_id')) {
+                $p = \App\Models\Paciente::find(session('paciente_id'));
+                if ($p) { $displayName = $p->nombre . ($p->apellido ? ' ' . $p->apellido : ''); $sexo = $p->sexo ?? null; }
+            } elseif (Auth::check()) {
+                $u = Auth::user();
+                $displayName = $u->name ?? $displayName;
+            }
+            $sexo = $sexo ? strtolower($sexo) : null;
+            $title = 'Bienvenido';
+            if ($sexo === 'femenino') { $title = 'Bienvenida'; }
+        @endphp
+
+        <h1 class="text-center mb-4">{{ $title }} {{ $displayName }}</h1>
     </div>
 
     <form method="GET" action="{{ route('buscar.doctor') }}" class="input-group mb-3">
