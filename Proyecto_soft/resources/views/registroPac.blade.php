@@ -25,18 +25,17 @@
       <input type="text" id="telefono" name="telefono" placeholder="1234-5678" required autocomplete="off" />
 
       <label for="fecha_nacimiento">Fecha de nacimiento:</label>
-      <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required autocomplete="off" />
+      <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required autocomplete="off" style="padding:10px; border-radius:8px; border:2px solid #e2e8f0;" />
       
+      <label for="numero_dui">Número de DUI:</label>
+      <input type="text" id="numero_dui" name="numero_dui" placeholder="00000000-0" required style="border:2px solid #e2e8f0; padding:10px; border-radius:8px;">
+
       <label for="sexo">Sexo</label>
-      <select id="sexo" name="sexo" required>
+      <select id="sexo" name="sexo" required style="padding:10px; border-radius:8px; border:2px solid #e2e8f0;">
         <option value="" disabled selected>Seleccione</option>
         <option value="Masculino">Masculino</option>
         <option value="Femenino">Femenino</option>
-        <option value="Otro">Otro</option>
       </select>
-
-      <label for="direccion">Dirección:</label>
-      <input type="text" id="direccion" name="direccion" placeholder="Col. Centro, San Miguel" required autocomplete="off" />
 
       <h2 class="subtitulo">Credenciales</h2>
 
@@ -58,8 +57,8 @@
         <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePasswordConfirm" />
       </div>
 
-      <div class="acciones">
-        <button type="submit" class="btn btn-primario">Registrarse</button>
+      <div class="acciones" style="gap:12px;">
+        <button type="submit" class="btn btn-primario" style="background:linear-gradient(90deg,#0ea5a4,#06b6d4); padding:12px 20px; border-radius:12px; box-shadow:0 6px 18px rgba(14,165,164,0.12); color:#fff; border:none;">Registrarse</button>
         <a href="{{ url('/') }}" class="btn btn-secundario">Regresar</a>
       </div>
     </form>

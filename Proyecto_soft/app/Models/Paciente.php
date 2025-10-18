@@ -19,6 +19,7 @@ class Paciente extends Model
         'correo',
         'telefono',
         'direccion',
+        'numero_dui',
         'password_hash',
         'fecha_creacion',
         'foto_perfil',

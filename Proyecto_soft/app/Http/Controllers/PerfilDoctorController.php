@@ -48,7 +48,6 @@ class PerfilDoctorController extends Controller
             'numero_colegiado' => 'required|string|max:50',
             'direccion_clinica' => 'required|string|max:255',
             'correo' => 'required|email',
-            'usuario' => 'required|string|max:100',
             'password' => 'nullable|string|min:6',
             'profile_image' => 'nullable|image|max:4096',
         ]);
@@ -61,7 +60,7 @@ class PerfilDoctorController extends Controller
         $doctor->numero_colegiado = $request->numero_colegiado;
         $doctor->direccion_clinica = $request->direccion_clinica;
         $doctor->correo = $request->correo;
-        $doctor->usuario = $request->usuario;
+    // 'usuario' field removed: keep DB consistent but do not update username here
 
         // Actualizar password solo si fue enviado
         if ($request->filled('password')) {
@@ -85,7 +84,8 @@ class PerfilDoctorController extends Controller
         if (Auth::check()) {
             $user = Auth::user();
             if ($user) {
-                $user->name = $request->usuario;
+                // Use the doctor's full name for the user name
+                $user->name = $request->nombre . ' ' . $request->apellido;
                 $user->email = $request->correo;
                 if ($request->filled('password')) {
                     $user->password = bcrypt($request->password);

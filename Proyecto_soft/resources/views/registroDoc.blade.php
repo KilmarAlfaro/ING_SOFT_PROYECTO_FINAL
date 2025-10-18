@@ -39,6 +39,19 @@
       <label for="numero_colegiado">Número colegiado:</label>
       <input type="text" id="numero_colegiado" name="numero_colegiado" value="{{ old('numero_colegiado') }}" placeholder="123456" required>
 
+      <label for="numero_dui">Número de DUI:</label>
+      <input type="text" id="numero_dui" name="numero_dui" value="{{ old('numero_dui') }}" placeholder="00000000-0" required style="border:2px solid #e2e8f0; padding:10px; border-radius:8px;">
+
+      <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+      <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" required style="padding:10px; border-radius:8px; border:2px solid #e2e8f0;">
+
+      <label for="sexo">Sexo:</label>
+      <select id="sexo" name="sexo" required style="padding:10px; border-radius:8px; border:2px solid #e2e8f0;">
+        <option value="" disabled selected>Seleccione</option>
+        <option value="Masculino" {{ old('sexo') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+        <option value="Femenino" {{ old('sexo') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+      </select>
+
       <label for="direccion_clinica">Dirección de la clínica u hospital:</label>
       <input type="text" id="direccion_clinica" name="direccion_clinica" value="{{ old('direccion_clinica') }}" placeholder="Av. Principal #123, Ciudad" required>
 
@@ -51,42 +64,40 @@
         <span class="mensaje-error">{{ $message }}</span>
       @enderror
 
-      <label for="usuario">Usuario:</label>
-      <input type="text" id="usuario" name="usuario" value="{{ old('usuario') }}" placeholder="usuario123" required>
-      @error('usuario')
-        <span class="mensaje-error">{{ $message }}</span>
-      @enderror
-
       <label for="password">Contraseña:</label>
       <div class="password-container">
-        <input type="password" id="password" name="password" placeholder="********" required>
+        <input type="password" id="password" name="password" placeholder="********" required autocomplete="new-password">
         <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePassword">
       </div>
 
-      <!-- ESTADO -->
-      <h2 class="subtitulo">Estado</h2>
-      <label for="estado">Estado:</label>
-      <select id="estado" name="estado" required>
-        <option value="activo" {{ old('estado') == 'activo' ? 'selected' : '' }}>Activo</option>
-        <option value="inactivo" {{ old('estado') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
-      </select>
+      <label for="password_confirmation">Confirmar contraseña:</label>
+      <div class="password-container">
+        <input type="password" id="password_confirmation" name="password_confirmation" placeholder="********" required autocomplete="new-password">
+        <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePasswordConfirm">
+      </div>
 
       <!-- BOTONES -->
-      <div class="acciones">
-        <button type="submit" class="btn btn-primario">Registrarse</button>
+      <div class="acciones" style="margin-top:14px; gap:12px;">
+        <button type="submit" class="btn-primario" style="background:linear-gradient(90deg,#0ea5a4,#06b6d4); padding:12px 20px; border-radius:12px; box-shadow:0 6px 18px rgba(14,165,164,0.12); color:#fff; border:none;">Registrarse</button>
         <a href="{{ url('/') }}" class="btn btn-secundario">Regresar</a>
       </div>
     </form>
   </div>
 
   <script>
-    // Mostrar/ocultar contraseña
+    // Mostrar/ocultar contraseña (password y confirm)
     const togglePassword = document.getElementById('togglePassword');
+    const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
     const password = document.getElementById('password');
-    togglePassword.addEventListener('click', () => {
-      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-      password.setAttribute('type', type);
-    });
+    const passwordConfirm = document.getElementById('password_confirmation');
+
+    function toggleFieldVisibility(field) {
+      const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+      field.setAttribute('type', type);
+    }
+
+    if (togglePassword && password) togglePassword.addEventListener('click', () => toggleFieldVisibility(password));
+    if (togglePasswordConfirm && passwordConfirm) togglePasswordConfirm.addEventListener('click', () => toggleFieldVisibility(passwordConfirm));
   </script>
 </body>
 </html>

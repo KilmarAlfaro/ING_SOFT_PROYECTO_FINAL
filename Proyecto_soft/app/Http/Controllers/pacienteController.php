@@ -24,10 +24,9 @@ class pacienteController extends Controller
             'nombre' => 'required|string|max:100',
             'apellido'  => 'required|string|max:100',
             'fecha_nacimiento' => 'required|date',
-            'sexo' => 'required|string|max:10',
+            'sexo' => 'required|string|in:Masculino,Femenino',
             'correo' => 'required|email|unique:pacientes,correo',
             'telefono' => 'required|string|max:15',
-            'direccion' => 'required|string|max:255',
             'password' => 'required|string|min:6|confirmed',   
         ]);
 
@@ -38,12 +37,15 @@ class pacienteController extends Controller
             'sexo' => $request->sexo,
             'correo' => $request->correo,
             'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
+            'numero_dui' => $request->input('numero_dui'),
             'password_hash' => Hash::make($request->password),
             'fecha_creacion' => now(),
         ]);
 
-        return redirect()->route('paciente.create')->with('success', 'Paciente registrado correctamente');
+        // iniciar sesión simple (legacy)
+        session()->put('paciente_id', \App\Models\Paciente::where('correo', $request->correo)->first()->id);
+
+        return redirect()->route('mainPac')->with('success', 'Se ha registrado correctamente');
     }
 
     // Mostrar formulario de edición

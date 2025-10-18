@@ -26,27 +26,37 @@ class DoctorController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required',
-            'apellido' => 'required',
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
             'correo' => 'required|email|unique:doctors,correo',
-            'telefono' => 'required',
-            'especialidad' => 'required',
-            'numero_colegiado' => 'required',
-            'usuario' => 'required|unique:doctors,usuario',
-            'password' => 'required',
-            'direccion_clinica' => 'required',
-            'estado' => 'required',
+            'telefono' => 'required|string|max:20',
+            'especialidad' => 'required|string|max:100',
+            'numero_colegiado' => 'required|string|max:50',
+            // removed 'usuario' from registration - login via correo + password
+            'password' => 'required|string|min:6|confirmed',
+            'direccion_clinica' => 'required|string|max:255',
+            // additional fields
+            'sexo' => 'nullable|string|in:Masculino,Femenino',
+            'numero_dui' => 'nullable|string|max:32',
+            'fecha_nacimiento' => 'nullable|date',
         ]);
 
-        $validated['password_hash'] = Hash::make($validated['password']);
-        $validated['fecha_creacion'] = now();
-        $validated['ultimo_login'] = null;
+        $data = $validated;
+        $data['password_hash'] = Hash::make($validated['password']);
+    $data['fecha_creacion'] = now();
+        $data['ultimo_login'] = null;
+        // default estado to activo on registration
+        $data['estado'] = 'activo';
+        unset($data['password']);
+        unset($data['password_confirmation']);
 
-        unset($validated['password']);
+        $doctor = Doctor::create($data);
 
-        $doctor = Doctor::create($validated);
+        // set legacy session like login
+        session()->put('doctor_id', $doctor->id);
+        session()->put('doctor_nombre', $doctor->nombre);
 
-        return redirect()->route('doctores.create', $doctor)->with('success', 'Doctor registrado correctamente');
+        return redirect()->route('mainDoc')->with('success', 'Se ha registrado correctamente');
     }
 
     // MOSTRAR PERFIL (por id)
@@ -72,7 +82,7 @@ class DoctorController extends Controller
             'telefono' => 'required',
             'especialidad' => 'required',
             'numero_colegiado' => 'required',
-            'usuario' => 'required|unique:doctors,usuario,' . $doctor->id,
+               // 'usuario' removed: login by correo
             'direccion_clinica' => 'required',
             'estado' => 'required',
         ]);

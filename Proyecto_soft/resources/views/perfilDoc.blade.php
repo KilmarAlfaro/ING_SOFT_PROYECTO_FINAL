@@ -83,10 +83,7 @@
 
                 <div class="full-width"><h2>Datos de cuenta</h2></div>
 
-                <div class="form-row">
-                    <label for="usuario">Usuario</label>
-                    <input type="text" id="usuario" name="usuario" value="{{ old('usuario', optional($doctor->user)->name ?? $doctor->usuario ?? '') }}" required>
-                </div>
+                <!-- Campo 'usuario' eliminado: login por correo -->
 
                 <div class="form-row">
                     <label for="password">Nueva contraseña (opcional)</label>
