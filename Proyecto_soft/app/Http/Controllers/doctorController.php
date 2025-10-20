@@ -102,12 +102,23 @@ class DoctorController extends Controller
     // BUSCADOR PARA DOCTORES DOCTOR
     public function buscar(Request $request)
     {
-        $query = $request->input('query');
-        $doctores = Doctor::where('nombre', 'LIKE', "%$query%")
-            ->orWhere('especialidad', 'LIKE', "%$query%")
-            ->get();
+        $q = $request->input('q');
+        $especialidad = $request->input('especialidad');
 
-        return view('mainPac', compact('doctores'));
+        $doctores = Doctor::query();
+        if ($q) {
+            $doctores->where(function($sub) use ($q) {
+                $sub->where('nombre', 'LIKE', "%$q%")
+                    ->orWhere('apellido', 'LIKE', "%$q%");
+            });
+        }
+        if ($especialidad) {
+            $doctores->where('especialidad', 'LIKE', "%$especialidad%");
+        }
+
+        $doctores = $doctores->orderBy('nombre')->paginate(12)->withQueryString();
+
+        return view('buscar.resultados', compact('doctores', 'q', 'especialidad'));
     }
 
     // GESTIONAR CONSULTA
@@ -115,6 +126,6 @@ class DoctorController extends Controller
     {
         $doctor = Doctor::findOrFail($id);
         // Aquí puedes manejar la lógica para realizar la consulta
-        return view('consulta', compact('doctores'));
+            return view('consulta', compact('doctor'));
     }
 }

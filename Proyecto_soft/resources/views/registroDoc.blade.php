@@ -34,7 +34,16 @@
       <input type="text" id="telefono" name="telefono" value="{{ old('telefono') }}" placeholder="Ejemplo: 1234-5678" required>
 
       <label for="especialidad">ESPECIALIDAD:</label>
-      <input type="text" id="especialidad" name="especialidad" value="{{ old('especialidad') }}" placeholder="General" required>
+      <select id="especialidad" name="especialidad" required>
+        <option value="" disabled {{ old('especialidad') ? '' : 'selected' }}>Seleccione especialidad</option>
+        @php
+          $especialidades = ['General','Cardiologo','Cirujano plastico','Pediatra','Dermatologo','Ginecologo','Neurologo','Ortopedista','Oftalmologo','Psiquiatra','Otro'];
+        @endphp
+        @foreach($especialidades as $esp)
+          <option value="{{ $esp }}" {{ old('especialidad') == $esp ? 'selected' : '' }}>{{ $esp }}</option>
+        @endforeach
+      </select>
+      <input type="text" id="especialidad_otro" name="especialidad_otro" placeholder="Especifique otra especialidad" value="{{ old('especialidad_otro') }}" style="display:none; margin-top:8px;" />
 
       <label for="numero_colegiado">NÚMERO COLEGIADO:</label>
       <input type="text" id="numero_colegiado" name="numero_colegiado" value="{{ old('numero_colegiado') }}" placeholder="123456" required>
@@ -54,6 +63,9 @@
 
       <label for="direccion_clinica">DIRECCIÓN DE LA CLÍNICA U HOSPITAL:</label>
       <input type="text" id="direccion_clinica" name="direccion_clinica" value="{{ old('direccion_clinica') }}" placeholder="Av. Principal #123, Ciudad" required>
+
+  <label for="descripcion">BREVE DESCRIPCIÓN (Será):</label>
+  <textarea id="descripcion" name="descripcion" rows="4" maxlength="1000" placeholder="Ej: Especialista en cardiología con 10 años de experiencia...">{{ old('descripcion') }}</textarea>
 
       <!-- CREDENCIALES -->
       <h2 class="subtitulo">CREDENCIALES</h2>
@@ -98,6 +110,26 @@
 
     if (togglePassword && password) togglePassword.addEventListener('click', () => toggleFieldVisibility(password));
     if (togglePasswordConfirm && passwordConfirm) togglePasswordConfirm.addEventListener('click', () => toggleFieldVisibility(passwordConfirm));
+
+    // Mostrar campo especificar otra especialidad
+    const especialidadSelect = document.getElementById('especialidad');
+    const especialidadOtro = document.getElementById('especialidad_otro');
+    function toggleEspecialidadOtro() {
+      if (!especialidadSelect) return;
+      if (especialidadSelect.value === 'Otro') {
+        especialidadOtro.style.display = 'block';
+        especialidadOtro.required = true;
+      } else {
+        especialidadOtro.style.display = 'none';
+        especialidadOtro.required = false;
+        especialidadOtro.value = '';
+      }
+    }
+    if (especialidadSelect) {
+      especialidadSelect.addEventListener('change', toggleEspecialidadOtro);
+      // init
+      toggleEspecialidadOtro();
+    }
   </script>
 </body>
 </html>

@@ -40,13 +40,22 @@
 
     <!-- CONTENEDOR PRINCIPAL -->
     <div id="dashboard" class="dashboard">
-        <!-- Columna Izquierda -->
+        <!-- Columna Izquierda: lista de consultas reales desde DB -->
         <aside class="sidebar-left">
             <h2>Consultas</h2>
             <ul class="consultas-list">
-                <li onclick="abrirConsulta('Consulta 1 - Paciente A')">Consulta #1 - Paciente A</li>
-                <li onclick="abrirConsulta('Consulta 2 - Paciente B')">Consulta #2 - Paciente B</li>
-                <li onclick="abrirConsulta('Consulta 3 - Paciente C')">Consulta #3 - Paciente C</li>
+                @php
+                    $doctorId = session('doctor_id');
+                    $consultas = [];
+                    if ($doctorId) {
+                        $consultas = \App\Models\Consulta::where('doctor_id', $doctorId)->orderBy('created_at', 'desc')->get();
+                    }
+                @endphp
+                @forelse($consultas as $c)
+                    <li onclick="abrirConsulta('{{ addslashes($c->mensaje) }}', {{ $c->id }})">Consulta #{{ $c->id }} - {{ $c->paciente->nombre ?? 'Paciente' }}</li>
+                @empty
+                    <li>No tiene consultas nuevas.</li>
+                @endforelse
             </ul>
         </aside>
 
@@ -71,8 +80,10 @@
                     else { $title = 'Bienvenido'; $prefix = 'Dr.'; }
                 @endphp
 
-                <h1>{{ $title }} {{ $prefix }} {{ $displayName }}</h1>
-                <p>Seleccione una consulta en la columna izquierda para ver los detalles.</p>
+                                <h1>{{ $title }} {{ $prefix }} {{ $displayName }}</h1>
+                                <div id="consulta-detalle">
+                                    <p>Seleccione una consulta en la columna izquierda para ver los detalles.</p>
+                                </div>
             </div>
         </main>
 
@@ -107,11 +118,13 @@
             document.getElementById("logoutModal").style.display = "none";
         }
 
-        function abrirConsulta(nombre) {
+        function abrirConsulta(nombre, id) {
             // Mostrar detalles en el centro
-            document.getElementById("contenido-principal").innerHTML = `
-                <h2>${nombre}</h2>
-                <p>Aquí se mostrarán los detalles completos de la consulta seleccionada.</p>
+            const detalle = document.getElementById('consulta-detalle');
+            detalle.innerHTML = `
+                <h2>Consulta #${id}</h2>
+                <p>${nombre}</p>
+                <p><a href="/consultas/doctor" class="btn">Ver todas mis consultas</a></p>
                 <button class="close-consulta-btn" onclick="cerrarConsulta()">Cerrar consulta</button>
             `;
 

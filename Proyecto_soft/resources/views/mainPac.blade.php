@@ -65,28 +65,101 @@
         <h1 class="text-center mb-4">{{ $title }} {{ $displayName }}</h1>
     </div>
 
-    <form method="GET" action="{{ route('buscar.doctor') }}" class="input-group mb-3">
-        <input type="text" name="query" class="form-control" placeholder="Buscar doctor por nombre o especialidad">
-        <button class="btn btn-primary" type="submit">Buscar</button>
-    </form>
-
     <div class="row">
-        @if(isset($doctores) && count($doctores) > 0)
-            @foreach($doctores as $doctor)
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $doctor->nombre }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ $doctor->especialidad }}</h6>
-                            <p class="card-text">{{ $doctor->descripcion }}</p>
-                            <a href="{{ route('consulta.doctor', $doctor->id) }}" class="btn btn-success">Hacer Consulta</a>
+        <div class="col-md-3">
+            <div class="card p-3 mb-3">
+                <h6>Buscar</h6>
+                @php
+                    $q = request('q');
+                    $especialidad = request('especialidad');
+                @endphp
+                <form method="GET" action="{{ route('mainPac') }}">
+                    <div class="mb-2">
+                        <input type="text" name="q" class="form-control form-control-sm" placeholder="Nombre" value="{{ $q }}">
+                    </div>
+                    <div class="mb-2">
+                        <select name="especialidad" class="form-select form-select-sm">
+                            <option value="">Todas las especialidades</option>
+                            @php
+                                $especialidades = ['General','Cardiologo','Cirujano plastico','Pediatra','Dermatologo','Ginecologo','Neurologo','Ortopedista','Oftalmologo','Psiquiatra','Otro'];
+                            @endphp
+                            @foreach($especialidades as $esp)
+                                <option value="{{ $esp }}" {{ (isset($especialidad) && $especialidad == $esp) ? 'selected' : '' }}>{{ $esp }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-sm btn-primary" type="submit">Filtrar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card p-2">
+                <h6 class="mb-2">Doctores</h6>
+                @php
+                    $doQuery = \App\Models\Doctor::query();
+                    if ($q) {
+                        $doQuery->where(function($s) use ($q){ $s->where('nombre','LIKE','%'.$q.'%')->orWhere('apellido','LIKE','%'.$q.'%'); });
+                    }
+                    if ($especialidad) { $doQuery->where('especialidad','LIKE','%'.$especialidad.'%'); }
+                    $smallList = $doQuery->orderBy('nombre')->limit(8)->get();
+                @endphp
+                @if($smallList->isEmpty())
+                    <div class="text-muted small">No hay doctores.</div>
+                @else
+                    <ul class="list-unstyled mb-0">
+                        @foreach($smallList as $d)
+                            @php $fn = explode(' ', trim($d->nombre))[0] ?? $d->nombre; $fl = explode(' ', trim($d->apellido))[0] ?? $d->apellido; @endphp
+                            <li class="d-flex align-items-center py-2 border-bottom">
+                                <div style="width:36px;height:36px;margin-right:8px;">
+                                    @if($d->foto_perfil)
+                                        <img src="{{ asset('storage/profile_pics/' . $d->foto_perfil) }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+                                    @else
+                                        <img src="{{ asset('imagenes/paciente.png') }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+                                    @endif
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-size:0.95rem;font-weight:600;">Dr(a). {{ $fn }} {{ $fl }}</div>
+                                    <div style="font-size:0.8rem;color:#666;">{{ $d->especialidad }}</div>
+                                </div>
+                                <div>
+                                    <a href="{{ route('consulta.doctor', $d->id) }}" class="btn btn-sm btn-outline-primary">Consultar</a>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            @php
+                // load full set for right area if needed
+                $rightQuery = \App\Models\Doctor::query();
+                if ($q) { $rightQuery->where(function($s) use ($q){ $s->where('nombre','LIKE','%'.$q.'%')->orWhere('apellido','LIKE','%'.$q.'%'); }); }
+                if ($especialidad) { $rightQuery->where('especialidad','LIKE','%'.$especialidad.'%'); }
+                $doctores = $rightQuery->orderBy('nombre')->paginate(12);
+            @endphp
+
+            <div class="row">
+                @forelse($doctores as $doctor)
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $doctor->nombre }} {{ $doctor->apellido }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ $doctor->especialidad }}</h6>
+                                <p class="card-text">{{ \Illuminate\Support\Str::limit($doctor->descripcion ?? 'Sin descripción', 200) }}</p>
+                                <a href="{{ route('consulta.doctor', $doctor->id) }}" class="btn btn-success">Hacer Consulta</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
-        @else
-            <p class="text-center">No se encontraron doctores.</p>
-        @endif
+                @empty
+                    <div class="col-12"><p class="text-center">No se encontraron doctores.</p></div>
+                @endforelse
+            </div>
+
+            <div class="d-flex justify-content-center">{{ $doctores->links() }}</div>
+        </div>
     </div>
 
 

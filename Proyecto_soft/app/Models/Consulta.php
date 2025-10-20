@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Consulta extends Model
+{
+    use HasFactory;
+
+    protected $table = 'consultas';
+
+    protected $fillable = [
+        'doctor_id',
+        'paciente_id',
+        'mensaje',
+        'respuesta',
+        'status',
+    ];
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
+    public function paciente()
+    {
+        return $this->belongsTo(Paciente::class);
+    }
+}

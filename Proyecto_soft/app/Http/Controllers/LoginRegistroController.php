@@ -158,6 +158,7 @@ class LoginRegistroController extends Controller
             'fecha_nacimiento' => 'nullable|date',
             'sexo' => 'nullable|string|in:Masculino,Femenino',
             'especialidad' => 'required|string|max:255',
+            'especialidad_otro' => 'nullable|string|max:255',
             'direccion_clinica' => 'required|string|max:255',
             'correo' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
@@ -182,7 +183,7 @@ class LoginRegistroController extends Controller
             'apellido' => $request->apellido ?? '',
             'correo' => $request->correo,
             'telefono' => $request->telefono ?? '',
-            'especialidad' => $request->especialidad ?? 'General',
+            'especialidad' => ($request->especialidad == 'Otro' && $request->especialidad_otro) ? $request->especialidad_otro : ($request->especialidad ?? 'General'),
             'numero_colegiado' => $request->numero_colegiado ?? 'N/A',
             'password_hash' => Hash::make($request->password),
             'direccion_clinica' => $request->direccion_clinica ?? '',
@@ -190,6 +191,7 @@ class LoginRegistroController extends Controller
             'sexo' => $request->sexo ?? null,
             'numero_dui' => $request->numero_dui ?? null,
             'fecha_nacimiento' => $request->fecha_nacimiento ?? null,
+            'descripcion' => $request->descripcion ?? null,
         ]);
 
         // Populate legacy session keys for UI that relies on them

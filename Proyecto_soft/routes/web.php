@@ -84,6 +84,12 @@ Route::middleware([RequireSessionOrAuth::class])->group(function () {
     // buscar doctor
     Route::get('/buscar-doctor', [doctorController::class, 'buscar'])->name('buscar.doctor');
 
+    // Consultas
+    Route::post('/consultas', [App\Http\Controllers\ConsultaController::class, 'store'])->name('consultas.store');
+    Route::get('/consultas/doctor', [App\Http\Controllers\ConsultaController::class, 'doctorIndex'])->name('consultas.doctor');
+    Route::get('/consultas/paciente', [App\Http\Controllers\ConsultaController::class, 'pacienteIndex'])->name('consultas.paciente');
+    Route::post('/consultas/{consulta}/responder', [App\Http\Controllers\ConsultaController::class, 'responder'])->name('consultas.responder');
+
     // consulta
     Route::get('/consulta-doctor/{id}', [doctorController::class, 'consulta'])->name('consulta.doctor');
 

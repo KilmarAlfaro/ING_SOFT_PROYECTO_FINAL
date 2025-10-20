@@ -27,8 +27,9 @@ class Doctor extends Model
         'numero_dui',
     'fecha_nacimiento',
     'sexo',
-        'foto_perfil',
-        'fecha_creacion',
+    'foto_perfil',
+    'descripcion',
+    'fecha_creacion',
         'ultimo_login',
     ];
 
