@@ -42,6 +42,8 @@
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 15px;
+    /* IMPORTANT: override global .card flex to allow children to span 100% width */
+    display: block;
     width: 100%;
     max-width: 360px; /* hace que el cuadro sea más estrecho */
     margin: 0 auto; /* lo centra */
@@ -88,3 +90,117 @@
 .btn-closs:hover{
     background-color: rgb(236, 177, 150);
 }
+
+/* Wider inputs and reset button styling for mainPac */
+.card .form-control.form-control-sm, .card .form-select.form-select-sm {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.btn-reset-filters{
+    display: block;
+    width: 100%;
+    padding: .5rem .6rem;
+    font-size: .95rem;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    background: #3683d1;
+    color: #ffffff;
+    text-align: center;
+    cursor: pointer;
+}
+.btn-reset-filters:hover{ background:#78a8d8;
+color: #fcfcfc; }
+
+/* Slight spacing tweak for the search area */
+.card .mb-2 { margin-bottom: .6rem; }
+
+/* Ensure chat list stays visually aligned with card */
+.chat-list { padding-left: 0; }
+
+/* Nav bar for mainPac */
+.mainpac-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    background:#3a7ca5; /* match mainDoc color */
+    color:#fff;
+    border-bottom:1px solid rgba(0,0,0,0.06);
+    position:sticky;
+    top:0;
+    z-index: 1100;
+}
+.mainpac-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.brand-logo{
+    width:34px;
+    height:34px;
+    object-fit:contain;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none; /* avoid selection/interaction */
+}
+.brand-logo:hover{
+    transform: none !important; /* ensure no hover scale if any generic rule applies */
+}
+.mainpac-brand .brand-title{
+    font-weight:700;
+    font-size:1.2rem;
+    letter-spacing:.3px;
+    color:#fff;
+}
+.mainpac-nav .logout-btn{
+    background:#dc3545 !important; /* identical to mainDoc */
+    color:#fff !important;
+    border:none !important;
+    padding:8px 12px !important;
+    border-radius:6px !important;
+    cursor:pointer;
+    transition: background-color .2s ease;
+    -webkit-user-select: none;
+    user-select: none; /* avoid caret/selection on button */
+}
+.mainpac-nav .logout-btn:hover{ background:#c82333 !important; }
+
+.busNom{
+    height: 35px;
+}
+
+/* Logout modal (identical to mainDoc) */
+#logoutModal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    align-items:center;
+    justify-content:center;
+    z-index:1300;
+}
+#logoutModal .dialog{
+    background:#ffffff;
+    padding:20px;
+    border-radius:8px;
+    max-width:360px;
+    width:calc(100% - 32px);
+    margin:0 auto;
+    text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.12);
+}
+#logoutModal .dialog .actions{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-top:12px;
+}
+
+/* Generic buttons (shared with mainDoc for consistency) */
+.btn{ display:inline-block; border:none; border-radius:6px; padding:8px 12px; cursor:pointer; font-size:.95rem; }
+.btn-primario{ background:#0d6efd; color:#fff; }
+.btn-primario:hover{ background:#0b5ed7; }
+.btn-secundario{ background:#e9ecef; color:#212529; }
+.btn-secundario:hover{ background:#dee2e6; }

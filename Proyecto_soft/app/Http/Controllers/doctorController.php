@@ -105,18 +105,36 @@ class DoctorController extends Controller
         $q = $request->input('q');
         $especialidad = $request->input('especialidad');
 
-        $doctores = Doctor::query();
+        $query = Doctor::query();
         if ($q) {
-            $doctores->where(function($sub) use ($q) {
+            $query->where(function($sub) use ($q) {
                 $sub->where('nombre', 'LIKE', "%$q%")
                     ->orWhere('apellido', 'LIKE', "%$q%");
             });
         }
         if ($especialidad) {
-            $doctores->where('especialidad', 'LIKE', "%$especialidad%");
+            $query->where('especialidad', 'LIKE', "%$especialidad%");
         }
 
-        $doctores = $doctores->orderBy('nombre')->paginate(12)->withQueryString();
+        // If this is an AJAX/JSON request return a compact JSON list (used for live search)
+        if ($request->wantsJson() || $request->ajax()) {
+            $items = $query->orderBy('nombre')->limit(12)->get()->map(function($d){
+                $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
+                $foto = $d->foto_perfil ? asset('storage/profile_pics/' . $d->foto_perfil) : $defaultAvatar;
+                return [
+                    'id' => $d->id,
+                    'nombre' => $d->nombre,
+                    'apellido' => $d->apellido,
+                    'especialidad' => $d->especialidad,
+                    'descripcion' => $d->descripcion,
+                    'foto' => $foto,
+                ];
+            });
+
+            return response()->json(['data' => $items]);
+        }
+
+        $doctores = $query->orderBy('nombre')->paginate(12)->withQueryString();
 
         return view('buscar.resultados', compact('doctores', 'q', 'especialidad'));
     }

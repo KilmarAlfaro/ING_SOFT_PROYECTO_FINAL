@@ -8,7 +8,8 @@
 </head>
 <body>
   <div class="registro-contenedor">
-    <h1 class="titulo">Registro de Paciente</h1>
+  <link rel="stylesheet" href="{{ asset('css/repaci.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/global.css') }}" />
 
     <form action="{{ route('registroPac.submit') }}" method="POST" autocomplete="off">
       @csrf

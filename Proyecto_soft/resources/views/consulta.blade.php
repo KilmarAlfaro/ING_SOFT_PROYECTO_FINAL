@@ -6,6 +6,7 @@
   <title>Consultar Doctor</title>
   <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
   <link rel="stylesheet" href="{{ asset('css/buscar.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
 <body>
   <div class="container mt-4">

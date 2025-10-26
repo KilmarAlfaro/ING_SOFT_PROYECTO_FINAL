@@ -1,0 +1,37 @@
+/* Global non-select for non-editable UI:
+   - Disable selection on all content by default
+   - Re-enable on interactive/editable controls so users can type/select in inputs
+*/
+
+/* Default: disable text selection */
+html, body, body * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable selection and caret for editable controls */
+input, textarea, select, [contenteditable="true"], .selectable {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Also allow selection for code/pre blocks in case of docs */
+pre, code, kbd, samp {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Buttons should not keep text caret/selection */
+button { -webkit-user-select: none; user-select: none; }
+
+/* Make images non-draggable/non-selectable unless explicitly overridden */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}

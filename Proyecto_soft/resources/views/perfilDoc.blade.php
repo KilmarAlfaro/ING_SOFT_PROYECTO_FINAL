@@ -6,6 +6,7 @@
     <title>Perfil del Doctor</title>
     <!-- Use patient profile styling for a cleaner, professional look -->
     <link rel="stylesheet" href="{{ asset('css/perfilpac.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
 <body>
     <div class="profile-container">

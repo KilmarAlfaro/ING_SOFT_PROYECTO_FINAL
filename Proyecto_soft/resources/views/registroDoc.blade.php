@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro Doctor</title>
   <link rel="stylesheet" href="{{ asset('css/registroDoc.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
 <!DOCTYPE html>
 <html lang="es">

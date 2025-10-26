@@ -6,6 +6,7 @@
   <title>Inicio</title>
   <!-- Enlaza el CSS desde public/css/estilos.css -->
   <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
 <body>
   <div class="inicio-contenedor">

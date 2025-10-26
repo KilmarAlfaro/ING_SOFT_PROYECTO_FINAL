@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Paciente</title>
   <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/global.css') }}">
   <style>
     .password-container {
       position: relative;

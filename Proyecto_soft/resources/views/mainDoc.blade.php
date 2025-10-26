@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Doctor</title>
     <link rel="stylesheet" href="{{ asset('css/estiloDoc.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
 <body>
 
     <!-- NAVBAR -->
     <nav>
+        <div class="nav-left" style="display:flex;align-items:center;gap:10px;">
+            <img class="brand-logo" src="https://cdn0.iconfinder.com/data/icons/coronavirus-67/100/coronavirus-04-512.png" alt="Logo" style="width:34px;height:34px;object-fit:contain;"/>
+            <h1 style="margin:0;">MEDTECH HUB</h1>
         </div>
-        <h1>Página Doctor</h1>
 
         <div class="nav-right">
             <!-- Botón Cerrar Sesión -->
@@ -96,16 +99,16 @@
         </aside>
     </div>
 
-    <!-- MODAL DE CONFIRMACIÓN -->
-    <div id="logoutModal" class="modal">
-        <div class="modal-content">
-            <h2>¿Estás seguro que quieres cerrar sesión?</h2>
-            <div class="modal-actions">
+    <!-- MODAL CERRAR SESIÓN (estilo mainPac) -->
+    <div id="logoutModal">
+        <div class="dialog">
+            <p>¿Estás seguro que deseas cerrar sesión?</p>
+            <div class="actions">
                 <form id="logoutForm" action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="confirm-btn">Sí</button>
+                    <button type="submit" id="confirmLogout" class="btn btn-primario">Sí, cerrar sesión</button>
                 </form>
-                <button type="button" class="cancel-btn" onclick="closeModal()">No</button>
+                <button id="cancelLogout" type="button" class="btn btn-secundario" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
     </div>
