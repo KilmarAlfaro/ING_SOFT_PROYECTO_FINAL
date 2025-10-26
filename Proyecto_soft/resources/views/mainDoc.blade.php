@@ -48,11 +48,12 @@
                     $doctorId = session('doctor_id');
                     $consultas = [];
                     if ($doctorId) {
-                        $consultas = \App\Models\Consulta::where('doctor_id', $doctorId)->orderBy('created_at', 'desc')->get();
+                        // order by created_at ascending so the first (oldest) consulta appears at top
+                        $consultas = \App\Models\Consulta::where('doctor_id', $doctorId)->orderBy('created_at', 'asc')->get();
                     }
                 @endphp
                 @forelse($consultas as $c)
-                    <li onclick="abrirConsulta('{{ addslashes($c->mensaje) }}', {{ $c->id }})">Consulta #{{ $c->id }} - {{ $c->paciente->nombre ?? 'Paciente' }}</li>
+                    <li onclick="abrirConsulta('{{ addslashes($c->mensaje) }}', {{ $c->id }})">Consulta #{{ $loop->iteration }} - {{ $c->paciente->nombre ?? 'Paciente' }}</li>
                 @empty
                     <li>No tiene consultas nuevas.</li>
                 @endforelse
@@ -119,12 +120,11 @@
         }
 
         function abrirConsulta(nombre, id) {
-            // Mostrar detalles en el centro
+            // Mostrar detalles en el centro (populate the detalle area only)
             const detalle = document.getElementById('consulta-detalle');
             detalle.innerHTML = `
-                <h2>Consulta #${id}</h2>
+                <h2>Consulta</h2>
                 <p>${nombre}</p>
-                <p><a href="/consultas/doctor" class="btn">Ver todas mis consultas</a></p>
                 <button class="close-consulta-btn" onclick="cerrarConsulta()">Cerrar consulta</button>
             `;
 
@@ -136,11 +136,9 @@
         }
 
         function cerrarConsulta() {
-            // Volver a mensaje inicial
-            document.getElementById("contenido-principal").innerHTML = `
-                <h1>Bienvenido Dr. Juan Pérez</h1>
-                <p>Seleccione una consulta en la columna izquierda para ver los detalles.</p>
-            `;
+            // Clear only the detalle area and restore the initial instruction text
+            const detalle = document.getElementById('consulta-detalle');
+            detalle.innerHTML = '<p>Seleccione una consulta en la columna izquierda para ver los detalles.</p>';
 
             // Ocultar columna derecha
             document.getElementById("sidebarRight").classList.add("hidden");

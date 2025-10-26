@@ -9,39 +9,38 @@
 </head>
 <body>
   <div class="container mt-4">
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card p-3">
-          <div class="d-flex align-items-center">
-            @if($doctor->foto_perfil)
-              <img src="{{ asset('storage/profile_pics/' . $doctor->foto_perfil) }}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;margin-right:12px;">
-            @else
-              <img src="{{ asset('imagenes/paciente.png') }}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;margin-right:12px;">
-            @endif
-            <div>
-              <h5>Dr(a). {{ explode(' ', trim($doctor->nombre))[0] }} {{ explode(' ', trim($doctor->apellido))[0] }}</h5>
-              <div class="text-muted">{{ $doctor->especialidad }}</div>
-            </div>
+    <div class="consulta-modal" role="dialog" aria-modal="true">
+      <div class="header">
+        <div class="doctor-info">
+          @php $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png'; @endphp
+          @if($doctor->foto_perfil)
+            <img src="{{ asset('storage/profile_pics/' . $doctor->foto_perfil) }}" alt="Foto">
+          @else
+            <img src="{{ $defaultAvatar }}" alt="Avatar">
+          @endif
+          <div>
+            <div style="font-weight:700">Dr(a). {{ explode(' ', trim($doctor->nombre))[0] }} {{ explode(' ', trim($doctor->apellido))[0] }}</div>
+            <div style="font-size:0.95rem;color:#666">{{ $doctor->especialidad }}</div>
           </div>
-          <hr>
-          <p>{{ $doctor->descripcion ?? 'Sin descripción' }}</p>
+        </div>
+        <div>
+          <a href="{{ route('mainPac') }}" class="btn btn-sm btn-link">Cerrar</a>
         </div>
       </div>
-      <div class="col-md-8">
-        <div class="card p-3">
-          <h5>Enviar consulta</h5>
-          <form method="POST" action="{{ route('consultas.store') }}">
-            @csrf
-            <input type="hidden" name="doctor_id" value="{{ $doctor->id }}">
-            <div class="mb-2">
-              <textarea name="mensaje" rows="4" class="form-control" placeholder="Escribe tu mensaje..." required></textarea>
-            </div>
-            <div>
-              <button class="btn btn-primary" type="submit">Enviar</button>
-              <a href="{{ route('mainPac') }}" class="btn btn-link">Volver</a>
-            </div>
-          </form>
-        </div>
+
+      <div class="body">
+        <p style="color:#333">{{ $doctor->descripcion ?? 'Sin descripción' }}</p>
+
+        <form method="POST" action="{{ route('consultas.store') }}">
+          @csrf
+          <input type="hidden" name="doctor_id" value="{{ $doctor->id }}">
+          <label for="mensaje">Mensaje</label>
+          <textarea id="mensaje" name="mensaje" required placeholder="Explica brevemente tu motivo y disponibilidad"></textarea>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Enviar consulta</button>
+            <a href="{{ route('mainPac') }}" class="btn btn-link">Cancelar</a>
+          </div>
+        </form>
       </div>
     </div>
   </div>
