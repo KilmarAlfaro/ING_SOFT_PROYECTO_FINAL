@@ -28,4 +28,9 @@ class Consulta extends Model
     {
         return $this->belongsTo(Paciente::class);
     }
+
+    public function mensajes()
+    {
+        return $this->hasMany(ConsultaMensaje::class)->orderBy('created_at', 'asc');
+    }
 }

@@ -54,12 +54,11 @@
 .col-md-4 {
     display: flex;
     justify-content: center;
-    margin-left: -100px;
 }
 
 /* Ajusta la altura de la lista para que no se desborde visualmente */
 .chat-list {
-    max-height: 400px; /* antes 520px, ahora más compacto */
+    max-height: 400px; /* default */
     overflow-y: auto;
 }
 
@@ -198,6 +197,64 @@ color: #fcfcfc; }
     margin-top:12px;
 }
 
+/* Confirm delete modal (match logout modal styling) */
+#confirmDeleteModal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    align-items:center;
+    justify-content:center;
+    z-index:1300;
+}
+#confirmDeleteModal .dialog{
+    background:#ffffff;
+    padding:20px;
+    border-radius:8px;
+    max-width:380px;
+    width:calc(100% - 32px);
+    margin:0 auto;
+    text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.12);
+}
+#confirmDeleteModal .dialog .title{
+    font-weight:700;
+    margin-bottom:6px;
+}
+#confirmDeleteModal .dialog .desc{
+    color:#4b5563;
+}
+#confirmDeleteModal .dialog .actions{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-top:12px;
+}
+
+/* Finalize modal (same look as confirm delete) */
+#confirmFinalizeModal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    align-items:center;
+    justify-content:center;
+    z-index:1300;
+}
+#confirmFinalizeModal .dialog{
+    background:#ffffff;
+    padding:20px;
+    border-radius:8px;
+    max-width:380px;
+    width:calc(100% - 32px);
+    margin:0 auto;
+    text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.12);
+}
+#confirmFinalizeModal .dialog .title{ font-weight:700; margin-bottom:6px; }
+#confirmFinalizeModal .dialog .desc{ color:#4b5563; }
+#confirmFinalizeModal .dialog .actions{ display:flex; gap:8px; justify-content:center; margin-top:12px; }
+
 /* Generic buttons (shared with mainDoc for consistency) */
 .btn{ display:inline-block; border:none; border-radius:6px; padding:8px 12px; cursor:pointer; font-size:.95rem; }
 .btn-primario{ background:#0d6efd; color:#fff; }
@@ -239,3 +296,84 @@ color: #fcfcfc; }
 .toast .toast-close{ background: transparent; border: none; color:#6b7280; cursor: pointer; font-size: 18px; line-height: 1; }
 .toast-success{ border-left-color: #16a34a; }
 .toast-error{ border-left-color: #dc2626; }
+
+/* Chat detail for mainPac */
+.detalle-consulta .cabecera-consulta{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.detalle-consulta .cabecera-consulta .avatar{ width:44px; height:44px; border-radius:50%; object-fit:cover; }
+.detalle-consulta .subtle{ color:#6b7280; font-size:.9rem; }
+.chat-box{ border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#f9fafb; display:flex; flex-direction:column; gap:8px; width:100%; min-height:0; height:100%; overflow-y:auto; }
+.bubble{ display:inline-block; padding:10px 12px 8px; border-radius:16px; margin:2px 0; max-width:88%; font-size:.95rem; line-height:1.35; box-shadow:0 1px 2px rgba(0,0,0,0.05); position:relative; }
+/* Mensaje del paciente (yo) a la derecha */
+.from-pac{ background:#dbeafe; color:#0f172a; align-self:flex-end; }
+/* Mensaje del doctor a la izquierda */
+.from-doc{ background:#eef2f7; color:#111827; align-self:flex-start; }
+.respuesta-form textarea{ width:100%; min-height:56px; height:56px; border:1px solid #ddd; border-radius:8px; padding:8px; }
+.respuesta-form .botones{ display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+
+/* Burbujas con hora y metadatos */
+.bubble .meta{ display:flex; align-items:center; gap:6px; font-size:.78rem; color:#6b7280; margin-top:4px; opacity:.9; }
+.bubble .time{ font-variant-numeric: tabular-nums; }
+
+/* Hacer que el card de chat ocupe casi toda la altura de la ventana */
+.pac-chat-card{ display:flex; flex-direction:column; height:calc(100vh - 220px); min-height:500px; overflow:hidden; }
+.pac-chat-card .detalle-consulta{
+    display:grid;
+    grid-template-rows: auto 1fr auto auto auto;
+    grid-template-areas:
+        "header"
+        "chat"
+        "form"
+        "actions"
+        "note";
+    flex:1;
+    min-height:0;
+    height:100%;
+    overflow:hidden;
+}
+.pac-chat-card #pacChatHeader{ grid-area: header; }
+.pac-chat-card #pacChatEmpty{ grid-area: chat; }
+.pac-chat-card #pacChatBox{ grid-area: chat; }
+.pac-chat-card #pacChatForm{ grid-area: form; }
+.pac-chat-card #pacAcciones{ grid-area: actions; }
+.pac-chat-card #pacChatNote{ grid-area: note; }
+.pac-chat-card #pacChatHeader{ padding:6px 8px; border-bottom:1px solid #e5e7eb; margin-bottom:8px; }
+.pac-chat-card #pacChatForm{ margin-top:10px; }
+.acciones-consulta{ display:flex; justify-content:flex-end; gap:8px; }
+
+/* Forzar que el área de mensajes sea la que scrollea y ocupe todo el ancho */
+.pac-chat-card #pacChatBox{
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    width: 100%;
+}
+.pac-chat-card #pacChatEmpty{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6b7280;
+}
+
+/* Nueva disposición de tres columnas (independientes) */
+.pac-layout{ align-items: stretch; }
+.pac-left .card,
+.pac-center .card,
+.pac-right .card{ height: calc(100vh - 220px); min-height: 500px; display:flex; flex-direction: column; overflow:hidden; align-items: stretch; margin-bottom: 16px; }
+
+/* Scroll independiente para la lista de doctores (columna izquierda) */
+.pac-left #doctorList{ flex:1 1 0; min-height:0; overflow-y:auto; max-height: none; }
+
+/* Scroll independiente para finalizadas (columna derecha) */
+.pac-right #pacFinalizadasList{ flex:1 1 0; min-height:0; overflow-y:auto; max-height: none; }
+
+/* Footer simple */
+.site-footer{
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: #f3f4f6;
+    color: #374151;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: .9rem;
+}

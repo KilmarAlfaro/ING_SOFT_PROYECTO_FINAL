@@ -89,6 +89,11 @@ Route::middleware([RequireSessionOrAuth::class])->group(function () {
     Route::get('/consultas/doctor', [App\Http\Controllers\ConsultaController::class, 'doctorIndex'])->name('consultas.doctor');
     Route::get('/consultas/paciente', [App\Http\Controllers\ConsultaController::class, 'pacienteIndex'])->name('consultas.paciente');
     Route::post('/consultas/{consulta}/responder', [App\Http\Controllers\ConsultaController::class, 'responder'])->name('consultas.responder');
+    Route::post('/consultas/{consulta}/finalizar', [App\Http\Controllers\ConsultaController::class, 'finalizar'])->name('consultas.finalizar');
+    Route::post('/consultas/{consulta}/ocultar-paciente', [App\Http\Controllers\ConsultaController::class, 'ocultarParaPaciente'])->name('consultas.ocultarPaciente');
+    Route::delete('/consultas/{consulta}', [App\Http\Controllers\ConsultaController::class, 'eliminar'])->name('consultas.eliminar');
+    Route::get('/consultas/{consulta}/mensajes', [App\Http\Controllers\ConsultaController::class, 'mensajes'])->name('consultas.mensajes');
+    Route::post('/consultas/{consulta}/mensajes', [App\Http\Controllers\ConsultaController::class, 'enviarMensaje'])->name('consultas.mensajes.enviar');
 
     // consulta
     Route::get('/consulta-doctor/{id}', [doctorController::class, 'consulta'])->name('consulta.doctor');

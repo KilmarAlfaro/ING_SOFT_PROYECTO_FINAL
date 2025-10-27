@@ -59,6 +59,30 @@
         </div>
     </div>
 
+    <!-- Modal confirmación eliminar consulta finalizada (solo vista del paciente) -->
+    <div id="confirmDeleteModal">
+        <div class="dialog">
+            <div class="title">Eliminar consulta</div>
+            <div class="desc">Esta acción solo la eliminará de tu vista. El doctor seguirá viéndola. ¿Deseas continuar?</div>
+            <div class="actions">
+                <button id="confirmDeleteBtn" type="button" class="btn btn-danger">Eliminar</button>
+                <button id="cancelDeleteBtn" type="button" class="btn btn-secundario">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal confirmación finalizar consulta -->
+    <div id="confirmFinalizeModal">
+        <div class="dialog">
+            <div class="title">Finalizar consulta</div>
+            <div class="desc">Al finalizar la consulta, ya no podrás enviar mensajes en este chat. ¿Deseas continuar?</div>
+            <div class="actions">
+                <button id="confirmFinalizeBtn" type="button" class="btn btn-danger">Finalizar</button>
+                <button id="cancelFinalizeBtn" type="button" class="btn btn-secundario">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container mt-5">
         @php
             $displayName = session('paciente_nombre');
@@ -83,107 +107,203 @@
         </noscript>
     </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card p-3 mb-3">
-                <h6>Buscar doctores disponibles</h6>
-                @php
-                    $q = request('q');
-                    $especialidad = request('especialidad');
+    <!-- Layout 3 columnas en una sola fila -->
 
-                    // prepare smallList for the left panel
-                    $doQuery = \App\Models\Doctor::query();
-                    if ($q) {
-                        $doQuery->where(function($s) use ($q){ $s->where('nombre','LIKE','%'.$q.'%')->orWhere('apellido','LIKE','%'.$q.'%'); });
-                    }
-                    if ($especialidad) { $doQuery->where('especialidad','LIKE','%'.$especialidad.'%'); }
-                    $smallList = $doQuery->orderBy('nombre')->limit(12)->get();
-                @endphp
-                {{-- Search card: inputs and filters. This form is intercepted by JS for live-search; it remains as a progressive enhancement and also works if JS is disabled. --}}
-                <form id="searchForm" onsubmit="return false;">
-                    {{-- Search by name (live) --}}
-                    <div class="mb-2 b">
-                        <input type="text" id="searchInput" name="q" class="busNom form-control form-control-sm" placeholder="Buscar por nombre" value="{{ $q }}" autocomplete="off">
-                    </div>
+    <!-- Contenedor unificado de 3 columnas: buscador | abiertas | finalizadas -->
+    <div class="container mt-3">
+        @php
+            $pacienteId = session('paciente_id');
+            $misActivas = collect();
+            $misFinalizadas = collect();
+            if ($pacienteId) {
+                $hasHide = \Illuminate\Support\Facades\Schema::hasColumn('consultas','oculta_para_paciente');
+                $misActivas = \App\Models\Consulta::with('doctor')
+                    ->where('paciente_id', $pacienteId)
+                    ->where(function($q){ $q->whereNull('status')->orWhere('status','!=','finalizado'); })
+                    ->when($hasHide, fn($q) => $q->where(function($w){ $w->whereNull('oculta_para_paciente')->orWhere('oculta_para_paciente', false); }))
+                    ->orderBy('created_at','desc')->get();
+                $misFinalizadas = \App\Models\Consulta::with('doctor')
+                    ->where('paciente_id', $pacienteId)
+                    ->where('status','finalizado')
+                    ->when($hasHide, fn($q) => $q->where(function($w){ $w->whereNull('oculta_para_paciente')->orWhere('oculta_para_paciente', false); }))
+                    ->orderBy('created_at','desc')->get();
+            }
+            $activeByDoctor = $misActivas->mapWithKeys(fn($c) => [$c->doctor_id => $c->id]);
+            $seed = null;
+            if ($misActivas->count()) { $seed = $misActivas->first(); }
+        @endphp
+        @if($seed)
+            @php
+                $doc = $seed->doctor;
+                $fn = $doc ? (explode(' ', trim($doc->nombre))[0] ?? $doc->nombre) : 'Doctor';
+                $fl = $doc ? (explode(' ', trim($doc->apellido))[0] ?? ($doc->apellido ?? '')) : '';
+                $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
+                $seedFoto = ($doc && !empty($doc->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $doc->foto_perfil)))
+                    ? asset('storage/profile_pics/' . $doc->foto_perfil)
+                    : $defaultAvatar;
+            @endphp
+            <div id="pacActiveSeed" data-id="{{ $seed->id }}" data-doctor="{{ $fn }} {{ $fl }}" data-foto="{{ $seedFoto }}" data-status="{{ $seed->status ?? 'nuevo' }}" style="display:none;"></div>
+        @endif
 
-                    {{-- Filter by specialty --}}
-                    <div class="mb-2">
-                        <select id="specialtySelect" name="especialidad" class="busNom form-select form-select-sm">
-                            <option value="">Todas las especialidades</option>
-                            @foreach(['General','Cardiologo','Cirujano plastico','Pediatra','Dermatologo','Ginecologo','Neurologo','Ortopedista','Oftalmologo','Psiquiatra','Otro'] as $esp)
-                                <option value="{{ $esp }}" {{ (isset($especialidad) && $especialidad == $esp) ? 'selected' : '' }}>{{ $esp }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+        <div class="row g-3 pac-layout">
+            <!-- Columna izquierda: buscador de doctores -->
+            <div class="col-lg-3 pac-left">
+                <div class="card p-3">
+                    <h6>Buscar doctores disponibles</h6>
+                    @php
+                        $q = request('q');
+                        $especialidad = request('especialidad');
 
-                    {{-- Reset filters button: full-width and visually aligned with the inputs above. --}}
-                    <div class="mb-2">
-                        <button id="resetFilters" class="btn btn-reset-filters">Restablecer filtros</button>
-                    </div>
-                </form>
-                @if($smallList->isEmpty())
-                    <div class="text-muted small">No hay doctores disponibles.</div>
-                @else
-                    <ul class="chat-list mb-0" style="max-height:520px;overflow:auto;">
-                        @foreach($smallList as $d)
-                            @php
-                                $fn = explode(' ', trim($d->nombre))[0] ?? $d->nombre;
-                                $fl = explode(' ', trim($d->apellido))[0] ?? $d->apellido;
-                                $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                                $fotoUrl = $d->foto_perfil ? asset('storage/profile_pics/' . $d->foto_perfil) : $defaultAvatar;
-                            @endphp
-                            <li class="chat-item" data-id="{{ $d->id }}" data-nombre="{{ $fn }}" data-apellido="{{ $fl }}" data-especialidad="{{ $d->especialidad }}" data-descripcion="{{ e($d->descripcion) }}" data-foto="{{ $fotoUrl }}">
-                                <div class="thumb">
-                                    <img src="{{ $fotoUrl }}" alt="avatar">
-                                </div>
-                                <div class="meta">
+                        $doQuery = \App\Models\Doctor::query();
+                        if ($q) {
+                            $doQuery->where(function($s) use ($q){ $s->where('nombre','LIKE','%'.$q.'%')->orWhere('apellido','LIKE','%'.$q.'%'); });
+                        }
+                        if ($especialidad) { $doQuery->where('especialidad','LIKE','%'.$especialidad.'%'); }
+                        $smallList = $doQuery->orderBy('nombre')->limit(12)->get();
+                    @endphp
+                    <form id="searchForm" onsubmit="return false;">
+                        <div class="mb-2 b">
+                            <input type="text" id="searchInput" name="q" class="busNom form-control form-control-sm" placeholder="Buscar por nombre" value="{{ $q }}" autocomplete="off">
+                        </div>
+                        <div class="mb-2">
+                            <select id="specialtySelect" name="especialidad" class="busNom form-select form-select-sm">
+                                <option value="">Todas las especialidades</option>
+                                @foreach(['General','Cardiologo','Cirujano plastico','Pediatra','Dermatologo','Ginecologo','Neurologo','Ortopedista','Oftalmologo','Psiquiatra','Otro'] as $esp)
+                                    <option value="{{ $esp }}" {{ (isset($especialidad) && $especialidad == $esp) ? 'selected' : '' }}>{{ $esp }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <button id="resetFilters" class="btn btn-reset-filters">Restablecer filtros</button>
+                        </div>
+                    </form>
+                    @if($smallList->isEmpty())
+                        <div class="text-muted small">No hay doctores disponibles.</div>
+                    @else
+                        <ul id="doctorList" class="chat-list mb-0">
+                            @foreach($smallList as $d)
+                                @php
+                                    $fn = explode(' ', trim($d->nombre))[0] ?? $d->nombre;
+                                    $fl = explode(' ', trim($d->apellido))[0] ?? $d->apellido;
+                                    $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
+                                    $fotoUrl = $d->foto_perfil ? asset('storage/profile_pics/' . $d->foto_perfil) : $defaultAvatar;
+                                    $existingId = $activeByDoctor[$d->id] ?? null;
+                                @endphp
+                                <li class="chat-item" data-id="{{ $d->id }}" data-nombre="{{ $fn }}" data-apellido="{{ $fl }}" data-especialidad="{{ $d->especialidad }}" data-descripcion="{{ e($d->descripcion) }}" data-foto="{{ $fotoUrl }}" @if($existingId) data-existing-id="{{ $existingId }}" @endif>
+                                    <div class="thumb">
+                                        <img src="{{ $fotoUrl }}" alt="avatar">
+                                    </div>
+                                    <div class="meta">
                                     <div class="name">Dr(a). {{ $fn }} {{ $fl }}</div>
                                     <div class="sub">{{ $d->especialidad }}</div>
-                                </div>
-                                <div class="actions">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="openConsultaModal({{ $d->id }})">Consultar</button>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
+                                    </div>
+                                    <div class="actions">
+                                        @if($existingId)
+                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="abrirChatPaciente({{ $existingId }}, {!! json_encode($fn.' '.$fl) !!}, {!! json_encode($fotoUrl) !!})">Continuar</button>
+                                        @else
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openConsultaModal({{ $d->id }})">Consultar</button>
+                                        @endif
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
             </div>
-        </div>
 
-
-                            <!-- Consulta Modal (hidden by default) -->
-                            <div id="consultaBackdrop" class="consulta-modal-backdrop" role="dialog" aria-hidden="true" style="display:none;">
-                                <div class="consulta-modal" role="document">
-                                    <div class="header">
-                                        <div class="doctor-info">
-                                            <img id="modalFoto" src="{{ asset('imagenes/paciente.png') }}" alt="Avatar">
-                                            <div>
-                                                <div id="modalName" style="font-weight:700">Dr(a). Nombre Apellido</div>
-                                                <div id="modalEsp" style="font-size:0.95rem;color:#666">Especialidad</div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div>
-                                    <div class="body">
-                                        <p id="modalDesc" style="color:#333">Descripción</p>
-                                        <form id="consultaForm" method="POST" action="{{ route('consultas.store') }}">
-                                            @csrf
-                                            <input type="hidden" name="doctor_id" id="modalDoctorId" value="">
-                                            <label for="modalMensaje">Mensaje</label>
-                                            <textarea id="modalMensaje" name="mensaje" required placeholder="Explica brevemente tu motivo y disponibilidad"></textarea>
-                                            <div class="actions">
-                                                <button class="btn btn-primary" type="submit">Enviar consulta</button>
-                                                <button type="button" class="btn btn-closs" onclick="closeConsultaModal()">Cancelar</button>
-                                            </div>
-                                        </form>
-                                    </div>
+            <!-- Columna centro: Consultas abiertas (chat) -->
+            <div class="col-lg-5 pac-center">
+                <div class="card p-3 pac-chat-card">
+                    <h6>Consultas abiertas</h6>
+                    <div class="detalle-consulta">
+                        <div class="cabecera-consulta" id="pacChatHeader" style="display:none; align-items:center; justify-content:space-between;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <img id="pacChatFoto" src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" class="avatar" alt="avatar" width="44" height="44" fetchpriority="high" decoding="async">
+                                <div>
+                                    <div class="name" id="pacChatTitle">Consulta</div>
+                                    <div class="subtle" id="pacChatId"></div>
+                                    <div class="subtle" id="pacMotivoLinea" style="margin-top:2px;"></div>
                                 </div>
                             </div>
-        
+                            <button type="button" class="btn btn-light btn-sm" onclick="cerrarChatPaciente()">Cerrar</button>
+                        </div>
+                        <div id="pacChatEmpty" class="text-muted" style="padding:8px 4px;">No tienes consultas abiertas.</div>
+                        <div class="chat-box" id="pacChatBox" style="display:none;"></div>
+                        <form id="pacChatForm" class="respuesta-form" onsubmit="return enviarMensajePaciente(event)" style="display:none;">
+                            <textarea id="pacChatInput" name="body" placeholder="Escribe tu mensaje..." required></textarea>
+                            <div class="botones">
+                                <button type="submit" id="pacChatSend" class="btn btn-primario">Enviar</button>
+                            </div>
+                        </form>
+                        <div class="acciones-consulta" id="pacAcciones" style="margin-top:8px;"></div>
+                        <div id="pacChatNote" class="subtle" style="display:none">Consulta finalizada (solo lectura)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna derecha: Consultas finalizadas -->
+            <div class="col-lg-4 pac-right">
+                <div class="card p-3">
+                    <h6>Consultas finalizadas</h6>
+                    <ul class="chat-list" id="pacFinalizadasList">
+                        @forelse($misFinalizadas as $c)
+                            @php
+                                $doc = $c->doctor;
+                                $fn = $doc ? (explode(' ', trim($doc->nombre))[0] ?? $doc->nombre) : 'Doctor';
+                                $fl = $doc ? (explode(' ', trim($doc->apellido))[0] ?? ($doc->apellido ?? '')) : '';
+                                $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
+                                $fotoUrl = ($doc && !empty($doc->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $doc->foto_perfil)))
+                                    ? asset('storage/profile_pics/' . $doc->foto_perfil)
+                                    : $defaultAvatar;
+                                $motivo = $c->mensaje ?? '';
+                            @endphp
+                            <li class="chat-item" data-id="{{ $c->id }}" data-doctor="{{ $fn }} {{ $fl }}" data-foto="{{ $fotoUrl }}" data-status="finalizado">
+                                <div class="thumb"><img src="{{ $fotoUrl }}" alt="avatar"></div>
+                                <div class="meta">
+                                    <div class="name">Dr(a). {{ $fn }} {{ $fl }}</div>
+                                    <div class="sub">{{ \Illuminate\Support\Str::limit($motivo, 80) }}</div>
+                                </div>
+                                <div class="actions">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-action="ocultar" data-id="{{ $c->id }}">Eliminar</button>
+                                </div>
+                            </li>
+                        @empty
+                            <li>No hay consultas finalizadas.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- Consulta Modal (restaurado) -->
+    <div id="consultaBackdrop" class="consulta-modal-backdrop" role="dialog" aria-hidden="true" style="display:none;">
+        <div class="consulta-modal" role="document">
+            <div class="header">
+                <div class="doctor-info">
+                    <img id="modalFoto" src="{{ asset('imagenes/paciente.png') }}" alt="Avatar">
+                    <div>
+                        <div id="modalName" style="font-weight:700">Dr(a). Nombre Apellido</div>
+                        <div id="modalEsp" style="font-size:0.95rem;color:#666">Especialidad</div>
+                    </div>
+                </div>
+            </div>
+            <div class="body">
+                <form id="consultaForm" method="POST" action="{{ route('consultas.store') }}">
+                    @csrf
+                    <input type="hidden" name="doctor_id" id="modalDoctorId" value="">
+                    <label for="modalMotivo" style="font-weight:600;">Motivo (título breve)</label>
+                    <input id="modalMotivo" name="motivo" type="text" required maxlength="255" placeholder="Ej.: Dolor de cabeza" class="form-control" style="margin-bottom:8px;">
 
-
-
+                    <label for="modalDescripcion" style="font-weight:600;">Descripción (se enviará al chat)</label>
+                    <textarea id="modalDescripcion" name="descripcion" required placeholder="Describe los síntomas, duración, antecedentes, etc." class="form-control" style="min-height:120px;"></textarea>
+                    <div class="actions">
+                        <button class="btn btn-primario" type="submit">Enviar</button>
+                        <button type="button" class="btn btn-secundario" onclick="closeConsultaModal()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
@@ -196,6 +316,7 @@
          *  3) Consulta modal open/close (uses data attributes from list items)
          *  4) Event wiring (input, select, reset, and delegation for list clicks)
          *  5) Toast utility (success/error) + trigger on flash messages
+         *  6) Paciente chat (fetch + send)
          */
 
         // ---------- 1) Logout modal handling ----------
@@ -217,8 +338,24 @@
             return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); };
         }
 
+        // Escape util to avoid breaking HTML when rendering messages
+        function escapeHtml(text){
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text || '').replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function formatTime(ts){
+            // expects 'YYYY-MM-DD HH:MM:SS' -> return 'HH:MM'
+            if (!ts || typeof ts !== 'string') return '';
+            const parts = ts.split(' ');
+            if (parts.length < 2) return '';
+            return parts[1].slice(0,5);
+        }
+
         // ---------- 2) Live search implementation ----------
         // Build a DOM node for a doctor (keeps same structure as server-rendered items)
+        const activeMap = @json($activeByDoctor);
+
         function buildDoctorItem(d){
             const li = document.createElement('li');
             li.className = 'chat-item';
@@ -228,6 +365,7 @@
             li.dataset.especialidad = d.especialidad || '';
             li.dataset.descripcion = d.descripcion || '';
             li.dataset.foto = d.foto || '';
+            if (activeMap && activeMap[d.id]) { li.dataset.existingId = activeMap[d.id]; }
 
             const thumb = document.createElement('div'); thumb.className = 'thumb';
             const img = document.createElement('img'); img.src = d.foto; img.alt = 'avatar'; thumb.appendChild(img);
@@ -238,13 +376,26 @@
             meta.appendChild(name); meta.appendChild(sub);
 
             const actions = document.createElement('div'); actions.className = 'actions';
-            const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn btn-sm btn-outline-primary'; btn.textContent = 'Consultar';
-            btn.addEventListener('click', function(e){ e.stopPropagation(); openConsultaModal(d.id); });
+            const btn = document.createElement('button'); btn.type = 'button';
+            const existingId = activeMap ? activeMap[d.id] : null;
+            if (existingId){
+                btn.className = 'btn btn-sm btn-outline-success'; btn.textContent = 'Continuar';
+                const fullName = (li.dataset.nombre + ' ' + li.dataset.apellido).trim();
+                btn.addEventListener('click', function(e){ e.stopPropagation(); abrirChatPaciente(existingId, fullName, d.foto); });
+            } else {
+                btn.className = 'btn btn-sm btn-outline-primary'; btn.textContent = 'Consultar';
+                btn.addEventListener('click', function(e){ e.stopPropagation(); openConsultaModal(d.id); });
+            }
             actions.appendChild(btn);
 
             li.appendChild(thumb); li.appendChild(meta); li.appendChild(actions);
-            // clicking the item itself opens the modal, delegation also handles this for server-rendered items
-            li.addEventListener('click', function(e){ if (e.target && e.target.tagName.toLowerCase()==='button') return; openConsultaModal(d.id); });
+            // clicking the item: continuar si existe, sino abrir modal
+            li.addEventListener('click', function(e){
+                if (e.target && e.target.tagName.toLowerCase()==='button') return;
+                const fullName = (li.dataset.nombre + ' ' + li.dataset.apellido).trim();
+                if (existingId){ abrirChatPaciente(existingId, fullName, d.foto); }
+                else { openConsultaModal(d.id); }
+            });
             return li;
         }
 
@@ -258,7 +409,7 @@
                 const res = await fetch(url, { headers:{ 'Accept':'application/json' } });
                 if (!res.ok) return;
                 const json = await res.json();
-                const list = document.querySelector('.chat-list');
+                const list = document.getElementById('doctorList');
                 if (!list) return;
                 list.innerHTML = '';
                 if (!json.data || json.data.length === 0){
@@ -272,38 +423,34 @@
             }
         }
 
-        // ---------- 3) Consulta modal open/close ----------
-        function openConsultaModal(id) {
-            // try to find a corresponding list item (may be server-rendered or built by JS)
-            var li = document.querySelector('.chat-item[data-id="' + id + '"]');
-            var foto = '{{ asset('imagenes/paciente.png') }}';
-            var nombre = '';
-            var apellido = '';
-            var esp = '';
-            var desc = '';
-            if (li) {
-                foto = li.dataset.foto || foto;
-                nombre = li.dataset.nombre || '';
-                apellido = li.dataset.apellido || '';
-                esp = li.dataset.especialidad || '';
-                desc = li.dataset.descripcion || '';
-            }
+        // ---------- 3) Abrir modal para crear consulta ----------
+    let pacChatCurrentId = null; // consulta id actual
+    let pacChatCurrentDoctorId = null; // doctor id de la consulta actual
+    let pacChatPendingDoctorId = null; // doctor seleccionado para crear consulta
 
-            var backdrop = document.getElementById('consultaBackdrop');
+        function openConsultaModal(id){
+            const li = document.querySelector('.chat-item[data-id="' + id + '"]');
+            const nombre = li ? ((li.dataset.nombre||'') + ' ' + (li.dataset.apellido||'')) : '';
+            const foto = li ? (li.dataset.foto||'{{ asset('imagenes/paciente.png') }}') : '{{ asset('imagenes/paciente.png') }}';
+            const esp = li ? (li.dataset.especialidad||'') : '';
+
+            pacChatPendingDoctorId = id;
+            const backdrop = document.getElementById('consultaBackdrop');
             if (!backdrop) return;
             document.getElementById('modalFoto').src = foto;
-            document.getElementById('modalName').textContent = 'Dr(a). ' + nombre + ' ' + apellido;
+            document.getElementById('modalName').textContent = 'Dr(a). ' + nombre.trim();
             document.getElementById('modalEsp').textContent = esp;
-            document.getElementById('modalDesc').textContent = desc || 'Sin descripción';
             document.getElementById('modalDoctorId').value = id;
-            document.getElementById('modalMensaje').value = '';
-
+            const motivoInput = document.getElementById('modalMotivo');
+            const descInput = document.getElementById('modalDescripcion');
+            if (motivoInput) motivoInput.value = '';
+            if (descInput) descInput.value = '';
             backdrop.style.display = 'flex';
             backdrop.setAttribute('aria-hidden','false');
         }
 
         function closeConsultaModal(){
-            var backdrop = document.getElementById('consultaBackdrop');
+            const backdrop = document.getElementById('consultaBackdrop');
             if (!backdrop) return;
             backdrop.style.display = 'none';
             backdrop.setAttribute('aria-hidden','true');
@@ -357,17 +504,19 @@
 
             if (reset) reset.addEventListener('click', function(e){ e.preventDefault(); input.value = ''; select.value = ''; performLiveSearch('', ''); });
 
-            // Delegated click handler for server-rendered list items (and future ones)
-            const listContainer = document.querySelector('.chat-list');
+            // Delegated click handler for server-rendered doctor list items (and future ones)
+            const listContainer = document.getElementById('doctorList');
             if (listContainer){
                 listContainer.addEventListener('click', function(e){
-                    // find closest .chat-item
                     const item = e.target.closest('.chat-item');
                     if (!item) return;
-                    // If click originated on a button inside actions, let its handler run (it stops propagation).
                     if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'button') return;
-                    const id = item.dataset.id;
-                    if (id) openConsultaModal(id);
+                    const doctorId = item.dataset.id;
+                    const existingId = item.getAttribute('data-existing-id');
+                    const fullName = ((item.getAttribute('data-nombre')||'') + ' ' + (item.getAttribute('data-apellido')||'')).trim();
+                    const foto = item.getAttribute('data-foto');
+                    if (existingId) { abrirChatPaciente(existingId, fullName, foto); }
+                    else if (doctorId) { openConsultaModal(doctorId); }
                 });
             }
 
@@ -380,8 +529,361 @@
             if (flashSuccess) { showToast(flashSuccess, 'success'); }
             else if (flashError) { showToast(flashError, 'error'); }
             else if (validationErrors && validationErrors.length) { showToast(validationErrors[0], 'error'); }
+
+            // Click en consultas finalizadas (lado derecho)
+            const finList = document.getElementById('pacFinalizadasList');
+            let pendingDeleteConsultaId = null;
+            const deleteModal = document.getElementById('confirmDeleteModal');
+            const deleteConfirmBtn = document.getElementById('confirmDeleteBtn');
+            const deleteCancelBtn = document.getElementById('cancelDeleteBtn');
+
+            function openDeleteModal(id){ pendingDeleteConsultaId = id; if (deleteModal) deleteModal.style.display = 'flex'; }
+            function closeDeleteModal(){ if (deleteModal) deleteModal.style.display = 'none'; pendingDeleteConsultaId = null; }
+
+            if (deleteCancelBtn) deleteCancelBtn.addEventListener('click', closeDeleteModal);
+            if (deleteConfirmBtn) deleteConfirmBtn.addEventListener('click', async function(){
+                const id = pendingDeleteConsultaId; if (!id) return;
+                try{
+                    const res = await fetch(`{{ url('/consultas') }}/${id}/ocultar-paciente`, {
+                        method: 'POST', headers: { 'Accept':'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    });
+                    if (res.ok){
+                        const li = document.querySelector(`#pacFinalizadasList .chat-item[data-id="${id}"]`);
+                        if (li) li.remove();
+                        showToast('Consulta eliminada', 'success');
+                        if (String(pacChatCurrentId) === String(id)) { cerrarChatPaciente(); }
+                    } else {
+                        showToast('No se pudo eliminar de tu vista', 'error');
+                    }
+                }catch(err){ console.error(err); showToast('Error de red', 'error'); }
+                closeDeleteModal();
+            });
+
+            if (finList){
+                finList.addEventListener('click', async function(e){
+                    // Ocultar solo para paciente
+                    const btn = e.target.closest('button[data-action="ocultar"]');
+                    if (btn){
+                        e.stopPropagation();
+                        const id = btn.getAttribute('data-id');
+                        if (!id) return;
+                        openDeleteModal(id);
+                        return;
+                    }
+
+                    // Abrir chat al hacer click en el item (excepto botón eliminar)
+                    const item = e.target.closest('.chat-item');
+                    if (!item) return;
+                    const id = item.getAttribute('data-id');
+                    if (id) abrirChatPaciente(id);
+                });
+            }
+
+            // Interceptar envío del modal para crear consulta por AJAX
+            const formConsulta = document.getElementById('consultaForm');
+            if (formConsulta){
+                formConsulta.addEventListener('submit', async function(ev){
+                    ev.preventDefault();
+                    const doctorId = document.getElementById('modalDoctorId').value;
+                    const motivo = (document.getElementById('modalMotivo')?.value || '').trim();
+                    const descripcion = (document.getElementById('modalDescripcion')?.value || '').trim();
+                    if (!doctorId || !motivo || !descripcion) return;
+                    // Obtener nombre y foto del listado para pintar header al instante
+                    let fullName = '';
+                    let fotoUrl = '';
+                    const liDoc = document.querySelector(`#doctorList .chat-item[data-id="${doctorId}"]`);
+                    if (liDoc){
+                        fullName = (((liDoc.dataset.nombre||'') + ' ' + (liDoc.dataset.apellido||'')).trim());
+                        fotoUrl = liDoc.dataset.foto || '';
+                    }
+                    try{
+                        const res = await fetch(`{{ route('consultas.store') }}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type':'application/json', 'Accept':'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ doctor_id: doctorId, motivo, descripcion })
+                        });
+                        if (res.status === 409){
+                            const j = await res.json();
+                            closeConsultaModal();
+                            showToast('Ya tienes una consulta abierta con este doctor. Abriendo chat...', 'success');
+                            if (j.data && j.data.id) {
+                                // Preload imagen para evitar parpadeo
+                                if (fotoUrl){ try{ const _img = new Image(); _img.src = fotoUrl; }catch(e){} }
+                                await abrirChatPaciente(j.data.id, fullName, fotoUrl);
+                            }
+                            return;
+                        }
+                        if (!res.ok) { showToast('No se pudo crear la consulta', 'error'); return; }
+                        const json = await res.json();
+                        const newId = json.data && json.data.id ? json.data.id : null;
+                        closeConsultaModal();
+                        if (newId){
+                            // Preload imagen y pintar header inmediatamente
+                            if (fotoUrl){ try{ const _img = new Image(); _img.src = fotoUrl; }catch(e){} }
+                            await abrirChatPaciente(newId, fullName, fotoUrl);
+                            // mostrar nota de creación
+                            showStatusNote('Consulta creada');
+                            // actualizar mapping y botón en lista izquierda
+                            if (typeof activeMap === 'object') { activeMap[doctorId] = newId; }
+                            const li = document.querySelector(`#doctorList .chat-item[data-id="${doctorId}"]`);
+                            if (li){
+                                li.setAttribute('data-existing-id', newId);
+                                const btn = li.querySelector('button');
+                                if (btn){
+                                    btn.textContent = 'Continuar';
+                                    btn.classList.remove('btn-outline-primary');
+                                    btn.classList.add('btn-outline-success');
+                                    btn.onclick = function(e){ e.stopPropagation(); abrirChatPaciente(newId, fullName, fotoUrl); };
+                                }
+                            }
+                        }
+                    }catch(err){ console.error(err); showToast('Error al crear la consulta', 'error'); }
+                });
+            }
+
+            // Abrir automáticamente la primera activa si existe
+            const seed = document.getElementById('pacActiveSeed');
+            if (seed){ abrirChatPaciente(seed.getAttribute('data-id')); }
         });
+
+        // ---------- 6) Paciente chat ----------
+        async function abrirChatPaciente(id, doctorNombre=null, doctorFoto=null){
+            pacChatCurrentId = id;
+            pacChatPendingDoctorId = null;
+            // header
+            const item = document.querySelector(`#pacFinalizadasList .chat-item[data-id="${id}"]`) || document.getElementById('pacActiveSeed');
+            const title = document.getElementById('pacChatTitle');
+            const foto = document.getElementById('pacChatFoto');
+            const header = document.getElementById('pacChatHeader');
+            const idHolder = document.getElementById('pacChatId');
+            const motivoHolder = document.getElementById('pacMotivoLinea');
+            const box = document.getElementById('pacChatBox');
+            const empty = document.getElementById('pacChatEmpty');
+            const note = document.getElementById('pacChatNote');
+            const input = document.getElementById('pacChatInput');
+            const send = document.getElementById('pacChatSend');
+            const acc = document.getElementById('pacAcciones');
+
+            const nombre = doctorNombre || (item ? (item.getAttribute('data-doctor') || 'Doctor') : 'Doctor');
+            const fotoUrl = doctorFoto || (item ? (item.getAttribute('data-foto') || foto.src) : foto.src);
+            let status = item ? (item.getAttribute('data-status') || 'nuevo') : 'nuevo';
+
+            if (title) title.textContent = `Chat con Dr(a). ${nombre}`;
+            if (foto) foto.src = fotoUrl;
+            if (idHolder) idHolder.textContent = `ID #${id}`;
+            if (header) header.style.display = '';
+            if (empty) empty.style.display = 'none';
+            const form = document.getElementById('pacChatForm');
+            if (form) form.style.display = '';
+            if (box) box.style.display = '';
+
+            // disable/enable input by status
+            const readOnly = (status === 'finalizado');
+            if (input) input.disabled = readOnly;
+            if (send) send.disabled = readOnly;
+            if (note) note.style.display = readOnly ? '' : 'none';
+            if (acc) { acc.innerHTML = ''; acc.style.display = ''; }
+
+            // fetch messages
+            try{
+                const res = await fetch(`{{ url('/consultas') }}/${id}/mensajes`, { headers:{ 'Accept':'application/json' } });
+                const data = await res.json();
+                if (box){
+                    box.innerHTML = (data.data || []).map(m => `
+                        <div class="bubble ${m.sender === 'doctor' ? 'from-doc' : 'from-pac'}">
+                            <div class="body">${escapeHtml(m.body)}</div>
+                            <div class="meta"><span class="time">${formatTime(m.created_at)}</span></div>
+                        </div>
+                    `).join('');
+                    box.scrollTop = box.scrollHeight;
+                }
+                // Guardar doctor_id actual para poder actualizar el listado izquierdo al finalizar
+                pacChatCurrentDoctorId = data.consulta && data.consulta.doctor_id ? data.consulta.doctor_id : pacChatCurrentDoctorId;
+                // Usar motivo desde la consulta
+                if (motivoHolder){
+                    const motivoText = data.consulta && data.consulta.motivo ? data.consulta.motivo : '';
+                    motivoHolder.textContent = motivoText ? ('Motivo: ' + motivoText) : '';
+                }
+                // Actualizar estado desde backend
+                if (data.consulta && data.consulta.status) {
+                    status = data.consulta.status;
+                    const ro = (status === 'finalizado');
+                    if (input) input.disabled = ro;
+                    if (send) send.disabled = ro;
+                    if (note) note.style.display = ro ? '' : 'none';
+                }
+                // Botón Finalizar si no está finalizada (sin recargar, vía modal + AJAX)
+                if (acc && status !== 'finalizado'){
+                    acc.innerHTML = `<button type="button" id="btnFinalizar" class="btn btn-danger btn-sm">Finalizar consulta</button>`;
+                    const btnFin = document.getElementById('btnFinalizar');
+                    if (btnFin){ btnFin.addEventListener('click', () => openFinalizeModal(id)); }
+                }
+            }catch(e){ console.error(e); }
+        }
+        // Finalizar consulta: modal + AJAX
+        const finalizeModal = document.getElementById('confirmFinalizeModal');
+        const finalizeConfirmBtn = document.getElementById('confirmFinalizeBtn');
+        const finalizeCancelBtn = document.getElementById('cancelFinalizeBtn');
+        function openFinalizeModal(id){ window.__pendingFinalizeId = id; if (finalizeModal) finalizeModal.style.display = 'flex'; }
+        function closeFinalizeModal(){ if (finalizeModal) finalizeModal.style.display = 'none'; window.__pendingFinalizeId = null; }
+        if (finalizeCancelBtn) finalizeCancelBtn.addEventListener('click', closeFinalizeModal);
+        if (finalizeConfirmBtn) finalizeConfirmBtn.addEventListener('click', async function(){
+            const id = window.__pendingFinalizeId; if (!id) return;
+            try{
+                const res = await fetch(`{{ url('/consultas') }}/${id}/finalizar`, {
+                    method: 'POST', headers: { 'Accept':'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                });
+                if (res.ok){
+                    // Bloquear input y mostrar nota
+                    const input = document.getElementById('pacChatInput');
+                    const send = document.getElementById('pacChatSend');
+                    const note = document.getElementById('pacChatNote');
+                    const acc = document.getElementById('pacAcciones');
+                    if (input) input.disabled = true;
+                    if (send) send.disabled = true;
+                    if (note) note.style.display = '';
+                    if (acc) acc.innerHTML = '';
+
+                    // Añadir a la lista de finalizadas (derecha) si no existe
+                    const finList = document.getElementById('pacFinalizadasList');
+                    const exist = finList ? finList.querySelector(`.chat-item[data-id="${id}"]`) : null;
+                    if (finList && !exist){
+                        const title = document.getElementById('pacChatTitle');
+                        const foto = document.getElementById('pacChatFoto');
+                        const nombre = title ? title.textContent.replace(/^Chat con\s*/,'') : 'Doctor';
+                        const fotoUrl = foto ? foto.src : 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
+                        const motivoLine = document.getElementById('pacMotivoLinea');
+                        let motivoText = motivoLine && motivoLine.textContent ? motivoLine.textContent : '';
+                        motivoText = motivoText.replace(/^\s*Motivo:\s*/i, '');
+                        const li = document.createElement('li');
+                        li.className = 'chat-item';
+                        li.setAttribute('data-id', id);
+                        li.setAttribute('data-doctor', nombre.replace(/^Chat con\s*/,''));
+                        li.setAttribute('data-foto', fotoUrl);
+                        li.setAttribute('data-status', 'finalizado');
+                        li.innerHTML = `
+                            <div class="thumb"><img src="${fotoUrl}" alt="avatar"></div>
+                            <div class="meta">
+                                <div class="name">${nombre}</div>
+                                <div class="sub">${escapeHtml(motivoText)}</div>
+                            </div>
+                            <div class="actions">
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-action="ocultar" data-id="${id}">Eliminar</button>
+                            </div>
+                        `;
+                        finList.prepend(li);
+                    }
+
+                    // Cerrar el chat de consultas abiertas
+                    cerrarChatPaciente();
+
+                    // Actualizar el mapeo de activos y el botón en la lista izquierda para permitir nuevas consultas
+                    const doctorId = pacChatCurrentDoctorId;
+                    if (doctorId){
+                        if (typeof activeMap === 'object' && activeMap[doctorId]) { delete activeMap[doctorId]; }
+                        const liDoc = document.querySelector(`#doctorList .chat-item[data-id="${doctorId}"]`);
+                        if (liDoc){
+                            liDoc.removeAttribute('data-existing-id');
+                            const btn = liDoc.querySelector('button');
+                            if (btn){
+                                btn.textContent = 'Consultar';
+                                btn.classList.remove('btn-outline-success');
+                                btn.classList.add('btn-outline-primary');
+                                btn.onclick = function(e){ e.stopPropagation(); openConsultaModal(doctorId); };
+                            }
+                        }
+                    }
+                } else {
+                    showToast('No se pudo finalizar', 'error');
+                }
+            }catch(err){ console.error(err); showToast('Error de red', 'error'); }
+            closeFinalizeModal();
+        });
+
+        function cerrarChatPaciente(){
+            pacChatCurrentId = null;
+            const header = document.getElementById('pacChatHeader');
+            const box = document.getElementById('pacChatBox');
+            const form = document.getElementById('pacChatForm');
+            const empty = document.getElementById('pacChatEmpty');
+            const acc = document.getElementById('pacAcciones');
+            const note = document.getElementById('pacChatNote');
+            if (header) header.style.display = 'none';
+            if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+            if (form) form.style.display = 'none';
+            if (empty) empty.style.display = '';
+            if (acc) { acc.innerHTML = ''; acc.style.display = 'none'; }
+            if (note) note.style.display = 'none';
+        }
+
+        async function enviarMensajePaciente(e){
+            e.preventDefault();
+            const form = e.target;
+            const textarea = form.querySelector('textarea[name="body"]');
+            const body = textarea ? textarea.value.trim() : '';
+            if (!body) return false;
+            try{
+                if (!pacChatCurrentId && pacChatPendingDoctorId){
+                    // Crear consulta vía JSON con primer mensaje
+                    const res = await fetch(`{{ route('consultas.store') }}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type':'application/json', 'Accept':'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        // Si se llega aquí, no deberíamos crear desde el input; mantener compatibilidad mínima
+                        body: JSON.stringify({ doctor_id: pacChatPendingDoctorId, motivo: body.slice(0,255), descripcion: body })
+                    });
+                    if (!res.ok) return false;
+                    const json = await res.json();
+                    pacChatCurrentId = json.data && json.data.id ? json.data.id : null;
+                    pacChatPendingDoctorId = null;
+                    if (textarea) textarea.value = '';
+                    // Cargar historial desde el servidor para respetar la hora local (SV)
+                    if (pacChatCurrentId) { await abrirChatPaciente(pacChatCurrentId); }
+                } else if (pacChatCurrentId) {
+                    const res = await fetch(`{{ url('/consultas') }}/${pacChatCurrentId}/mensajes`, {
+                        method: 'POST',
+                        headers: { 'Content-Type':'application/json', 'Accept':'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({ body })
+                    });
+                    if (!res.ok) return false;
+                    const rjson = await res.json();
+                    // agregar burbuja sin recargar todo
+                    const box = document.getElementById('pacChatBox');
+                    if (box){
+                        const bubble = document.createElement('div');
+                        bubble.className = 'bubble from-pac';
+                        const ts = rjson && rjson.data && rjson.data.created_at ? rjson.data.created_at : '';
+                        bubble.innerHTML = `<div class="body">${escapeHtml(body)}</div><div class="meta"><span class="time">${formatTime(ts)}</span></div>`;
+                        box.appendChild(bubble);
+                        box.scrollTop = box.scrollHeight;
+                    }
+                    textarea.value = '';
+                }
+            }catch(err){ console.error(err); }
+            return false;
+        }
+
+        // Mostrar una nota de estado bajo el chat (similar a finalizada) temporalmente
+        function showStatusNote(text){
+            const note = document.getElementById('pacChatNote');
+            if (!note) return;
+            note.textContent = text;
+            note.style.display = '';
+            // ocultar después de unos segundos si no es finalizado
+            setTimeout(() => {
+                // Mantener visible solo si el estado es finalizado
+                const item = document.querySelector(`#pacFinalizadasList .chat-item[data-id="${pacChatCurrentId}"]`) || document.getElementById('pacActiveSeed');
+                const status = item ? (item.getAttribute('data-status') || 'nuevo') : 'nuevo';
+                if (status !== 'finalizado'){
+                    note.style.display = 'none';
+                    note.textContent = 'Consulta finalizada (solo lectura)';
+                }
+            }, 4000);
+        }
     </script>
+
+    <footer class="site-footer">
+        <span>© 2025 MedTech Hub · Demo footer</span>
+    </footer>
 
 </body>
 </html>
