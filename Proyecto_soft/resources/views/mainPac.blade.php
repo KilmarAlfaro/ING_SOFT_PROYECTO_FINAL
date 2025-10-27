@@ -76,6 +76,11 @@
         @endphp
 
         <h1 class="text-center mb-4">{{ $title }} {{ $displayName }}</h1>
+        <noscript>
+            @if(session('success'))
+                <div class="message success">{{ session('success') }}</div>
+            @endif
+        </noscript>
     </div>
 
     <div class="row">
@@ -180,6 +185,8 @@
 
 
 
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
     <script>
         /*
          * mainPac scripts - consolidated and commented to avoid spaghetti.
@@ -188,6 +195,7 @@
          *  2) Live search (debounced) -> requests JSON from doctorController@buscar and rebuilds the left list
          *  3) Consulta modal open/close (uses data attributes from list items)
          *  4) Event wiring (input, select, reset, and delegation for list clicks)
+         *  5) Toast utility (success/error) + trigger on flash messages
          */
 
         // ---------- 1) Logout modal handling ----------
@@ -301,11 +309,46 @@
             backdrop.setAttribute('aria-hidden','true');
         }
 
+        // ---------- 5) Toasts ----------
+        function showToast(message, type){
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + (type === 'error' ? 'toast-error' : 'toast-success');
+
+            const content = document.createElement('div');
+            content.className = 'toast-content';
+            content.textContent = message;
+
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'toast-close';
+            closeBtn.setAttribute('aria-label','Cerrar');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.addEventListener('click', () => { container.removeChild(toast); });
+
+            toast.appendChild(content);
+            toast.appendChild(closeBtn);
+            container.appendChild(toast);
+
+            // animate in
+            requestAnimationFrame(() => { toast.classList.add('show'); });
+
+            // auto dismiss
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { if (toast.parentNode) container.removeChild(toast); }, 200);
+            }, 3500);
+        }
+
         // ---------- 4) Wiring: attach handlers for inputs, select and reset button; delegate list clicks ----------
         document.addEventListener('DOMContentLoaded', function(){
             const input = document.getElementById('searchInput');
             const select = document.getElementById('specialtySelect');
             const reset = document.getElementById('resetFilters');
+            const flashSuccess = @json(session('success'));
+            const flashError = @json(session('error'));
+            const validationErrors = @json($errors->all());
 
             const debounced = debounce(function(){ performLiveSearch(input.value.trim(), select.value); }, 300);
 
@@ -332,6 +375,11 @@
             if (input && input.value.trim() !== '' || (select && select.value !== '')){
                 performLiveSearch(input.value.trim(), select.value);
             }
+
+            // Trigger toasts from flash/validation
+            if (flashSuccess) { showToast(flashSuccess, 'success'); }
+            else if (flashError) { showToast(flashError, 'error'); }
+            else if (validationErrors && validationErrors.length) { showToast(validationErrors[0], 'error'); }
         });
     </script>
 

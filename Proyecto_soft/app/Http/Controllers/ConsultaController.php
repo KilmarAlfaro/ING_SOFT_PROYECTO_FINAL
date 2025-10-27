@@ -31,7 +31,7 @@ class ConsultaController extends Controller
             'status' => 'nuevo',
         ]);
 
-        return back()->with('success', 'Mensaje enviado al doctor');
+    return back()->with('success', 'Su consulta ha sido enviada correctamente');
     }
 
     // Doctor ve sus consultas entrantes
