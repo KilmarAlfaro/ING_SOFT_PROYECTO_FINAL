@@ -245,6 +245,7 @@
                         <div id="motivoLinea" class="subtle"></div>
                     </div>
                     <span style="flex:1"></span>
+                    <button type="button" class="btn btn-secundario" onclick="cerrarDetalle()">Cerrar</button>
                 </div>
                 <div class="chat-box" id="chatBox"></div>
                 <div class="acciones-consulta" id="accionesConsulta"></div>
@@ -256,16 +257,9 @@
                 const data = await res.json();
                 const box = document.getElementById('chatBox');
                 if (box && data && Array.isArray(data.data)){
-                    box.innerHTML = data.data.map(m => {
-                        const t = formatTime(m.created_at);
-                        const cls = m.sender === 'doctor' ? 'from-doc' : 'from-pac';
-                        return `
-                            <div class="bubble ${cls}">
-                                <div class="body">${escapeHtml(m.body)}</div>
-                                <div class="meta time">${t}</div>
-                            </div>
-                        `;
-                    }).join('');
+                    box.innerHTML = data.data.map(m => `
+                        <div class="bubble ${m.sender === 'doctor' ? 'from-doc' : 'from-pac'}">${escapeHtml(m.body)}</div>
+                    `).join('');
                     box.scrollTop = box.scrollHeight;
                 }
                 // Set Motivo (primer mensaje del paciente o el primero en general)
@@ -284,25 +278,19 @@
                 acciones.innerHTML = `
                     <form class="respuesta-form" onsubmit="return enviarMensaje(event, ${id}, this)">
                         <textarea name="body" placeholder="Escribe tu respuesta..." required></textarea>
-                        <button type="submit" class="send-btn" aria-label="Enviar">
-                            <img src="https://cdn0.iconfinder.com/data/icons/zondicons/20/send-256.png" alt="Enviar" width="20" height="20"/>
-                        </button>
+                        <div class="botones">
+                            <button type="submit" class="btn btn-primario">Enviar</button>
+                        </div>
                     </form>
-                    <div class="acciones-row">
-                        <button type="button" class="btn btn-success" onclick="cerrarDetalle()">Cerrar chat</button>
-                        <form method="POST" action="{{ url('/consultas') }}/${id}/finalizar">
-                            @csrf
-                            <button type="submit" class="btn btn-danger">Finalizar consulta</button>
-                        </form>
-                    </div>
+                `;
+                acciones.innerHTML += `
+                    <form method="POST" action="{{ url('/consultas') }}/${id}/finalizar" style="margin-top:8px; text-align:right;">
+                        @csrf
+                        <button type="submit" class="btn btn-secundario">Finalizar consulta</button>
+                    </form>
                 `;
             } else {
-                acciones.innerHTML = `
-                    <div class="acciones-row">
-                        <button type="button" class="btn btn-success" onclick="cerrarDetalle()">Cerrar chat</button>
-                        <span></span>
-                    </div>
-                `;
+                acciones.innerHTML = ``;
             }
         }
 
@@ -323,18 +311,12 @@
                     body: JSON.stringify({ body })
                 });
                 if (!res.ok) return false;
-                const rjson = await res.json();
                 // Añadir el nuevo mensaje al chat sin reconstruir toda la vista
                 const box = document.getElementById('chatBox');
                 if (box){
                     const bubble = document.createElement('div');
                     bubble.className = 'bubble from-doc';
-                    const t = formatTime(new Date().toISOString());
-                    bubble.innerHTML = `
-                        <div class="body"></div>
-                        <div class="meta time">${t}</div>
-                    `;
-                    bubble.querySelector('.body').textContent = body;
+                    bubble.textContent = body;
                     box.appendChild(bubble);
                     box.scrollTop = box.scrollHeight;
                 }
@@ -342,7 +324,6 @@
             } catch(e){ console.error(e); }
             return false;
         }
-
 
         function escapeHtml(text){
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -357,18 +338,6 @@
             const evt = new Event('input', { bubbles: true });
             inp.dispatchEvent(evt);
             inp.focus();
-        }
-
-        // Formatea a HH:mm en hora local si es posible
-        function formatTime(dt){
-            try{
-                if (!dt) return '';
-                const d = new Date(dt);
-                if (isNaN(d.getTime())) return '';
-                const hh = String(d.getHours()).padStart(2,'0');
-                const mm = String(d.getMinutes()).padStart(2,'0');
-                return `${hh}:${mm}`;
-            }catch(_){ return ''; }
         }
 
         // Delegar click en toda la fila de consulta activa
