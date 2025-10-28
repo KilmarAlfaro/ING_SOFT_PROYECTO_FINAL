@@ -196,6 +196,10 @@
                                     <div class="meta">
                                     <div class="name">Dr(a). {{ $fn }} {{ $fl }}</div>
                                     <div class="sub">{{ $d->especialidad }}</div>
+                                    @php $desc = $d->descripcion ? \Illuminate\Support\Str::limit($d->descripcion, 140) : null; @endphp
+                                    @if($desc)
+                                        <div class="desc">{{ $desc }}</div>
+                                    @endif
                                     </div>
                                     <div class="actions">
                                         @if($existingId)
@@ -225,15 +229,15 @@
                                     <div class="subtle" id="pacMotivoLinea" style="margin-top:2px;"></div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-light btn-sm" onclick="cerrarChatPaciente()">Cerrar</button>
+                            
                         </div>
                         <div id="pacChatEmpty" class="text-muted" style="padding:8px 4px;">No tienes consultas abiertas.</div>
                         <div class="chat-box" id="pacChatBox" style="display:none;"></div>
                         <form id="pacChatForm" class="respuesta-form" onsubmit="return enviarMensajePaciente(event)" style="display:none;">
                             <textarea id="pacChatInput" name="body" placeholder="Escribe tu mensaje..." required></textarea>
-                            <div class="botones">
-                                <button type="submit" id="pacChatSend" class="btn btn-primario">Enviar</button>
-                            </div>
+                            <button type="submit" id="pacChatSend" class="send-btn" aria-label="Enviar">
+                                <img src="https://cdn0.iconfinder.com/data/icons/zondicons/20/send-256.png" alt="Enviar" width="20" height="20"/>
+                            </button>
                         </form>
                         <div class="acciones-consulta" id="pacAcciones" style="margin-top:8px;"></div>
                         <div id="pacChatNote" class="subtle" style="display:none">Consulta finalizada (solo lectura)</div>
@@ -284,6 +288,7 @@
                     <div>
                         <div id="modalName" style="font-weight:700">Dr(a). Nombre Apellido</div>
                         <div id="modalEsp" style="font-size:0.95rem;color:#666">Especialidad</div>
+                        <div id="modalDesc" class="desc" style="font-size:0.9rem;color:#4b5563;margin-top:4px;"></div>
                     </div>
                 </div>
             </div>
@@ -373,7 +378,9 @@
             const meta = document.createElement('div'); meta.className = 'meta';
             const name = document.createElement('div'); name.className = 'name'; name.textContent = 'Dr(a). ' + li.dataset.nombre + ' ' + li.dataset.apellido;
             const sub = document.createElement('div'); sub.className = 'sub'; sub.textContent = d.especialidad || '';
+            const desc = document.createElement('div'); desc.className = 'desc'; desc.textContent = d.descripcion || '';
             meta.appendChild(name); meta.appendChild(sub);
+            if (d.descripcion) meta.appendChild(desc);
 
             const actions = document.createElement('div'); actions.className = 'actions';
             const btn = document.createElement('button'); btn.type = 'button';
@@ -433,6 +440,11 @@
             const nombre = li ? ((li.dataset.nombre||'') + ' ' + (li.dataset.apellido||'')) : '';
             const foto = li ? (li.dataset.foto||'{{ asset('imagenes/paciente.png') }}') : '{{ asset('imagenes/paciente.png') }}';
             const esp = li ? (li.dataset.especialidad||'') : '';
+            const desc = li ? (li.dataset.descripcion||'') : '';
+            // Mostrar descripción únicamente para el doctor seleccionado
+            const list = document.getElementById('doctorList');
+            if (list){ list.querySelectorAll('.chat-item.show-desc').forEach(el => el.classList.remove('show-desc')); }
+            if (li){ li.classList.add('show-desc'); }
 
             pacChatPendingDoctorId = id;
             const backdrop = document.getElementById('consultaBackdrop');
@@ -440,6 +452,7 @@
             document.getElementById('modalFoto').src = foto;
             document.getElementById('modalName').textContent = 'Dr(a). ' + nombre.trim();
             document.getElementById('modalEsp').textContent = esp;
+            document.getElementById('modalDesc').textContent = desc;
             document.getElementById('modalDoctorId').value = id;
             const motivoInput = document.getElementById('modalMotivo');
             const descInput = document.getElementById('modalDescripcion');
@@ -454,6 +467,9 @@
             if (!backdrop) return;
             backdrop.style.display = 'none';
             backdrop.setAttribute('aria-hidden','true');
+            // Al cerrar, ocultar nuevamente descripciones expandidas en la lista
+            const list = document.getElementById('doctorList');
+            if (list){ list.querySelectorAll('.chat-item.show-desc').forEach(el => el.classList.remove('show-desc')); }
         }
 
         // ---------- 5) Toasts ----------
@@ -712,11 +728,23 @@
                     if (send) send.disabled = ro;
                     if (note) note.style.display = ro ? '' : 'none';
                 }
-                // Botón Finalizar si no está finalizada (sin recargar, vía modal + AJAX)
+                // Botones de acciones según estado
                 if (acc && status !== 'finalizado'){
-                    acc.innerHTML = `<button type="button" id="btnFinalizar" class="btn btn-danger btn-sm">Finalizar consulta</button>`;
+                    acc.innerHTML = `
+                        <div class="acciones-row">
+                            <button type="button" class="btn btn-success btn-sm" onclick="cerrarChatPaciente()">Cerrar chat</button>
+                            <button type="button" id="btnFinalizar" class="btn btn-danger btn-sm">Finalizar consulta</button>
+                        </div>
+                    `;
                     const btnFin = document.getElementById('btnFinalizar');
                     if (btnFin){ btnFin.addEventListener('click', () => openFinalizeModal(id)); }
+                } else if (acc && status === 'finalizado'){
+                    acc.innerHTML = `
+                        <div class="acciones-row">
+                            <button type="button" class="btn btn-success btn-sm" onclick="cerrarChatPaciente()">Cerrar chat</button>
+                            <span></span>
+                        </div>
+                    `;
                 }
             }catch(e){ console.error(e); }
         }

@@ -195,11 +195,19 @@ nav .brand-logo:hover{
 /* Columna central */
 .main-content {
     background: #ffffff;
-    padding: 2rem;
+    padding: 1.2rem; /* compacto pero usable */
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 220px); /* altura similar a mainPac */
+    min-height: 480px;
+    overflow: hidden;
 }
+
+/* Asegurar que el contenedor interno permita que la grid crezca correctamente */
+#contenido-principal { display:flex; flex-direction:column; flex:1 1 auto; min-height:0; }
 
 .main-content h1 {
     color: #3a7ca5;
@@ -253,16 +261,35 @@ nav .brand-logo:hover{
 
 /* Si el centro ocupa todo */
 /* Detalle de consulta + chat */
-.detalle-consulta .cabecera-consulta{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.detalle-consulta{ display:grid; grid-template-rows: auto 1fr auto; grid-template-areas: "header" "chat" "actions"; flex:1; min-height:0; overflow:hidden; }
+.detalle-consulta .cabecera-consulta{ grid-area: header; display:flex; align-items:center; gap:12px; margin-bottom:10px; }
 .detalle-consulta .cabecera-consulta .avatar{ width:44px; height:44px; border-radius:50%; object-fit:cover; }
 .detalle-consulta .subtle{ color:#6b7280; font-size:.9rem; }
-.chat-box{ border:1px solid #e5e7eb; border-radius:10px; padding:10px; max-height:360px; overflow:auto; background:#f9fafb; }
-.bubble{ display:inline-block; padding:8px 12px; border-radius:14px; margin:6px 0; max-width:80%; }
+.chat-box{ grid-area: chat; border:1px solid #e5e7eb; border-radius:10px; padding:12px; height:100%; min-height:0; overflow-y:auto; overflow-x:hidden; background:#f9fafb; display:flex; flex-direction:column; gap:0; width:100%; box-sizing:border-box; }
+.bubble{ display:inline-flex; flex-direction:column; align-items:flex-start; padding:10px 14px; border-radius:10px; margin:12px 0 14px 0; max-width:80%; font-size:1rem; line-height:1.35; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow-wrap:anywhere; word-break: break-word; white-space: pre-wrap; box-sizing:border-box; height:auto; min-height:0; width:auto; }
+.chat-box .bubble:first-child{ margin-top:0; }
+.bubble .body{ margin:0; padding:0; }
+.bubble .meta{ display:block; margin-top:4px; font-size:11px; line-height:1; color:#6b7280; }
+.bubble .time{ font-variant-numeric: tabular-nums; }
+.from-doc .meta{ align-self:flex-end; text-align:right; }
+.from-pac .meta{ align-self:flex-start; text-align:left; }
 .from-pac{ background:#e6f0ff; color:#1f2937; align-self:flex-start; }
-.from-doc{ background:#d1fae5; color:#065f46; align-self:flex-end; float:right; clear:both; }
-.acciones-consulta{ margin-top:12px; }
-.respuesta-form textarea{ width:100%; min-height:90px; border:1px solid #ddd; border-radius:8px; padding:8px; }
-.respuesta-form .botones{ display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+.from-doc{ background:#d1fae5; color:#065f46; align-self:flex-end; }
+.acciones-consulta{ grid-area: actions; margin-top:12px; width:100%; }
+/* Fila inferior con cerrar (izquierda) y finalizar (derecha) */
+.acciones-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; width:100%; }
+/* Formulario de respuesta: fila con textarea + botón de envío como icono */
+.respuesta-form{ display:flex; align-items:center; gap:8px; width:100%; }
+.respuesta-form textarea{ flex:1; min-height:40px; height:40px; border:1px solid #ddd; border-radius:8px; padding:6px; resize:vertical; }
+.respuesta-form .send-btn{ width:40px; height:40px; border:none; border-radius:8px; background:#0d6efd; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.respuesta-form .send-btn:hover{ background:#0b5ed7; }
+.respuesta-form .send-btn img{ filter: invert(100%); width:20px; height:20px; display:block; }
+
+/* Botones de acciones de cierre/finalizar */
+.btn-success{ background:#16a34a; color:#fff; border:none; border-radius:6px; padding:8px 12px; cursor:pointer; font-size:.95rem; }
+.btn-success:hover{ background:#15803d; }
+.btn-danger{ background:#dc2626; color:#fff; border:none; border-radius:6px; padding:8px 12px; cursor:pointer; font-size:.95rem; }
+.btn-danger:hover{ background:#b91c1c; }
 
 /* Columna derecha oculta */
 .hidden {
