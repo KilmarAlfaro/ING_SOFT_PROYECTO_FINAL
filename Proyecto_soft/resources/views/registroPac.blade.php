@@ -59,8 +59,8 @@
       </div>
 
       <div class="acciones" style="gap:12px;">
+        <a href="{{ url('/') }}" class="btn btn-danger">Regresar</a>
         <button type="submit" class="btn btn-primario">Registrarse</button>
-        <a href="{{ url('/') }}" class="btn btn-secundario">Regresar</a>
       </div>
     </form>
   </div>

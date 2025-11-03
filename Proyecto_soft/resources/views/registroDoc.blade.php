@@ -91,8 +91,8 @@
 
       <!-- BOTONES -->
       <div class="acciones" style="gap:12px;">
+        <a href="{{ url('/') }}" class="btn btn-danger">REGRESAR</a>
         <button type="submit" class="btn btn-primario">REGISTRARSE</button>
-        <a href="{{ url('/') }}" class="btn btn-secundario">REGRESAR</a>
       </div>
     </form>
   </div>

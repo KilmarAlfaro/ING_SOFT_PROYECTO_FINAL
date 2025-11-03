@@ -110,6 +110,16 @@
 .btn-secundario:hover {
   background-color: #ee6e05;
 }
+
+/* Botón rojo para REGRESAR */
+.btn-danger{
+  background-color:#dc2626; /* rojo */
+  color:#fff;
+  text-decoration:none;
+}
+.btn-danger:hover{
+  background-color:#b91c1c; /* rojo más oscuro */
+}
 .acciones {
   display: flex;
   justify-content: space-between;
