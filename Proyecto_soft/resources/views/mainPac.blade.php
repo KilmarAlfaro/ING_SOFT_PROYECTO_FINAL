@@ -25,9 +25,14 @@
             <a href="{{ route('perfil.paciente') }}" style="display:inline-block;">
                 @php
                     $pacienteId = session('paciente_id');
+                    $ver = null;
+                    if ($pacienteId) {
+                        $p = \App\Models\Paciente::find($pacienteId);
+                        $ver = optional($p?->updated_at)->timestamp ?? time();
+                    }
                 @endphp
                 @if($pacienteId)
-                    <img src="{{ route('avatar.paciente', $pacienteId) }}" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
+                    <img src="{{ route('avatar.paciente', $pacienteId) }}?v={{ $ver }}" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
                 @else
                     <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
                 @endif
@@ -131,7 +136,8 @@
                 $fn = $doc ? (explode(' ', trim($doc->nombre))[0] ?? $doc->nombre) : 'Doctor';
                 $fl = $doc ? (explode(' ', trim($doc->apellido))[0] ?? ($doc->apellido ?? '')) : '';
                 $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                $seedFoto = ($doc && $doc->id) ? route('avatar.doctor', $doc->id) : $defaultAvatar;
+                $ver = optional($doc?->updated_at)->timestamp ?? time();
+                $seedFoto = ($doc && $doc->id) ? route('avatar.doctor', $doc->id) . '?v=' . $ver : $defaultAvatar;
             @endphp
             <div id="pacActiveSeed" data-id="{{ $seed->id }}" data-doctor="{{ $fn }} {{ $fl }}" data-foto="{{ $seedFoto }}" data-status="{{ $seed->status ?? 'nuevo' }}" style="display:none;"></div>
         @endif
@@ -177,7 +183,8 @@
                                     $fn = explode(' ', trim($d->nombre))[0] ?? $d->nombre;
                                     $fl = explode(' ', trim($d->apellido))[0] ?? $d->apellido;
                                     $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                                    $fotoUrl = route('avatar.doctor', $d->id);
+                                    $ver = optional($d->updated_at)->timestamp ?? time();
+                                    $fotoUrl = route('avatar.doctor', $d->id) . '?v=' . $ver;
                                     $existingId = $activeByDoctor[$d->id] ?? null;
                                 @endphp
                                 <li class="chat-item" data-id="{{ $d->id }}" data-nombre="{{ $fn }}" data-apellido="{{ $fl }}" data-especialidad="{{ $d->especialidad }}" data-descripcion="{{ e($d->descripcion) }}" data-foto="{{ $fotoUrl }}" @if($existingId) data-existing-id="{{ $existingId }}" @endif>
@@ -247,7 +254,8 @@
                                 $fn = $doc ? (explode(' ', trim($doc->nombre))[0] ?? $doc->nombre) : 'Doctor';
                                 $fl = $doc ? (explode(' ', trim($doc->apellido))[0] ?? ($doc->apellido ?? '')) : '';
                                 $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                                $fotoUrl = ($doc && $doc->id) ? route('avatar.doctor', $doc->id) : $defaultAvatar;
+                                $ver = optional($doc->updated_at ?? null)->timestamp ?? time();
+                                $fotoUrl = ($doc && $doc->id) ? route('avatar.doctor', $doc->id) . '?v=' . $ver : $defaultAvatar;
                                 $motivo = $c->mensaje ?? '';
                             @endphp
                             <li class="chat-item" data-id="{{ $c->id }}" data-doctor="{{ $fn }} {{ $fl }}" data-foto="{{ $fotoUrl }}" data-status="finalizado">

@@ -12,11 +12,19 @@ class MediaController extends Controller
     public function doctorAvatar(int $id)
     {
         $doc = Doctor::find($id);
-        if ($doc && $doc->foto_perfil_blob) {
+        if ($doc && $doc->foto_perfil_blob && strlen($doc->foto_perfil_blob) > 100) {
             $mime = $doc->foto_perfil_mime ?: 'image/jpeg';
+            $etag = 'W/"'.md5($doc->foto_perfil_blob).'"';
+            if (request()->header('If-None-Match') === $etag) {
+                return response('', 304, [
+                    'ETag' => $etag,
+                    'Cache-Control' => 'no-cache, must-revalidate',
+                ]);
+            }
             return response($doc->foto_perfil_blob, 200, [
                 'Content-Type' => $mime,
-                'Cache-Control' => 'public, max-age=604800',
+                'ETag' => $etag,
+                'Cache-Control' => 'no-cache, must-revalidate',
             ]);
         }
 
@@ -24,8 +32,20 @@ class MediaController extends Controller
         $disk = config('avatar.disk', 'public');
         $folder = config('avatar.folder', 'profile_pics');
         if ($doc && $doc->foto_perfil && Storage::disk($disk)->exists($folder.'/'.$doc->foto_perfil)) {
-            // Stream the file (works for local and most remote disks)
-            return Storage::disk($disk)->response($folder.'/'.$doc->foto_perfil);
+            $bytes = Storage::disk($disk)->get($folder.'/'.$doc->foto_perfil);
+            $mime = $doc->foto_perfil_mime ?: 'image/jpeg';
+            $etag = 'W/"'.md5($bytes).'"';
+            if (request()->header('If-None-Match') === $etag) {
+                return response('', 304, [
+                    'ETag' => $etag,
+                    'Cache-Control' => 'no-cache, must-revalidate',
+                ]);
+            }
+            return response($bytes, 200, [
+                'Content-Type' => $mime,
+                'ETag' => $etag,
+                'Cache-Control' => 'no-cache, must-revalidate',
+            ]);
         }
 
         return redirect(config('avatar.default_url'));
@@ -34,18 +54,39 @@ class MediaController extends Controller
     public function pacienteAvatar(int $id)
     {
         $pac = Paciente::find($id);
-        if ($pac && $pac->foto_perfil_blob) {
+        if ($pac && $pac->foto_perfil_blob && strlen($pac->foto_perfil_blob) > 100) {
             $mime = $pac->foto_perfil_mime ?: 'image/jpeg';
+            $etag = 'W/"'.md5($pac->foto_perfil_blob).'"';
+            if (request()->header('If-None-Match') === $etag) {
+                return response('', 304, [
+                    'ETag' => $etag,
+                    'Cache-Control' => 'no-cache, must-revalidate',
+                ]);
+            }
             return response($pac->foto_perfil_blob, 200, [
                 'Content-Type' => $mime,
-                'Cache-Control' => 'public, max-age=604800',
+                'ETag' => $etag,
+                'Cache-Control' => 'no-cache, must-revalidate',
             ]);
         }
 
         $disk = config('avatar.disk', 'public');
         $folder = config('avatar.folder', 'profile_pics');
         if ($pac && $pac->foto_perfil && Storage::disk($disk)->exists($folder.'/'.$pac->foto_perfil)) {
-            return Storage::disk($disk)->response($folder.'/'.$pac->foto_perfil);
+            $bytes = Storage::disk($disk)->get($folder.'/'.$pac->foto_perfil);
+            $mime = $pac->foto_perfil_mime ?: 'image/jpeg';
+            $etag = 'W/"'.md5($bytes).'"';
+            if (request()->header('If-None-Match') === $etag) {
+                return response('', 304, [
+                    'ETag' => $etag,
+                    'Cache-Control' => 'no-cache, must-revalidate',
+                ]);
+            }
+            return response($bytes, 200, [
+                'Content-Type' => $mime,
+                'ETag' => $etag,
+                'Cache-Control' => 'no-cache, must-revalidate',
+            ]);
         }
 
         return redirect(config('avatar.default_url'));

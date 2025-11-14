@@ -85,16 +85,22 @@ class PerfilPacienteController extends Controller
         }
 
         if ($request->hasFile('profile_image')) {
+            // IMPORTANTE: capturar bytes y mime ANTES de mover/almacenar el archivo
+            $image = $request->file('profile_image');
+            $bytes = @file_get_contents($image->getRealPath());
+            $mime = $image->getMimeType() ?: 'image/jpeg';
+
             // Guardar en disco configurado (opcional)
             $disk = config('avatar.disk', 'public');
             $folder = config('avatar.folder', 'profile_pics');
-            $path = $request->file('profile_image')->store($folder, $disk);
+            $path = $image->store($folder, $disk);
             $paciente->foto_perfil = basename($path);
 
-            // Guardar bytes en BD para portabilidad
-            $image = $request->file('profile_image');
-            $paciente->foto_perfil_blob = file_get_contents($image->getRealPath());
-            $paciente->foto_perfil_mime = $image->getMimeType() ?: 'image/jpeg';
+            // Guardar bytes en BD para portabilidad (usar los bytes capturados)
+            if ($bytes !== false && strlen($bytes) > 0) {
+                $paciente->foto_perfil_blob = $bytes;
+                $paciente->foto_perfil_mime = $mime;
+            }
         }
 
         $paciente->save();

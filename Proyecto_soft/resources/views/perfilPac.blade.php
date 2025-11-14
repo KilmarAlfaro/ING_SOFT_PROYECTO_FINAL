@@ -22,13 +22,17 @@
         @csrf 
 
         <div class="profile-pic-container">
-            @php $pacienteFoto = route('avatar.paciente', $paciente->id); @endphp
+            @php 
+                $ver = optional($paciente->updated_at)->timestamp ?? time();
+                $pacienteFoto = route('avatar.paciente', $paciente->id) . '?v=' . $ver; 
+            @endphp
             <img id="pacientePreview" src="{{ $pacienteFoto }}" alt="Foto de perfil" class="profile-pic">
             
             <label for="profile_image" class="file-upload-label">
                 Cambiar foto de perfil
             </label>
             <input type="file" name="profile_image" id="profile_image" accept="image/*">
+            @error('profile_image') <div class="message" style="color:red">{{ $message }}</div> @enderror
         </div>
         <div class="form-group">
             <label for="nombre">Nombre:</label>

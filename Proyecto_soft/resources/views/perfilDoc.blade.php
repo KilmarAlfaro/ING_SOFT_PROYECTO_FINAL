@@ -26,7 +26,10 @@
 
             <div class="grid">
                 <div class="profile-pic-container" style="margin-bottom:18px; text-align:left;">
-                    @php $doctorFoto = route('avatar.doctor', $doctor->id); @endphp
+                    @php 
+                        $ver = optional($doctor->updated_at)->timestamp ?? time();
+                        $doctorFoto = route('avatar.doctor', $doctor->id) . '?v=' . $ver; 
+                    @endphp
                     <img id="doctorPreview" src="{{ $doctorFoto }}" alt="Foto de perfil" class="profile-pic">
                     <div style="margin-top:8px;">
                         <label for="profile_image" class="file-upload-label">Cambiar foto de perfil</label>
