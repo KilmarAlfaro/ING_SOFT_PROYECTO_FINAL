@@ -59,3 +59,25 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Profile pictures and storage
+
+This app stores user profile pictures under `storage/app/public/profile_pics` and serves them via the `/storage` symlink.
+
+Setup steps after cloning or moving to a new machine:
+
+1. Create the public storage link (required once per environment):
+	 - Windows/macOS/Linux: `php artisan storage:link`
+2. Ensure any existing images are present at `storage/app/public/profile_pics`.
+3. The application generates public URLs using `Storage::disk('public')->url('profile_pics/<filename>')`.
+
+Using a remote/global storage (recommended for production):
+
+- Configure the `s3` disk in `.env`:
+	- `FILESYSTEM_DISK=s3`
+	- `AWS_ACCESS_KEY_ID=...`
+	- `AWS_SECRET_ACCESS_KEY=...`
+	- `AWS_DEFAULT_REGION=...`
+	- `AWS_BUCKET=...`
+	- (optional) `AWS_URL=https://<your-cdn-or-bucket-url>`
+- Upload profile images to the `profile_pics/` folder in your bucket. The code will keep working as it uses `Storage` to resolve URLs.

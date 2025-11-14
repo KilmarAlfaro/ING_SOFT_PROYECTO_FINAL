@@ -24,13 +24,7 @@
             <a href="{{ route('perfil.doctor') }}">
                 @php
                     $doctorId = session('doctor_id');
-                    $foto = null;
-                    if ($doctorId) {
-                        $d = \App\Models\Doctor::find($doctorId);
-                        if ($d && !empty($d->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $d->foto_perfil))) {
-                            $foto = asset('storage/profile_pics/' . $d->foto_perfil);
-                        }
-                    }
+                    $foto = $doctorId ? route('avatar.doctor', $doctorId) : null;
                 @endphp
                 @if($foto)
                     <img src="{{ $foto }}" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
@@ -78,9 +72,7 @@
                         $fn = $pac ? (explode(' ', trim($pac->nombre))[0] ?? $pac->nombre) : 'Paciente';
                         $fl = $pac ? (explode(' ', trim($pac->apellido))[0] ?? ($pac->apellido ?? '')) : '';
                         $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                        $fotoUrl = ($pac && !empty($pac->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $pac->foto_perfil)))
-                            ? asset('storage/profile_pics/' . $pac->foto_perfil)
-                            : $defaultAvatar;
+                        $fotoUrl = ($pac && $pac->id) ? route('avatar.paciente', $pac->id) : $defaultAvatar;
                     @endphp
                     <li class="chat-item"
                         data-id="{{ $c->id }}"
@@ -150,9 +142,7 @@
                         $fn = $pac ? (explode(' ', trim($pac->nombre))[0] ?? $pac->nombre) : 'Paciente';
                         $fl = $pac ? (explode(' ', trim($pac->apellido))[0] ?? ($pac->apellido ?? '')) : '';
                         $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                        $fotoUrl = ($pac && !empty($pac->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $pac->foto_perfil)))
-                            ? asset('storage/profile_pics/' . $pac->foto_perfil)
-                            : $defaultAvatar;
+                        $fotoUrl = ($pac && $pac->id) ? route('avatar.paciente', $pac->id) : $defaultAvatar;
                     @endphp
                     <li class="chat-item" data-id="{{ $c->id }}" data-paciente="{{ $fn }} {{ $fl }}" data-foto="{{ $fotoUrl }}" data-status="finalizado">
                         <div class="thumb"><img src="{{ $fotoUrl }}" alt="avatar"></div>

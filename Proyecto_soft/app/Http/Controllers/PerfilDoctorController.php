@@ -74,13 +74,16 @@ class PerfilDoctorController extends Controller
 
         // manejar imagen de perfil
         if ($request->hasFile('profile_image')) {
-            // eliminar anterior si existe
-            if ($doctor->foto_perfil && Storage::disk('public')->exists('profile_pics/' . $doctor->foto_perfil)) {
-                Storage::disk('public')->delete('profile_pics/' . $doctor->foto_perfil);
-            }
-
-            $path = $request->file('profile_image')->store('profile_pics', 'public');
+            // Guardar en disco configurado (opcional, como respaldo)
+            $disk = config('avatar.disk', 'public');
+            $folder = config('avatar.folder', 'profile_pics');
+            $path = $request->file('profile_image')->store($folder, $disk);
             $doctor->foto_perfil = basename($path);
+
+            // Guardar bytes en BD para portabilidad (tipo WhatsApp)
+            $image = $request->file('profile_image');
+            $doctor->foto_perfil_blob = file_get_contents($image->getRealPath());
+            $doctor->foto_perfil_mime = $image->getMimeType() ?: 'image/jpeg';
         }
 
         $doctor->save();
