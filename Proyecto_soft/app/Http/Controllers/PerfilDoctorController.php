@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\Doctor;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 
 class PerfilDoctorController extends Controller
 {
@@ -83,12 +84,23 @@ class PerfilDoctorController extends Controller
             $disk = config('avatar.disk', 'public');
             $folder = config('avatar.folder', 'profile_pics');
             $path = $image->store($folder, $disk);
-            $doctor->foto_perfil = basename($path);
+            // Guardar nombre sólo si la columna existe
+            if (Schema::hasColumn('doctors', 'foto_perfil')) {
+                // eliminar archivo anterior si existía
+                if (! empty($doctor->foto_perfil) && Storage::disk($disk)->exists($folder.'/'.$doctor->foto_perfil)) {
+                    try { Storage::disk($disk)->delete($folder.'/'.$doctor->foto_perfil); } catch (\Exception $e) { /* ignore */ }
+                }
+                $doctor->foto_perfil = basename($path);
+            }
 
-            // Guardar bytes en BD para portabilidad (tipo WhatsApp)
+            // Guardar bytes en BD para portabilidad sólo si las columnas existen
             if ($bytes !== false && strlen($bytes) > 0) {
-                $doctor->foto_perfil_blob = $bytes;
-                $doctor->foto_perfil_mime = $mime;
+                if (Schema::hasColumn('doctors', 'foto_perfil_blob')) {
+                    $doctor->foto_perfil_blob = $bytes;
+                }
+                if (Schema::hasColumn('doctors', 'foto_perfil_mime')) {
+                    $doctor->foto_perfil_mime = $mime;
+                }
             }
         }
 

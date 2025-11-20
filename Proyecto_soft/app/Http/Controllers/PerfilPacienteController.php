@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Paciente;
 
@@ -94,12 +95,23 @@ class PerfilPacienteController extends Controller
             $disk = config('avatar.disk', 'public');
             $folder = config('avatar.folder', 'profile_pics');
             $path = $image->store($folder, $disk);
-            $paciente->foto_perfil = basename($path);
+            // Guardar el nombre del archivo sólo si la columna existe
+            if (Schema::hasColumn('pacientes', 'foto_perfil')) {
+                // eliminar archivo anterior si existía
+                if (! empty($paciente->foto_perfil) && Storage::disk($disk)->exists($folder.'/'.$paciente->foto_perfil)) {
+                    try { Storage::disk($disk)->delete($folder.'/'.$paciente->foto_perfil); } catch (\Exception $e) { /* ignore */ }
+                }
+                $paciente->foto_perfil = basename($path);
+            }
 
-            // Guardar bytes en BD para portabilidad (usar los bytes capturados)
+            // Guardar bytes en BD para portabilidad sólo si las columnas existen
             if ($bytes !== false && strlen($bytes) > 0) {
-                $paciente->foto_perfil_blob = $bytes;
-                $paciente->foto_perfil_mime = $mime;
+                if (Schema::hasColumn('pacientes', 'foto_perfil_blob')) {
+                    $paciente->foto_perfil_blob = $bytes;
+                }
+                if (Schema::hasColumn('pacientes', 'foto_perfil_mime')) {
+                    $paciente->foto_perfil_mime = $mime;
+                }
             }
         }
 
