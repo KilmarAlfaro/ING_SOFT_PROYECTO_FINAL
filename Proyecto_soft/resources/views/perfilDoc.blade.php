@@ -26,11 +26,11 @@
 
             <div class="grid">
                 <div class="profile-pic-container" style="margin-bottom:18px; text-align:left;">
-                    @if(!empty($doctor->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $doctor->foto_perfil)))
-                        <img id="doctorPreview" src="{{ asset('storage/profile_pics/' . $doctor->foto_perfil) }}" alt="Foto de perfil" class="profile-pic">
-                    @else
-                        <img id="doctorPreview" src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil" class="profile-pic">
-                    @endif
+                    @php 
+                        $ver = optional($doctor->updated_at)->timestamp ?? time();
+                        $doctorFoto = route('avatar.doctor', $doctor->id) . '?v=' . $ver; 
+                    @endphp
+                    <img id="doctorPreview" src="{{ $doctorFoto }}" alt="Foto de perfil" class="profile-pic">
                     <div style="margin-top:8px;">
                         <label for="profile_image" class="file-upload-label">Cambiar foto de perfil</label>
                         <input type="file" name="profile_image" id="profile_image" accept="image/*">

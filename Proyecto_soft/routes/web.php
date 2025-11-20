@@ -8,6 +8,7 @@ use App\Http\Controllers\doctorController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PerfilDoctorController;
 use App\Http\Controllers\PerfilPacienteController;
+use App\Http\Controllers\MediaController;
 use App\Http\Middleware\RequireSessionOrAuth;
 
 /* Rutas públicas */
@@ -121,3 +122,7 @@ Route::get('/consulta-doctor/{id}', [doctorController::class, 'consulta'])->name
 */
 Route::get('/perfil/paciente', [PerfilPacienteController::class, 'edit'])->name('perfil.paciente');
 Route::post('/perfil/paciente', [PerfilPacienteController::class, 'update'])->name('perfil.paciente.update');
+
+// Avatares servidos desde BD o almacenamiento (acceso público)
+Route::get('/media/doctores/{id}', [MediaController::class, 'doctorAvatar'])->name('avatar.doctor');
+Route::get('/media/pacientes/{id}', [MediaController::class, 'pacienteAvatar'])->name('avatar.paciente');

@@ -22,16 +22,17 @@
         @csrf 
 
         <div class="profile-pic-container">
-            @if(!empty($paciente->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $paciente->foto_perfil)))
-                <img id="pacientePreview" src="{{ asset('storage/profile_pics/' . $paciente->foto_perfil) }}" alt="Foto de perfil" class="profile-pic">
-            @else
-                <img id="pacientePreview" src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Foto de perfil" class="profile-pic">
-            @endif
+            @php 
+                $ver = optional($paciente->updated_at)->timestamp ?? time();
+                $pacienteFoto = route('avatar.paciente', $paciente->id) . '?v=' . $ver; 
+            @endphp
+            <img id="pacientePreview" src="{{ $pacienteFoto }}" alt="Foto de perfil" class="profile-pic">
             
             <label for="profile_image" class="file-upload-label">
                 Cambiar foto de perfil
             </label>
             <input type="file" name="profile_image" id="profile_image" accept="image/*">
+            @error('profile_image') <div class="message" style="color:red">{{ $message }}</div> @enderror
         </div>
         <div class="form-group">
             <label for="nombre">Nombre:</label>

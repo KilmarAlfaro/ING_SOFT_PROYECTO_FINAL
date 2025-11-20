@@ -6,6 +6,7 @@ use App\Models\Doctor;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorController extends Controller
 {
@@ -120,7 +121,8 @@ class DoctorController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             $items = $query->orderBy('nombre')->limit(12)->get()->map(function($d){
                 $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                $foto = $d->foto_perfil ? asset('storage/profile_pics/' . $d->foto_perfil) : $defaultAvatar;
+                $ver = optional($d->updated_at)->timestamp ?? time();
+                $foto = route('avatar.doctor', $d->id) . '?v=' . $ver;
                 return [
                     'id' => $d->id,
                     'nombre' => $d->nombre,

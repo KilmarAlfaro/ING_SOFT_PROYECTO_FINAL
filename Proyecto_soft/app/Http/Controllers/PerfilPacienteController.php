@@ -85,13 +85,22 @@ class PerfilPacienteController extends Controller
         }
 
         if ($request->hasFile('profile_image')) {
-            // eliminar foto anterior si existe
-            if ($paciente->foto_perfil && Storage::disk('public')->exists('profile_pics/' . $paciente->foto_perfil)) {
-                Storage::disk('public')->delete('profile_pics/' . $paciente->foto_perfil);
-            }
+            // IMPORTANTE: capturar bytes y mime ANTES de mover/almacenar el archivo
+            $image = $request->file('profile_image');
+            $bytes = @file_get_contents($image->getRealPath());
+            $mime = $image->getMimeType() ?: 'image/jpeg';
 
-            $path = $request->file('profile_image')->store('profile_pics', 'public');
+            // Guardar en disco configurado (opcional)
+            $disk = config('avatar.disk', 'public');
+            $folder = config('avatar.folder', 'profile_pics');
+            $path = $image->store($folder, $disk);
             $paciente->foto_perfil = basename($path);
+
+            // Guardar bytes en BD para portabilidad (usar los bytes capturados)
+            if ($bytes !== false && strlen($bytes) > 0) {
+                $paciente->foto_perfil_blob = $bytes;
+                $paciente->foto_perfil_mime = $mime;
+            }
         }
 
         $paciente->save();

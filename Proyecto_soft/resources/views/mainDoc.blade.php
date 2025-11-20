@@ -27,13 +27,12 @@
                     $foto = null;
                     if ($doctorId) {
                         $d = \App\Models\Doctor::find($doctorId);
-                        if ($d && !empty($d->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $d->foto_perfil))) {
-                            $foto = asset('storage/profile_pics/' . $d->foto_perfil);
-                        }
+                        $ver = optional($d?->updated_at)->timestamp ?? time();
+                        $foto = route('avatar.doctor', $doctorId) . '?v=' . $ver;
                     }
                 @endphp
                 @if($foto)
-                    <img src="{{ $foto }}" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
+                    <img src="{{ $foto }}" alt="Perfil" style="width:55px;height:50px;border-radius:50%">
                 @else
                     <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil">
                 @endif
@@ -78,9 +77,8 @@
                         $fn = $pac ? (explode(' ', trim($pac->nombre))[0] ?? $pac->nombre) : 'Paciente';
                         $fl = $pac ? (explode(' ', trim($pac->apellido))[0] ?? ($pac->apellido ?? '')) : '';
                         $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                        $fotoUrl = ($pac && !empty($pac->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $pac->foto_perfil)))
-                            ? asset('storage/profile_pics/' . $pac->foto_perfil)
-                            : $defaultAvatar;
+                        $ver = optional($pac?->updated_at)->timestamp ?? time();
+                        $fotoUrl = ($pac && $pac->id) ? route('avatar.paciente', $pac->id) . '?v=' . $ver : $defaultAvatar;
                     @endphp
                     <li class="chat-item"
                         data-id="{{ $c->id }}"
@@ -150,9 +148,8 @@
                         $fn = $pac ? (explode(' ', trim($pac->nombre))[0] ?? $pac->nombre) : 'Paciente';
                         $fl = $pac ? (explode(' ', trim($pac->apellido))[0] ?? ($pac->apellido ?? '')) : '';
                         $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
-                        $fotoUrl = ($pac && !empty($pac->foto_perfil) && file_exists(public_path('storage/profile_pics/' . $pac->foto_perfil)))
-                            ? asset('storage/profile_pics/' . $pac->foto_perfil)
-                            : $defaultAvatar;
+                        $ver = optional($pac?->updated_at)->timestamp ?? time();
+                        $fotoUrl = ($pac && $pac->id) ? route('avatar.paciente', $pac->id) . '?v=' . $ver : $defaultAvatar;
                     @endphp
                     <li class="chat-item" data-id="{{ $c->id }}" data-paciente="{{ $fn }} {{ $fl }}" data-foto="{{ $fotoUrl }}" data-status="finalizado">
                         <div class="thumb"><img src="{{ $fotoUrl }}" alt="avatar"></div>
