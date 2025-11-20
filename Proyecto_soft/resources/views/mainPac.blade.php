@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>mainPac</title>
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS (única vez) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ asset('css/buscar.css') }}">
@@ -230,7 +230,7 @@
                             
                         </div>
                         <div id="pacChatEmpty" class="text-muted" style="padding:8px 4px;">No tienes consultas abiertas.</div>
-                        <div class="chat-box" id="pacChatBox" style="display:none;"></div>
+                        <div class="chat-box" id="pacChatBox" style="display:none;" aria-live="polite"></div>
                         <form id="pacChatForm" class="respuesta-form" onsubmit="return enviarMensajePaciente(event)" style="display:none;">
                             <textarea id="pacChatInput" name="body" placeholder="Escribe tu mensaje..." required></textarea>
                             <button type="submit" id="pacChatSend" class="send-btn" aria-label="Enviar">
@@ -293,7 +293,7 @@
                 <form id="consultaForm" method="POST" action="{{ route('consultas.store') }}">
                     @csrf
                     <input type="hidden" name="doctor_id" id="modalDoctorId" value="">
-                    <label for="modalMotivo" style="font-weight:600;">Motivo (título breve)</label>
+                    <label for="modalMotivo" style="font-weight:600;">Motivo de la consulta</label>
                     <input id="modalMotivo" name="motivo" type="text" required maxlength="255" placeholder="Ej.: Dolor de cabeza" class="form-control" style="margin-bottom:8px;">
 
                     <label for="modalDescripcion" style="font-weight:600;">Descripción (se enviará al chat)</label>
@@ -656,7 +656,21 @@
 
             // Abrir automáticamente la primera activa si existe
             const seed = document.getElementById('pacActiveSeed');
+            // (default behavior) - no client-side Enter interception here; sending is handled by the form submit
+
             if (seed){ abrirChatPaciente(seed.getAttribute('data-id')); }
+
+            // Enter para enviar (Shift+Enter conserva salto) en paciente
+            const pacTa = document.getElementById('pacChatInput');
+            if (pacTa){
+                pacTa.addEventListener('keydown', function(ev){
+                    if (ev.key === 'Enter' && !ev.shiftKey){
+                        ev.preventDefault();
+                        const f = document.getElementById('pacChatForm');
+                        if (f){ (typeof f.requestSubmit === 'function') ? f.requestSubmit() : f.submit(); }
+                    }
+                });
+            }
         });
 
         // ---------- 6) Paciente chat ----------
@@ -704,8 +718,7 @@
                 if (box){
                     box.innerHTML = (data.data || []).map(m => `
                         <div class="bubble ${m.sender === 'doctor' ? 'from-doc' : 'from-pac'}">
-                            <div class="body">${escapeHtml(m.body)}</div>
-                            <div class="meta"><span class="time">${formatTime(m.created_at)}</span></div>
+                            <div class="body"><span class="text">${escapeHtml(m.body)}</span><span class="time">${formatTime(m.created_at)}</span></div>
                         </div>
                     `).join('');
                     box.scrollTop = box.scrollHeight;
@@ -726,11 +739,11 @@
                     if (note) note.style.display = ro ? '' : 'none';
                 }
                 // Botones de acciones según estado
-                if (acc && status !== 'finalizado'){
+                    if (acc && status !== 'finalizado'){
                     acc.innerHTML = `
                         <div class="acciones-row">
-                            <button type="button" class="btn btn-success btn-sm" onclick="cerrarChatPaciente()">Cerrar chat</button>
-                            <button type="button" id="btnFinalizar" class="btn btn-danger btn-sm">Finalizar consulta</button>
+                            <button type="button" class="btn btn-success btn-sm" onclick="cerrarChatPaciente()" aria-label="Cerrar chat">Cerrar chat</button>
+                            <button type="button" id="btnFinalizar" class="btn btn-danger btn-sm" aria-label="Finalizar consulta">Finalizar consulta</button>
                         </div>
                     `;
                     const btnFin = document.getElementById('btnFinalizar');
@@ -738,7 +751,7 @@
                 } else if (acc && status === 'finalizado'){
                     acc.innerHTML = `
                         <div class="acciones-row">
-                            <button type="button" class="btn btn-success btn-sm" onclick="cerrarChatPaciente()">Cerrar chat</button>
+                            <button type="button" class="btn btn-success btn-sm" onclick="cerrarChatPaciente()" aria-label="Cerrar chat">Cerrar chat</button>
                             <span></span>
                         </div>
                     `;
@@ -877,7 +890,7 @@
                         const bubble = document.createElement('div');
                         bubble.className = 'bubble from-pac';
                         const ts = rjson && rjson.data && rjson.data.created_at ? rjson.data.created_at : '';
-                        bubble.innerHTML = `<div class="body">${escapeHtml(body)}</div><div class="meta"><span class="time">${formatTime(ts)}</span></div>`;
+                        bubble.innerHTML = `<div class="body"><span class="text">${escapeHtml(body)}</span><span class="time">${formatTime(ts)}</span></div>`;
                         box.appendChild(bubble);
                         box.scrollTop = box.scrollHeight;
                     }

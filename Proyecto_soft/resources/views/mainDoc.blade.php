@@ -6,8 +6,9 @@
     <title>Panel Doctor</title>
     <link rel="stylesheet" href="{{ asset('css/estiloDoc.css') }}">
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
+    <!-- Chat styles moved to global CSS for consistency -->
 </head>
-<body>
+<body class="doctor-chat">
 
     <!-- NAVBAR -->
     <nav>
@@ -235,16 +236,27 @@
 
             const detalle = document.getElementById('consulta-detalle');
             detalle.innerHTML = `
-                <div class="cabecera-consulta">
-                    <img src="${foto}" alt="avatar" class="avatar">
-                    <div>
-                        <h2 style="margin:0">Consulta de ${nombre}</h2>
-                        <div id="motivoLinea" class="subtle"></div>
+                <div class="cabecera-consulta" id="docChatHeader" style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <img id="docChatFoto" src="${foto}" alt="avatar" class="avatar" width="44" height="44">
+                        <div>
+                            <div class="name" id="docChatTitle">Consulta de ${nombre}</div>
+                            <div class="subtle" id="docChatId">ID #${id}</div>
+                            <div class="subtle" id="motivoLinea" style="margin-top:2px;"></div>
+                        </div>
                     </div>
                     <span style="flex:1"></span>
                 </div>
-                <div class="chat-box" id="chatBox"></div>
+                <div id="docChatEmpty" class="text-muted" style="padding:8px 4px;display:none;">Sin mensajes todavía.</div>
+                <div class="chat-box" id="chatBox" aria-live="polite"></div>
+                <form id="docChatForm" class="respuesta-form" onsubmit="return enviarMensaje(event, ${id}, this)">
+                    <textarea id="docChatInput" name="body" placeholder="Escribe tu respuesta..." required></textarea>
+                    <button type="submit" id="docChatSend" class="send-btn" aria-label="Enviar">
+                        <img src="https://cdn0.iconfinder.com/data/icons/zondicons/20/send-256.png" alt="Enviar" width="20" height="20" />
+                    </button>
+                </form>
                 <div class="acciones-consulta" id="accionesConsulta"></div>
+                <div id="docChatNote" class="subtle" style="display:none">Consulta finalizada (solo lectura)</div>
             `;
 
             // cargar mensajes
@@ -255,51 +267,73 @@
                 if (box && data && Array.isArray(data.data)){
                     box.innerHTML = data.data.map(m => {
                         const t = formatTime(m.created_at);
-                        const cls = m.sender === 'doctor' ? 'from-doc' : 'from-pac';
+                        const cls = m.sender === 'doctor' ? 'from-doc' : 'from-pac'; // doctor propios -> derecha verde (override CSS)
                         return `
                             <div class="bubble ${cls}">
-                                <div class="body">${escapeHtml(m.body)}</div>
-                                <div class="meta time">${t}</div>
+                                <div class="body"><span class="text">${escapeHtml(m.body)}</span><span class="time">${t}</span></div>
                             </div>
                         `;
                     }).join('');
                     box.scrollTop = box.scrollHeight;
                 }
-                // Set Motivo (primer mensaje del paciente o el primero en general)
+                // Set Motivo: prefer explicit consulta.motivo from backend; fallback to first patient message
                 const motivoEl = document.getElementById('motivoLinea');
-                if (motivoEl && data && Array.isArray(data.data)){
-                    const firstPac = data.data.find(m => m.sender === 'paciente');
-                    const firstMsg = firstPac || data.data[0];
-                    motivoEl.textContent = firstMsg ? ('Motivo: ' + firstMsg.body) : '';
+                if (motivoEl){
+                    const motivoFromConsulta = data && data.consulta && data.consulta.motivo ? data.consulta.motivo : null;
+                    if (motivoFromConsulta){
+                        motivoEl.textContent = 'Motivo: ' + motivoFromConsulta;
+                    } else if (data && Array.isArray(data.data)){
+                        const firstPac = data.data.find(m => m.sender === 'paciente');
+                        const firstMsg = firstPac || data.data[0];
+                        motivoEl.textContent = firstMsg ? ('Motivo: ' + firstMsg.body) : '';
+                    } else {
+                        motivoEl.textContent = '';
+                    }
                 }
             } catch(e){ console.error(e); }
 
             // acciones (si no finalizado): form para enviar mensaje
             const acciones = document.getElementById('accionesConsulta');
+            const form = document.getElementById('docChatForm');
+            const input = document.getElementById('docChatInput');
+            const sendBtn = document.getElementById('docChatSend');
+            const note = document.getElementById('docChatNote');
             if (!acciones) return;
-            if (status !== 'finalizado'){
-                acciones.innerHTML = `
-                    <form class="respuesta-form" onsubmit="return enviarMensaje(event, ${id}, this)">
-                        <textarea name="body" placeholder="Escribe tu respuesta..." required></textarea>
-                        <button type="submit" class="send-btn" aria-label="Enviar">
-                            <img src="https://cdn0.iconfinder.com/data/icons/zondicons/20/send-256.png" alt="Enviar" width="20" height="20"/>
-                        </button>
-                    </form>
-                    <div class="acciones-row">
-                        <button type="button" class="btn btn-success" onclick="cerrarDetalle()">Cerrar chat</button>
-                        <form method="POST" action="{{ url('/consultas') }}/${id}/finalizar">
-                            @csrf
-                            <button type="submit" class="btn btn-danger">Finalizar consulta</button>
-                        </form>
-                    </div>
-                `;
-            } else {
+            if (status === 'finalizado'){
+                if (form) form.style.display = 'none';
+                if (input) input.disabled = true;
+                if (sendBtn) sendBtn.disabled = true;
+                if (note) note.style.display = '';
                 acciones.innerHTML = `
                     <div class="acciones-row">
-                        <button type="button" class="btn btn-success" onclick="cerrarDetalle()">Cerrar chat</button>
+                        <button type="button" class="btn btn-success" onclick="cerrarDetalle()" aria-label="Cerrar chat">Cerrar chat</button>
                         <span></span>
                     </div>
                 `;
+            } else {
+                if (form) form.style.display = '';
+                if (input) input.disabled = false;
+                if (sendBtn) sendBtn.disabled = false;
+                if (note) note.style.display = 'none';
+                acciones.innerHTML = `
+                    <div class="acciones-row">
+                        <button type="button" class="btn btn-success" onclick="cerrarDetalle()" aria-label="Cerrar chat">Cerrar chat</button>
+                        <form method="POST" action="{{ url('/consultas') }}/${id}/finalizar" style="display:inline-flex;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger" aria-label="Finalizar consulta">Finalizar consulta</button>
+                        </form>
+                    </div>
+                `;
+            }
+            // Enter para enviar (Shift+Enter -> nueva línea)
+            if (input){
+                input.addEventListener('keydown', function(ev){
+                    if (ev.key === 'Enter' && !ev.shiftKey){
+                        ev.preventDefault();
+                        const f = document.getElementById('docChatForm');
+                        if (f){ (typeof f.requestSubmit === 'function') ? f.requestSubmit() : f.submit(); }
+                    }
+                }, { once: true });
             }
         }
 
@@ -327,11 +361,7 @@
                     const bubble = document.createElement('div');
                     bubble.className = 'bubble from-doc';
                     const t = formatTime(new Date().toISOString());
-                    bubble.innerHTML = `
-                        <div class="body"></div>
-                        <div class="meta time">${t}</div>
-                    `;
-                    bubble.querySelector('.body').textContent = body;
+                    bubble.innerHTML = `<div class="body"><span class="text">${escapeHtml(body)}</span><span class="time">${t}</span></div>`;
                     box.appendChild(bubble);
                     box.scrollTop = box.scrollHeight;
                 }

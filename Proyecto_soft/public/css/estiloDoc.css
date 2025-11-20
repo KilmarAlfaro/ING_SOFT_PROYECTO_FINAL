@@ -266,7 +266,8 @@ nav .brand-logo:hover{
 .detalle-consulta .cabecera-consulta .avatar{ width:44px; height:44px; border-radius:50%; object-fit:cover; }
 .detalle-consulta .subtle{ color:#6b7280; font-size:.9rem; }
 .chat-box{ grid-area: chat; border:1px solid #e5e7eb; border-radius:10px; padding:12px; height:100%; min-height:0; overflow-y:auto; overflow-x:hidden; background:#f9fafb; display:flex; flex-direction:column; gap:0; width:100%; box-sizing:border-box; }
-.bubble{ display:inline-flex; flex-direction:column; align-items:flex-start; padding:10px 14px; border-radius:10px; margin:12px 0 14px 0; max-width:80%; font-size:1rem; line-height:1.35; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow-wrap:anywhere; word-break: break-word; white-space: pre-wrap; box-sizing:border-box; height:auto; min-height:0; width:auto; }
+.bubble{ display:flex; flex-direction:column; max-width:76%; position:relative; margin-top:14px; /* mismo margen que mainPac */ background:transparent !important; padding:0; box-shadow:none; }
+.chat-box .bubble:first-child{ margin-top:0; }
 .chat-box .bubble:first-child{ margin-top:0; }
 .bubble .body{ margin:0; padding:0; }
 .bubble .meta{ display:block; margin-top:4px; font-size:11px; line-height:1; color:#6b7280; }
