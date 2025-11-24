@@ -77,7 +77,7 @@ img {
   position: relative;
   padding: 8px 54px 8px 12px; /* espacio para timestamp a la derecha */
   border-radius: 16px;
-  font-size: 0.95rem;
+  font-size: 17px;
   line-height: 1.38;
   word-break: break-word;
   white-space: pre-wrap; /* preservar saltos de línea */
@@ -86,8 +86,9 @@ img {
 }
 
 .bubble.from-pac .body {
-  background: #dcf8c6; /* verde claro WhatsApp */
+  background: #e6f0ff; /* azul claro clínico */
   border-bottom-right-radius: 4px;
+  color: #0a3d5e; /* texto oscuro legible */
 }
 
 .bubble.from-doc .body {
@@ -176,7 +177,7 @@ body.doctor-chat .detalle-consulta .chat-box { flex:1 1 auto; }
 body.doctor-chat .acciones-consulta { margin-top:8px; }
 /* Invertir colores/alineación: mensajes del doctor (from-doc) a la derecha en verde */
 body.doctor-chat .bubble.from-doc { align-self:flex-end; }
-body.doctor-chat .bubble.from-doc .body { background:#dcf8c6; border: none; border-bottom-right-radius:4px; }
+body.doctor-chat .bubble.from-doc .body { background:#e6f0ff; border: none; border-bottom-right-radius:4px; color:#0a3d5e; }
 /* Quitar cola en mensajes propios del doctor (verde) para igualarlo al paciente */
 body.doctor-chat .bubble.from-doc .body::after { display:none !important; }
 body.doctor-chat .bubble.from-doc .body { border-bottom-right-radius:16px; }
