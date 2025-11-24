@@ -279,12 +279,8 @@ nav .brand-logo:hover{
 .acciones-consulta{ grid-area: actions; margin-top:12px; width:100%; }
 /* Fila inferior con cerrar (izquierda) y finalizar (derecha) */
 .acciones-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; width:100%; }
-/* Formulario de respuesta: fila con textarea + botón de envío como icono */
+/* Formulario de respuesta: fila con textarea + opciones */
 .respuesta-form{ display:flex; align-items:center; gap:8px; width:100%; }
-.respuesta-form textarea{ flex:1; min-height:40px; height:40px; border:1px solid #ddd; border-radius:8px; padding:6px; resize:vertical; }
-.respuesta-form .send-btn{ width:40px; height:40px; border:none; border-radius:8px; background:#0d6efd; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-.respuesta-form .send-btn:hover{ background:#0b5ed7; }
-.respuesta-form .send-btn img{ filter: invert(100%); width:20px; height:20px; display:block; }
 
 /* Botones de acciones de cierre/finalizar */
 .btn-success{ background:#16a34a; color:#fff; border:none; border-radius:6px; padding:8px 12px; cursor:pointer; font-size:.95rem; }
@@ -295,6 +291,20 @@ nav .brand-logo:hover{
 /* Columna derecha oculta */
 .hidden {
     display: none;
+}
+
+/* Ajuste específico: textarea del chat del doctor más compacto (similar a mainPac) */
+body.doctor-chat .respuesta-form textarea {
+    flex: 1;
+    min-height: 44px;
+    max-height: 220px;
+    padding: 10px 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    resize: vertical;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    background:#fff;
 }
 
 /* Botón cerrar consulta */

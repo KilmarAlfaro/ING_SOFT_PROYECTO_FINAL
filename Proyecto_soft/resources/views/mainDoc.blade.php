@@ -227,6 +227,38 @@
             closeDeleteModal();
         }
 
+        function focusEditableTextarea(el){
+            if (!el || el.disabled) return;
+            requestAnimationFrame(() => {
+                el.focus();
+                const len = el.value ? el.value.length : 0;
+                try { el.setSelectionRange(len, len); } catch (_err) {}
+            });
+        }
+
+        function defaultScrollState(){ return { distance:0, atBottom:true }; }
+
+        function captureScrollState(el){
+            if (!el) return defaultScrollState();
+            const distance = Math.max(0, el.scrollHeight - el.scrollTop - el.clientHeight);
+            const atBottom = distance < 48;
+            return { distance, atBottom };
+        }
+
+        function restoreScrollState(el, state){
+            if (!el || !state) return;
+            const apply = () => {
+                if (state.atBottom){
+                    el.scrollTop = el.scrollHeight;
+                } else {
+                    const target = el.scrollHeight - el.clientHeight - state.distance;
+                    el.scrollTop = Math.max(0, target);
+                }
+            };
+            apply();
+            requestAnimationFrame(apply);
+        }
+
         async function mostrarDetalle(id){
             const item = document.querySelector('.chat-item[data-id="'+id+'"]');
             if (!item) return;
@@ -251,9 +283,6 @@
                 <div class="chat-box" id="chatBox" aria-live="polite"></div>
                 <form id="docChatForm" class="respuesta-form" onsubmit="return enviarMensaje(event, ${id}, this)">
                     <textarea id="docChatInput" name="body" placeholder="Escribe tu respuesta..." required></textarea>
-                    <button type="submit" id="docChatSend" class="send-btn" aria-label="Enviar">
-                        <img src="https://cdn0.iconfinder.com/data/icons/zondicons/20/send-256.png" alt="Enviar" width="20" height="20" />
-                    </button>
                 </form>
                 <div class="acciones-consulta" id="accionesConsulta"></div>
                 <div id="docChatNote" class="subtle" style="display:none">Consulta finalizada (solo lectura)</div>
@@ -265,16 +294,19 @@
                 const data = await res.json();
                 const box = document.getElementById('chatBox');
                 if (box && data && Array.isArray(data.data)){
+                    const sameChat = box.dataset.chatId === String(id);
+                    const scrollState = sameChat ? captureScrollState(box) : defaultScrollState();
                     box.innerHTML = data.data.map(m => {
                         const t = formatTime(m.created_at);
-                        const cls = m.sender === 'doctor' ? 'from-doc' : 'from-pac'; // doctor propios -> derecha verde (override CSS)
+                        const cls = m.sender === 'doctor' ? 'from-doc' : 'from-pac';
                         return `
                             <div class="bubble ${cls}">
                                 <div class="body"><span class="text">${escapeHtml(m.body)}</span><span class="time">${t}</span></div>
                             </div>
                         `;
                     }).join('');
-                    box.scrollTop = box.scrollHeight;
+                    box.dataset.chatId = String(id);
+                    restoreScrollState(box, scrollState);
                 }
                 // Set Motivo: prefer explicit consulta.motivo from backend; fallback to first patient message
                 const motivoEl = document.getElementById('motivoLinea');
@@ -296,13 +328,11 @@
             const acciones = document.getElementById('accionesConsulta');
             const form = document.getElementById('docChatForm');
             const input = document.getElementById('docChatInput');
-            const sendBtn = document.getElementById('docChatSend');
             const note = document.getElementById('docChatNote');
             if (!acciones) return;
             if (status === 'finalizado'){
                 if (form) form.style.display = 'none';
                 if (input) input.disabled = true;
-                if (sendBtn) sendBtn.disabled = true;
                 if (note) note.style.display = '';
                 acciones.innerHTML = `
                     <div class="acciones-row">
@@ -313,7 +343,6 @@
             } else {
                 if (form) form.style.display = '';
                 if (input) input.disabled = false;
-                if (sendBtn) sendBtn.disabled = false;
                 if (note) note.style.display = 'none';
                 acciones.innerHTML = `
                     <div class="acciones-row">
@@ -324,6 +353,7 @@
                         </form>
                     </div>
                 `;
+                focusEditableTextarea(input);
             }
             // Enter para enviar (Shift+Enter -> nueva línea)
             if (input){
@@ -333,7 +363,7 @@
                         const f = document.getElementById('docChatForm');
                         if (f){ (typeof f.requestSubmit === 'function') ? f.requestSubmit() : f.submit(); }
                     }
-                }, { once: true });
+                });
             }
         }
 
@@ -358,12 +388,16 @@
                 // Añadir el nuevo mensaje al chat sin reconstruir toda la vista
                 const box = document.getElementById('chatBox');
                 if (box){
+                    const shouldStick = captureScrollState(box).atBottom;
                     const bubble = document.createElement('div');
                     bubble.className = 'bubble from-doc';
                     const t = formatTime(new Date().toISOString());
                     bubble.innerHTML = `<div class="body"><span class="text">${escapeHtml(body)}</span><span class="time">${t}</span></div>`;
                     box.appendChild(bubble);
-                    box.scrollTop = box.scrollHeight;
+                    if (shouldStick){
+                        box.scrollTop = box.scrollHeight;
+                        requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; });
+                    }
                 }
                 if (textarea) textarea.value = '';
             } catch(e){ console.error(e); }

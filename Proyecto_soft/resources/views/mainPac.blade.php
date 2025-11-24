@@ -233,9 +233,6 @@
                         <div class="chat-box" id="pacChatBox" style="display:none;" aria-live="polite"></div>
                         <form id="pacChatForm" class="respuesta-form" onsubmit="return enviarMensajePaciente(event)" style="display:none;">
                             <textarea id="pacChatInput" name="body" placeholder="Escribe tu mensaje..." required></textarea>
-                            <button type="submit" id="pacChatSend" class="send-btn" aria-label="Enviar">
-                                <img src="https://cdn0.iconfinder.com/data/icons/zondicons/20/send-256.png" alt="Enviar" width="20" height="20"/>
-                            </button>
                         </form>
                         <div class="acciones-consulta" id="pacAcciones" style="margin-top:8px;"></div>
                         <div id="pacChatNote" class="subtle" style="display:none">Consulta finalizada (solo lectura)</div>
@@ -352,6 +349,38 @@
             const parts = ts.split(' ');
             if (parts.length < 2) return '';
             return parts[1].slice(0,5);
+        }
+
+        function focusEditableTextarea(el){
+            if (!el || el.disabled) return;
+            requestAnimationFrame(() => {
+                el.focus();
+                const len = el.value ? el.value.length : 0;
+                try { el.setSelectionRange(len, len); } catch (_err) {}
+            });
+        }
+
+        function defaultScrollState(){ return { distance:0, atBottom:true }; }
+
+        function captureScrollState(el){
+            if (!el) return defaultScrollState();
+            const distance = Math.max(0, el.scrollHeight - el.scrollTop - el.clientHeight);
+            const atBottom = distance < 48;
+            return { distance, atBottom };
+        }
+
+        function restoreScrollState(el, state){
+            if (!el || !state) return;
+            const apply = () => {
+                if (state.atBottom){
+                    el.scrollTop = el.scrollHeight;
+                } else {
+                    const target = el.scrollHeight - el.clientHeight - state.distance;
+                    el.scrollTop = Math.max(0, target);
+                }
+            };
+            apply();
+            requestAnimationFrame(apply);
         }
 
         // ---------- 2) Live search implementation ----------
@@ -688,7 +717,6 @@
             const empty = document.getElementById('pacChatEmpty');
             const note = document.getElementById('pacChatNote');
             const input = document.getElementById('pacChatInput');
-            const send = document.getElementById('pacChatSend');
             const acc = document.getElementById('pacAcciones');
 
             const nombre = doctorNombre || (item ? (item.getAttribute('data-doctor') || 'Doctor') : 'Doctor');
@@ -706,8 +734,10 @@
 
             // disable/enable input by status
             const readOnly = (status === 'finalizado');
-            if (input) input.disabled = readOnly;
-            if (send) send.disabled = readOnly;
+            if (input) {
+                input.disabled = readOnly;
+                if (!readOnly) focusEditableTextarea(input);
+            }
             if (note) note.style.display = readOnly ? '' : 'none';
             if (acc) { acc.innerHTML = ''; acc.style.display = ''; }
 
@@ -716,12 +746,15 @@
                 const res = await fetch(`{{ url('/consultas') }}/${id}/mensajes`, { headers:{ 'Accept':'application/json' } });
                 const data = await res.json();
                 if (box){
+                    const sameChat = box.dataset.chatId === String(id);
+                    const scrollState = sameChat ? captureScrollState(box) : defaultScrollState();
                     box.innerHTML = (data.data || []).map(m => `
                         <div class="bubble ${m.sender === 'doctor' ? 'from-doc' : 'from-pac'}">
                             <div class="body"><span class="text">${escapeHtml(m.body)}</span><span class="time">${formatTime(m.created_at)}</span></div>
                         </div>
                     `).join('');
-                    box.scrollTop = box.scrollHeight;
+                    box.dataset.chatId = String(id);
+                    restoreScrollState(box, scrollState);
                 }
                 // Guardar doctor_id actual para poder actualizar el listado izquierdo al finalizar
                 pacChatCurrentDoctorId = data.consulta && data.consulta.doctor_id ? data.consulta.doctor_id : pacChatCurrentDoctorId;
@@ -734,8 +767,10 @@
                 if (data.consulta && data.consulta.status) {
                     status = data.consulta.status;
                     const ro = (status === 'finalizado');
-                    if (input) input.disabled = ro;
-                    if (send) send.disabled = ro;
+                    if (input) {
+                        input.disabled = ro;
+                        if (!ro) focusEditableTextarea(input);
+                    }
                     if (note) note.style.display = ro ? '' : 'none';
                 }
                 // Botones de acciones según estado
@@ -774,11 +809,9 @@
                 if (res.ok){
                     // Bloquear input y mostrar nota
                     const input = document.getElementById('pacChatInput');
-                    const send = document.getElementById('pacChatSend');
                     const note = document.getElementById('pacChatNote');
                     const acc = document.getElementById('pacAcciones');
                     if (input) input.disabled = true;
-                    if (send) send.disabled = true;
                     if (note) note.style.display = '';
                     if (acc) acc.innerHTML = '';
 
@@ -847,7 +880,11 @@
             const acc = document.getElementById('pacAcciones');
             const note = document.getElementById('pacChatNote');
             if (header) header.style.display = 'none';
-            if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+            if (box) {
+                box.style.display = 'none';
+                box.innerHTML = '';
+                delete box.dataset.chatId;
+            }
             if (form) form.style.display = 'none';
             if (empty) empty.style.display = '';
             if (acc) { acc.innerHTML = ''; acc.style.display = 'none'; }
@@ -887,12 +924,16 @@
                     // agregar burbuja sin recargar todo
                     const box = document.getElementById('pacChatBox');
                     if (box){
+                        const shouldStick = captureScrollState(box).atBottom;
                         const bubble = document.createElement('div');
                         bubble.className = 'bubble from-pac';
                         const ts = rjson && rjson.data && rjson.data.created_at ? rjson.data.created_at : '';
                         bubble.innerHTML = `<div class="body"><span class="text">${escapeHtml(body)}</span><span class="time">${formatTime(ts)}</span></div>`;
                         box.appendChild(bubble);
-                        box.scrollTop = box.scrollHeight;
+                        if (shouldStick){
+                            box.scrollTop = box.scrollHeight;
+                            requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; });
+                        }
                     }
                     textarea.value = '';
                 }
