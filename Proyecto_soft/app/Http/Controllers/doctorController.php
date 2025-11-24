@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Arr;
 
 class DoctorController extends Controller
 {
@@ -105,6 +107,7 @@ class DoctorController extends Controller
     {
         $q = $request->input('q');
         $especialidad = $request->input('especialidad');
+        $includeActive = array_filter(array_map('intval', Arr::wrap($request->input('include_active'))));
 
         $query = Doctor::query();
         if ($q) {
@@ -117,12 +120,23 @@ class DoctorController extends Controller
             $query->where('especialidad', 'LIKE', "%$especialidad%");
         }
 
+        $hasEstado = Schema::hasColumn('doctors', 'estado');
+        if ($hasEstado) {
+            $query->where(function($sub) use ($includeActive){
+                $sub->whereNull('estado')->orWhere('estado', 'activo');
+                if (!empty($includeActive)) {
+                    $sub->orWhereIn('id', $includeActive);
+                }
+            });
+        }
+
         // If this is an AJAX/JSON request return a compact JSON list (used for live search)
         if ($request->wantsJson() || $request->ajax()) {
-            $items = $query->orderBy('nombre')->limit(12)->get()->map(function($d){
+            $items = $query->orderBy('nombre')->limit(12)->get()->map(function($d) use ($hasEstado, $includeActive){
                 $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
                 $ver = optional($d->updated_at)->timestamp ?? time();
                 $foto = route('avatar.doctor', $d->id) . '?v=' . $ver;
+                $estadoActual = $hasEstado ? strtolower($d->estado ?? '') : null;
                 return [
                     'id' => $d->id,
                     'nombre' => $d->nombre,
@@ -130,6 +144,8 @@ class DoctorController extends Controller
                     'especialidad' => $d->especialidad,
                     'descripcion' => $d->descripcion,
                     'foto' => $foto,
+                    'estado' => $estadoActual,
+                    'forced' => $estadoActual === 'inactivo' && in_array($d->id, $includeActive ?? []),
                 ];
             });
 

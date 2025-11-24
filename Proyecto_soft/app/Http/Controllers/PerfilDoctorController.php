@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Doctor;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
+use App\Models\User;
 
 class PerfilDoctorController extends Controller
 {
@@ -57,6 +58,7 @@ class PerfilDoctorController extends Controller
             'descripcion' => 'nullable|string|max:1000',
             'password' => 'nullable|string|min:6|confirmed',
             'profile_image' => 'nullable|image|max:4096',
+            'estado' => 'required|in:activo,inactivo',
         ], $messages);
 
         // Actualiza los datos personales en tabla doctors
@@ -68,6 +70,9 @@ class PerfilDoctorController extends Controller
         $doctor->direccion_clinica = $request->direccion_clinica;
         $doctor->correo = $request->correo;
         $doctor->descripcion = $request->descripcion;
+        if (Schema::hasColumn('doctors', 'estado')) {
+            $doctor->estado = $request->estado;
+        }
     // 'usuario' field removed: keep DB consistent but do not update username here
 
         // Actualizar password solo si fue enviado
@@ -123,6 +128,47 @@ class PerfilDoctorController extends Controller
         }
 
         return redirect()->route('perfil.doctor')->with('success', 'Perfil actualizado correctamente.');
+    }
+
+    public function destroy(Request $request)
+    {
+        if (Auth::check()) {
+            $doctor = Doctor::where('user_id', Auth::id())->firstOrFail();
+            $user = Auth::user();
+        } elseif (Session::has('doctor_id')) {
+            $doctor = Doctor::findOrFail(Session::get('doctor_id'));
+            $user = $doctor->user_id ? User::find($doctor->user_id) : null;
+        } else {
+            abort(403);
+        }
+
+        $request->validate([
+            'confirm_delete' => 'required|in:yes',
+        ]);
+
+        // remove stored avatar file if present
+        $disk = config('avatar.disk', 'public');
+        $folder = config('avatar.folder', 'profile_pics');
+        if (! empty($doctor->foto_perfil) && Storage::disk($disk)->exists($folder . '/' . $doctor->foto_perfil)) {
+            try {
+                Storage::disk($disk)->delete($folder . '/' . $doctor->foto_perfil);
+            } catch (\Exception $e) {
+                // ignore clean up failures
+            }
+        }
+
+        $doctor->delete();
+
+        if ($user) {
+            $user->delete();
+        }
+
+        if (Auth::check()) {
+            Auth::logout();
+        }
+        Session::forget(['doctor_id', 'doctor']);
+
+        return redirect()->route('inicio')->with('success', 'Tu cuenta ha sido eliminada correctamente.');
     }
 
 }

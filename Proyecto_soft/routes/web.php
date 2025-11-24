@@ -81,6 +81,7 @@ Route::middleware([RequireSessionOrAuth::class])->group(function () {
     // Perfil doctor
     Route::get('/perfil-doc', [PerfilDoctorController::class, 'show'])->name('perfil.doctor');
     Route::post('/perfil-doc', [PerfilDoctorController::class, 'update'])->name('perfil.doctor.update');
+    Route::delete('/perfil-doc', [PerfilDoctorController::class, 'destroy'])->name('perfil.doctor.destroy');
 
     // buscar doctor
     Route::get('/buscar-doctor', [doctorController::class, 'buscar'])->name('buscar.doctor');

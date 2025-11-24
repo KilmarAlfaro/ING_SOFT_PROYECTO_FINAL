@@ -127,6 +127,7 @@
                     ->orderBy('created_at','desc')->get();
             }
             $activeByDoctor = $misActivas->mapWithKeys(fn($c) => [$c->doctor_id => $c->id]);
+            $activeDoctorIds = $activeByDoctor->keys()->filter()->unique()->values()->all();
             $seed = null;
             if ($misActivas->count()) { $seed = $misActivas->first(); }
         @endphp
@@ -150,12 +151,21 @@
                     @php
                         $q = request('q');
                         $especialidad = request('especialidad');
+                        $hasDoctorEstado = \Illuminate\Support\Facades\Schema::hasColumn('doctors', 'estado');
 
                         $doQuery = \App\Models\Doctor::query();
                         if ($q) {
                             $doQuery->where(function($s) use ($q){ $s->where('nombre','LIKE','%'.$q.'%')->orWhere('apellido','LIKE','%'.$q.'%'); });
                         }
                         if ($especialidad) { $doQuery->where('especialidad','LIKE','%'.$especialidad.'%'); }
+                        if ($hasDoctorEstado) {
+                            $doQuery->where(function($w) use ($activeDoctorIds) {
+                                $w->whereNull('estado')->orWhere('estado', 'activo');
+                                if (!empty($activeDoctorIds)) {
+                                    $w->orWhereIn('id', $activeDoctorIds);
+                                }
+                            });
+                        }
                         $smallList = $doQuery->orderBy('nombre')->limit(12)->get();
                     @endphp
                     <form id="searchForm" onsubmit="return false;">
@@ -186,8 +196,10 @@
                                     $ver = optional($d->updated_at)->timestamp ?? time();
                                     $fotoUrl = route('avatar.doctor', $d->id) . '?v=' . $ver;
                                     $existingId = $activeByDoctor[$d->id] ?? null;
+                                    $estadoActual = $hasDoctorEstado ? strtolower($d->estado ?? '') : null;
+                                    $forcedVisible = $hasDoctorEstado && $estadoActual === 'inactivo' && in_array($d->id, $activeDoctorIds ?? []);
                                 @endphp
-                                <li class="chat-item" data-id="{{ $d->id }}" data-nombre="{{ $fn }}" data-apellido="{{ $fl }}" data-especialidad="{{ $d->especialidad }}" data-descripcion="{{ e($d->descripcion) }}" data-foto="{{ $fotoUrl }}" @if($existingId) data-existing-id="{{ $existingId }}" @endif>
+                                <li class="chat-item" data-id="{{ $d->id }}" data-nombre="{{ $fn }}" data-apellido="{{ $fl }}" data-especialidad="{{ $d->especialidad }}" data-descripcion="{{ e($d->descripcion) }}" data-foto="{{ $fotoUrl }}" data-estado="{{ $estadoActual ?? '' }}" data-forced="{{ $forcedVisible ? '1' : '0' }}" @if($existingId) data-existing-id="{{ $existingId }}" @endif>
                                     <div class="thumb">
                                         <img src="{{ $fotoUrl }}" alt="avatar">
                                     </div>
@@ -386,6 +398,7 @@
         // ---------- 2) Live search implementation ----------
         // Build a DOM node for a doctor (keeps same structure as server-rendered items)
         const activeMap = @json($activeByDoctor);
+        const activeDoctorIds = Object.keys(activeMap || {});
 
         function buildDoctorItem(d){
             const li = document.createElement('li');
@@ -397,6 +410,8 @@
             li.dataset.descripcion = d.descripcion || '';
             li.dataset.foto = d.foto || '';
             if (activeMap && activeMap[d.id]) { li.dataset.existingId = activeMap[d.id]; }
+            if (d.estado) { li.dataset.estado = d.estado.toLowerCase(); }
+            if (d.forced) { li.dataset.forced = '1'; }
 
             const thumb = document.createElement('div'); thumb.className = 'thumb';
             const img = document.createElement('img'); img.src = d.foto; img.alt = 'avatar'; thumb.appendChild(img);
@@ -437,6 +452,9 @@
             const params = new URLSearchParams();
             if (q) params.set('q', q);
             if (especialidad) params.set('especialidad', especialidad);
+            if (activeDoctorIds.length) {
+                activeDoctorIds.forEach(id => params.append('include_active[]', id));
+            }
             const url = '{{ route('buscar.doctor') }}' + (params.toString() ? ('?' + params.toString()) : '');
             try {
                 const res = await fetch(url, { headers:{ 'Accept':'application/json' } });
@@ -667,6 +685,9 @@
                             showStatusNote('Consulta creada');
                             // actualizar mapping y botón en lista izquierda
                             if (typeof activeMap === 'object') { activeMap[doctorId] = newId; }
+                            if (!activeDoctorIds.includes(String(doctorId))) {
+                                activeDoctorIds.push(String(doctorId));
+                            }
                             const li = document.querySelector(`#doctorList .chat-item[data-id="${doctorId}"]`);
                             if (li){
                                 li.setAttribute('data-existing-id', newId);
@@ -852,15 +873,23 @@
                     const doctorId = pacChatCurrentDoctorId;
                     if (doctorId){
                         if (typeof activeMap === 'object' && activeMap[doctorId]) { delete activeMap[doctorId]; }
+                        const doctorIdStr = String(doctorId);
+                        const idx = activeDoctorIds.indexOf(doctorIdStr);
+                        if (idx !== -1) activeDoctorIds.splice(idx, 1);
                         const liDoc = document.querySelector(`#doctorList .chat-item[data-id="${doctorId}"]`);
                         if (liDoc){
-                            liDoc.removeAttribute('data-existing-id');
-                            const btn = liDoc.querySelector('button');
-                            if (btn){
-                                btn.textContent = 'Consultar';
-                                btn.classList.remove('btn-outline-success');
-                                btn.classList.add('btn-outline-primary');
-                                btn.onclick = function(e){ e.stopPropagation(); openConsultaModal(doctorId); };
+                            const isForced = liDoc.getAttribute('data-forced') === '1' || liDoc.getAttribute('data-estado') === 'inactivo';
+                            if (isForced){
+                                liDoc.remove();
+                            } else {
+                                liDoc.removeAttribute('data-existing-id');
+                                const btn = liDoc.querySelector('button');
+                                if (btn){
+                                    btn.textContent = 'Consultar';
+                                    btn.classList.remove('btn-outline-success');
+                                    btn.classList.add('btn-outline-primary');
+                                    btn.onclick = function(e){ e.stopPropagation(); openConsultaModal(doctorId); };
+                                }
                             }
                         }
                     }
