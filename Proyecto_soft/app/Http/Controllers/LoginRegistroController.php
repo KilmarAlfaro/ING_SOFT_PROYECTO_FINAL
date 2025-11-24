@@ -2,209 +2,217 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Paciente;
 use App\Models\Doctor;
+use App\Models\Paciente;
+use App\Models\User;
+use App\Rules\ValidDui;
+use App\Services\DuiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class LoginRegistroController extends Controller
 {
-    /* ==============================
-       LOGIN PACIENTE
-       ============================== */
-    public function loginPac(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+	/**
+	 * Autentica un paciente usando las credenciales legadas o la tabla users.
+	 */
+	public function loginPac(Request $request)
+	{
+		$credentials = $request->validate([
+			'email' => 'required|email',
+			'password' => 'required|string',
+		]);
 
-        // Buscar paciente por correo
-        $paciente = Paciente::where('correo', $request->email)->first();
+		$paciente = Paciente::where('correo', $credentials['email'])->first();
+		if (!$paciente) {
+			return back()->with('email_no_registrado', true);
+		}
 
-        if (!$paciente) {
-            return back()->with('email_no_registrado', true);
-        }
+		if (!Hash::check($credentials['password'], $paciente->password_hash)) {
+			return back()->with('password_incorrecta', true);
+		}
 
-        // Verificar contraseña
-        if (!Hash::check($request->password, $paciente->password_hash)) {
-            return back()->with('password_incorrecta', true);
-        }
+		$user = User::where('email', $credentials['email'])->where('role', 'paciente')->first();
+		if ($user) {
+			Auth::login($user);
+		} else {
+			Session::put('paciente_id', $paciente->id);
+			Session::put('paciente_nombre', $paciente->nombre);
+			Session::put('paciente_sexo', $paciente->sexo ?? null);
+		}
 
-        // Si existe un usuario en la tabla users con este correo, autenticar con Laravel Auth
-        $user = User::where('email', $request->email)->where('role', 'paciente')->first();
-        if ($user) {
-            Auth::login($user);
-        } else {
-            // Fallback a la sesi3n antigua
-            Session::put('paciente_id', $paciente->id);
-            Session::put('paciente_nombre', $paciente->nombre);
-            Session::put('paciente_sexo', $paciente->sexo ?? null);
-        }
+		return redirect()->route('mainPac');
+	}
 
-        // Redirigir a dashboard
-        return redirect()->route('mainPac');
-    }
+	/**
+	 * Autentica un doctor usando las credenciales legadas o la tabla users.
+	 */
+	public function loginDoc(Request $request)
+	{
+		$credentials = $request->validate([
+			'email' => 'required|email',
+			'password' => 'required|string',
+		]);
 
-    /* ==============================
-       LOGIN DOCTOR
-       ============================== */
-    public function loginDoc(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+		$doctor = Doctor::where('correo', $credentials['email'])->first();
+		if (!$doctor) {
+			return back()->with('email_no_registrado', true);
+		}
 
-        // Buscar doctor por correo
-        $doctor = Doctor::where('correo', $request->email)->first();
+		if (!Hash::check($credentials['password'], $doctor->password_hash)) {
+			return back()->with('password_incorrecta', true);
+		}
 
-        if (!$doctor) {
-            return back()->with('email_no_registrado', true);
-        }
+		$user = User::where('email', $credentials['email'])->where('role', 'doctor')->first();
+		if ($user) {
+			Auth::login($user);
+		} else {
+			Session::put('doctor_id', $doctor->id);
+			Session::put('doctor_nombre', $doctor->nombre);
+			Session::put('doctor_sexo', $doctor->sexo ?? null);
+		}
 
-        // Verificar contraseña
-        if (!Hash::check($request->password, $doctor->password_hash)) {
-            return back()->with('password_incorrecta', true);
-        }
+		return redirect()->route('mainDoc');
+	}
 
-        // Si existe un usuario en la tabla users con este correo, autenticar con Laravel Auth
-        $user = User::where('email', $request->email)->where('role', 'doctor')->first();
-        if ($user) {
-            Auth::login($user);
-        } else {
-            // Fallback a la sesi3n antigua
-            Session::put('doctor_id', $doctor->id);
-            Session::put('doctor_nombre', $doctor->nombre);
-            Session::put('doctor_sexo', $doctor->sexo ?? null);
-        }
+	/**
+	 * Registra a un nuevo paciente con validaciones de DUI y sincroniza legacy tables.
+	 */
+	public function registroPac(Request $request)
+	{
+		$messages = [
+			'numero_dui.regex' => 'El DUI debe escribirse como 8 dígitos, un guion y el dígito verificador (########-#).',
+			'numero_dui.unique' => 'El DUI ingresado ya está registrado.',
+		];
 
-        // Redirigir al dashboard del doctor
-        return redirect()->route('mainDoc');
-    }
+		$validated = $request->validate([
+			'nombre' => 'required|string|max:255',
+			'apellido' => 'nullable|string|max:255',
+			'telefono' => 'required|string|max:20',
+			'fecha_nacimiento' => 'nullable|date',
+			'numero_dui' => ['required', 'string', 'regex:/^\d{8}-?\d$/', new ValidDui, 'unique:users,dui', 'unique:pacientes,numero_dui'],
+			'sexo' => 'nullable|string|in:Masculino,Femenino',
+			'direccion' => 'nullable|string|max:255',
+			'correo' => 'required|email|unique:users,email|unique:pacientes,correo',
+			'password' => 'required|string|min:6|confirmed',
+		], $messages);
 
-    /* ==============================
-       REGISTRO PACIENTE
-       ============================== */
-    public function registroPac(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'nullable|string|max:255',
-            'telefono' => 'required|string|max:20',
-            'fecha_nacimiento' => 'nullable|date',
-            'numero_dui' => 'required|string|max:20',
-            'sexo' => 'nullable|string|in:Masculino,Femenino',
-            'correo' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+		$formattedDui = DuiService::format($validated['numero_dui']);
+		$fullName = trim($validated['nombre'] . ' ' . ($validated['apellido'] ?? ''));
 
-        $user = User::create([
-            'name' => $request->nombre . ($request->apellido ? ' ' . $request->apellido : ''),
-            'telefono' => $request->telefono,
-            'dui' => $request->numero_dui,
-            'direccion' => $request->direccion ?? null,
-            'email' => $request->correo,
-            'password' => Hash::make($request->password),
-            'role' => 'paciente',
-        ]);
+		$user = User::create([
+			'name' => $fullName,
+			'telefono' => $validated['telefono'],
+			'dui' => $formattedDui,
+			'direccion' => $validated['direccion'] ?? null,
+			'email' => $validated['correo'],
+			'password' => Hash::make($validated['password']),
+			'role' => 'paciente',
+		]);
 
-        Auth::login($user);
+		Auth::login($user);
 
-        // Optionally create a Paciente record so legacy session flows can use it later
-        $paciente = null;
-        try {
-            $paciente = \App\Models\Paciente::create([
-                'nombre' => $request->nombre,
-                'apellido' => $request->apellido ?? '',
-                'correo' => $request->correo,
-                'telefono' => $request->telefono,
-                'numero_dui' => $request->numero_dui ?? null,
-                'fecha_nacimiento' => $request->fecha_nacimiento ?? null,
-                'sexo' => $request->sexo ?? null,
-                'password_hash' => Hash::make($request->password),
-            ]);
-        } catch (\Exception $e) {
-            // ignore failures creating paciente record; user account exists and can proceed
-        }
+		try {
+			$paciente = Paciente::create([
+				'user_id' => $user->id,
+				'nombre' => $validated['nombre'],
+				'apellido' => $validated['apellido'] ?? null,
+				'correo' => $validated['correo'],
+				'telefono' => $validated['telefono'],
+				'numero_dui' => $formattedDui,
+				'fecha_nacimiento' => $validated['fecha_nacimiento'] ?? null,
+				'sexo' => $validated['sexo'] ?? null,
+				'direccion' => $validated['direccion'] ?? null,
+				'password_hash' => Hash::make($validated['password']),
+			]);
 
-        // Populate legacy session keys to support views that rely on them
-        if ($paciente) {
-            Session::put('paciente_id', $paciente->id);
-            Session::put('paciente_nombre', $paciente->nombre);
-            Session::put('paciente_sexo', $paciente->sexo ?? null);
-        } else {
-            // fallback to the Auth user name so UI still has a name
-            Session::put('paciente_nombre', $user->name);
-            Session::put('paciente_sexo', $request->sexo ?? null);
-        }
+			Session::put('paciente_id', $paciente->id);
+			Session::put('paciente_nombre', $paciente->nombre);
+			Session::put('paciente_sexo', $paciente->sexo ?? null);
+		} catch (\Throwable $th) {
+			Log::warning('No se pudo sincronizar paciente legacy: ' . $th->getMessage());
+			Session::put('paciente_nombre', $fullName);
+			Session::put('paciente_sexo', $validated['sexo'] ?? null);
+		}
 
-        return redirect()->route('mainPac');
-    }
+		return redirect()->route('mainPac');
+	}
 
-    /* ==============================
-       REGISTRO DOCTOR
-       ============================== */
-    public function registroDoc(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'nullable|string|max:255',
-            'telefono' => 'required|string|max:20',
-            'numero_dui' => 'required|string|max:20',
-            'fecha_nacimiento' => 'nullable|date',
-            'sexo' => 'nullable|string|in:Masculino,Femenino',
-            'especialidad' => 'required|string|max:255',
-            'especialidad_otro' => 'nullable|string|max:255',
-            'direccion_clinica' => 'required|string|max:255',
-            'correo' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+	/**
+	 * Registra a un nuevo doctor con validaciones de DUI y campos complementarios.
+	 */
+	public function registroDoc(Request $request)
+	{
+		$messages = [
+			'numero_dui.regex' => 'El DUI debe escribirse como 8 dígitos, un guion y el dígito verificador (########-#).',
+			'numero_dui.unique' => 'El DUI ingresado ya está registrado.',
+		];
 
-        $user = User::create([
-            'name' => $request->nombre . ($request->apellido ? ' ' . $request->apellido : ''),
-            'telefono' => $request->telefono,
-            'dui' => $request->numero_dui,
-            'direccion' => $request->direccion_clinica ?? null,
-            'email' => $request->correo,
-            'password' => Hash::make($request->password),
-            'role' => 'doctor',
-        ]);
+		$validated = $request->validate([
+			'nombre' => 'required|string|max:255',
+			'apellido' => 'nullable|string|max:255',
+			'telefono' => 'required|string|max:20',
+			'numero_dui' => ['required', 'string', 'regex:/^\d{8}-?\d$/', new ValidDui, 'unique:users,dui', 'unique:doctors,numero_dui'],
+			'fecha_nacimiento' => 'nullable|date',
+			'sexo' => 'nullable|string|in:Masculino,Femenino',
+			'especialidad' => 'required|string|max:255',
+			'especialidad_otro' => 'nullable|string|max:255',
+			'numero_colegiado' => 'nullable|string|max:50',
+			'direccion_clinica' => 'required|string|max:255',
+			'descripcion' => 'nullable|string',
+			'correo' => 'required|email|unique:users,email|unique:doctors,correo',
+			'password' => 'required|string|min:6|confirmed',
+		], $messages);
 
-        Auth::login($user);
+		$formattedDui = DuiService::format($validated['numero_dui']);
+		$fullName = trim($validated['nombre'] . ' ' . ($validated['apellido'] ?? ''));
+		$finalEspecialidad = ($validated['especialidad'] === 'Otro' && $validated['especialidad_otro'])
+			? $validated['especialidad_otro']
+			: $validated['especialidad'];
 
-        // Crear registro en tabla doctors y vincular con el usuario creado.
-        $doctor = Doctor::create([
-            'user_id' => $user->id,
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido ?? '',
-            'correo' => $request->correo,
-            'telefono' => $request->telefono ?? '',
-            'especialidad' => ($request->especialidad == 'Otro' && $request->especialidad_otro) ? $request->especialidad_otro : ($request->especialidad ?? 'General'),
-            'numero_colegiado' => $request->numero_colegiado ?? 'N/A',
-            'password_hash' => Hash::make($request->password),
-            'direccion_clinica' => $request->direccion_clinica ?? '',
-            'estado' => 'activo',
-            'sexo' => $request->sexo ?? null,
-            'numero_dui' => $request->numero_dui ?? null,
-            'fecha_nacimiento' => $request->fecha_nacimiento ?? null,
-            'descripcion' => $request->descripcion ?? null,
-        ]);
+		$user = User::create([
+			'name' => $fullName,
+			'telefono' => $validated['telefono'],
+			'dui' => $formattedDui,
+			'direccion' => $validated['direccion_clinica'],
+			'email' => $validated['correo'],
+			'password' => Hash::make($validated['password']),
+			'role' => 'doctor',
+		]);
 
-        // Populate legacy session keys for UI that relies on them
-        if ($doctor) {
-            Session::put('doctor_id', $doctor->id);
-            Session::put('doctor_nombre', $doctor->nombre);
-            Session::put('doctor_sexo', $doctor->sexo ?? null);
-        } else {
-            Session::put('doctor_nombre', $user->name);
-            Session::put('doctor_sexo', $request->sexo ?? null);
-        }
+		Auth::login($user);
 
-        return redirect()->route('mainDoc');
-    }
+		try {
+			$doctor = Doctor::create([
+				'user_id' => $user->id,
+				'nombre' => $validated['nombre'],
+				'apellido' => $validated['apellido'] ?? null,
+				'correo' => $validated['correo'],
+				'telefono' => $validated['telefono'],
+				'numero_dui' => $formattedDui,
+				'fecha_nacimiento' => $validated['fecha_nacimiento'] ?? null,
+				'sexo' => $validated['sexo'] ?? null,
+				'especialidad' => $finalEspecialidad,
+				'numero_colegiado' => $validated['numero_colegiado'] ?? 'N/A',
+				'direccion_clinica' => $validated['direccion_clinica'],
+				'descripcion' => $validated['descripcion'] ?? null,
+				'password_hash' => Hash::make($validated['password']),
+				'estado' => 'activo',
+			]);
+
+			Session::put('doctor_id', $doctor->id);
+			Session::put('doctor_nombre', $doctor->nombre);
+			Session::put('doctor_sexo', $doctor->sexo ?? null);
+		} catch (\Throwable $th) {
+			Log::warning('No se pudo sincronizar doctor legacy: ' . $th->getMessage());
+			Session::put('doctor_nombre', $fullName);
+			Session::put('doctor_sexo', $validated['sexo'] ?? null);
+		}
+
+		return redirect()->route('mainDoc');
+	}
 }
+
 
