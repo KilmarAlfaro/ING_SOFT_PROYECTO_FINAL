@@ -65,12 +65,6 @@
                 </div>
 
                 <div class="form-row full-width">
-                    <label for="descripcion">Descripción profesional</label>
-                    <textarea id="descripcion" name="descripcion" rows="4" maxlength="1000" placeholder="Resalta tu experiencia, especialización y logros">{{ old('descripcion', $doctor->descripcion ?? '') }}</textarea>
-                    @error('descripcion') <div class="message" style="color:red">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="form-row full-width">
                     <label for="direccion_clinica">Dirección de la clínica</label>
                     <input type="text" id="direccion_clinica" name="direccion_clinica" value="{{ old('direccion_clinica', $doctor->direccion_clinica ?? '') }}" required>
                 </div>
@@ -101,11 +95,11 @@
                         <button type="button" id="discardBtn" class="btn btn-descartar">Descartar cambios</button>
                     </div>
                     <div class="right">
-                        <button type="submit" class="btn btn-primario">Actualizar perfil</button>
+                        <a href="{{ route('mainDoc') }}" class="btn btn-regresar btn-regresar-inline">Regresar</a>
                     </div>
                 </div>
 
-                <a href="{{ route('mainDoc') }}" class="btn-regresar-full">Regresar</a>
+                <button type="submit" class="btn btn-primario btn-actualizar-full">Actualizar perfil</button>
             </div>
         </form>
     </div>

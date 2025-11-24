@@ -114,6 +114,7 @@ input:focus, textarea:focus {
     border-radius: 8px;
     cursor: pointer;
     transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
+    text-decoration: none;
 }
 
 /* Specific variants */

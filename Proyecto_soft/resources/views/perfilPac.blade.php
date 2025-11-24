@@ -103,11 +103,11 @@
                 <button type="button" id="discardPaciente" class="btn btn-descartar">Descartar cambios</button>
             </div>
             <div class="right">
-                <button type="submit" class="btn btn-primario">Actualizar Perfil</button>
+                <a href="{{ route('mainPac') }}" class="btn btn-regresar btn-regresar-inline">Regresar</a>
             </div>
         </div>
 
-        <a href="{{ route('mainPac') }}" class="btn-regresar-full">Regresar</a>
+        <button type="submit" class="btn btn-primario btn-actualizar-full">Actualizar Perfil</button>
     </form>
 </div>
 
