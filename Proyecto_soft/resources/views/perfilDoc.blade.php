@@ -10,13 +10,10 @@
 </head>
 <body>
     <div class="profile-container">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-            <h2 style="margin:0">Mi perfil</h2>
-            <a href="{{ route('mainDoc') }}" class="btn btn-secundario">Volver</a>
-        </div>
+        <h2 style="margin-bottom:12px">Mi perfil</h2>
 
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="message success">{{ session('success') }}</div>
         @endif
 
         {{-- Mostrar errores inline junto a cada campo (se manejan más abajo) --}}
@@ -65,6 +62,12 @@
                 <div class="form-row">
                     <label for="numero_colegiado">Número de colegiado</label>
                     <input type="text" id="numero_colegiado" name="numero_colegiado" value="{{ old('numero_colegiado', $doctor->numero_colegiado ?? '') }}" required>
+                </div>
+
+                <div class="form-row full-width">
+                    <label for="descripcion">Descripción profesional</label>
+                    <textarea id="descripcion" name="descripcion" rows="4" maxlength="1000" placeholder="Resalta tu experiencia, especialización y logros">{{ old('descripcion', $doctor->descripcion ?? '') }}</textarea>
+                    @error('descripcion') <div class="message" style="color:red">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="form-row full-width">

@@ -123,8 +123,16 @@ input:focus, textarea:focus {
 .btn-descartar { background-color: #f97316; /* orange */ }
 .btn-descartar:hover { background-color: #ea580c; transform: translateY(-1px); }
 
+.btn-secundario { background-color: #e5e7eb; color: #1f2937; text-decoration: none; }
+.btn-secundario:hover { background-color: #d1d5db; transform: translateY(-1px); }
+
 .btn-regresar { background-color: #2563eb; /* blue */ }
 .btn-regresar:hover { background-color: #1e40af; transform: translateY(-1px); }
+
+.btn-success { background-color: #16a34a; color: #fff; }
+.btn-success:hover { background-color: #15803d; transform: translateY(-1px); }
+
+.btn-regresar-inline { display: inline-block; padding: 10px 16px; text-align: center; }
 
 /* Action row: left (discard) and right (save + regresar) */
 .actions-row {
@@ -153,3 +161,12 @@ input:focus, textarea:focus {
     background-color: #2563eb;
 }
 .btn-regresar-full:hover{ background-color: #1e40af; transform: translateY(-1px); }
+
+.btn-actualizar-full {
+    display: block;
+    width: calc(100% - 32px);
+    max-width: none;
+    padding: 14px;
+    margin: 18px 16px 16px; /* margin-top separates from action row */
+    text-align: center;
+}

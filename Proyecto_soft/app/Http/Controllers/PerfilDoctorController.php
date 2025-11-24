@@ -54,6 +54,7 @@ class PerfilDoctorController extends Controller
             'numero_colegiado' => 'required|string|max:50',
             'direccion_clinica' => 'required|string|max:255',
             'correo' => 'required|email',
+            'descripcion' => 'nullable|string|max:1000',
             'password' => 'nullable|string|min:6|confirmed',
             'profile_image' => 'nullable|image|max:4096',
         ], $messages);
@@ -66,6 +67,7 @@ class PerfilDoctorController extends Controller
         $doctor->numero_colegiado = $request->numero_colegiado;
         $doctor->direccion_clinica = $request->direccion_clinica;
         $doctor->correo = $request->correo;
+        $doctor->descripcion = $request->descripcion;
     // 'usuario' field removed: keep DB consistent but do not update username here
 
         // Actualizar password solo si fue enviado
