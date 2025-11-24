@@ -89,11 +89,11 @@ class LoginRegistroController extends Controller
 
 		$validated = $request->validate([
 			'nombre' => 'required|string|max:255',
-			'apellido' => 'nullable|string|max:255',
+			'apellido' => 'required|string|max:255',
 			'telefono' => 'required|string|max:20',
-			'fecha_nacimiento' => 'nullable|date',
+			'fecha_nacimiento' => 'required|date',
 			'numero_dui' => ['required', 'string', 'regex:/^\d{8}-?\d$/', new ValidDui, 'unique:users,dui', 'unique:pacientes,numero_dui'],
-			'sexo' => 'nullable|string|in:Masculino,Femenino',
+			'sexo' => 'required|string|in:Masculino,Femenino',
 			'direccion' => 'nullable|string|max:255',
 			'correo' => 'required|email|unique:users,email|unique:pacientes,correo',
 			'password' => 'required|string|min:6|confirmed',
@@ -118,12 +118,12 @@ class LoginRegistroController extends Controller
 			$paciente = Paciente::create([
 				'user_id' => $user->id,
 				'nombre' => $validated['nombre'],
-				'apellido' => $validated['apellido'] ?? null,
+				'apellido' => $validated['apellido'],
 				'correo' => $validated['correo'],
 				'telefono' => $validated['telefono'],
 				'numero_dui' => $formattedDui,
-				'fecha_nacimiento' => $validated['fecha_nacimiento'] ?? null,
-				'sexo' => $validated['sexo'] ?? null,
+				'fecha_nacimiento' => $validated['fecha_nacimiento'],
+				'sexo' => $validated['sexo'],
 				'direccion' => $validated['direccion'] ?? null,
 				'password_hash' => Hash::make($validated['password']),
 			]);

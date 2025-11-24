@@ -49,7 +49,7 @@
       @enderror
 
       <label for="telefono">NÚMERO DE TELÉFONO:</label>
-      <input type="text" id="telefono" name="telefono" value="{{ old('telefono') }}" placeholder="Ejemplo: 1234-5678" required>
+      <input type="text" id="telefono" name="telefono" value="{{ old('telefono') }}" placeholder="Ejemplo: 1234-5678" inputmode="numeric" maxlength="9" data-mask="phone" required>
       @error('telefono')
         <span class="mensaje-error">{{ $message }}</span>
       @enderror
@@ -79,7 +79,7 @@
       @enderror
 
       <label for="numero_dui">NÚMERO DE DUI:</label>
-      <input type="text" id="numero_dui" name="numero_dui" value="{{ old('numero_dui') }}" placeholder="00000000-0" required style="border:2px solid #e2e8f0; padding:10px; border-radius:8px;">
+      <input type="text" id="numero_dui" name="numero_dui" value="{{ old('numero_dui') }}" placeholder="00000000-0" inputmode="numeric" maxlength="10" data-mask="dui" required style="border:2px solid #e2e8f0; padding:10px; border-radius:8px;">
       @error('numero_dui')
         <span class="mensaje-error">{{ $message }}</span>
       @enderror
@@ -181,6 +181,28 @@
       // init
       toggleEspecialidadOtro();
     }
+
+    const formatDui = (value) => {
+      const digits = value.replace(/\D/g, '').slice(0, 9);
+      return digits.length <= 8 ? digits : `${digits.slice(0, 8)}-${digits.slice(8)}`;
+    };
+
+    const formatPhone = (value) => {
+      const digits = value.replace(/\D/g, '').slice(0, 8);
+      return digits.length <= 4 ? digits : `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    };
+
+    document.querySelectorAll('[data-mask="dui"]').forEach((input) => {
+      input.addEventListener('input', () => {
+        input.value = formatDui(input.value);
+      });
+    });
+
+    document.querySelectorAll('[data-mask="phone"]').forEach((input) => {
+      input.addEventListener('input', () => {
+        input.value = formatPhone(input.value);
+      });
+    });
   </script>
 </body>
 </html>
