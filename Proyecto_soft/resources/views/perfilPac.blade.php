@@ -109,6 +109,28 @@
 
         <button type="submit" class="btn btn-primario btn-actualizar-full">Actualizar Perfil</button>
     </form>
+
+    <div class="danger-zone">
+        <h3>Eliminar cuenta</h3>
+        <p>Esta acción borrará definitivamente tus datos personales, consultas y mensajes asociados. No podrás recuperarlos.</p>
+        <form id="deletePacienteForm" action="{{ route('perfil.paciente.destroy') }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <input type="hidden" name="confirm_delete" value="yes">
+            <button type="button" id="deletePacienteBtn" class="btn btn-peligro">Eliminar todos mis datos</button>
+        </form>
+    </div>
+</div>
+
+<div id="confirmationModal" class="confirm-modal" aria-hidden="true">
+    <div class="confirm-modal__content">
+        <h3>Confirma tu acción</h3>
+        <p id="confirmMessage" class="confirm-modal__message">¿Deseas continuar?</p>
+        <div class="confirm-modal__actions">
+            <button type="button" class="btn btn-secundario" id="confirmCancel">Cancelar</button>
+            <button type="button" class="btn btn-primario" id="confirmAccept">Continuar</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -127,6 +149,58 @@
     }
 
     // Discard: reset inputs to initial values
+
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmMessageEl = document.getElementById('confirmMessage');
+    const confirmAcceptBtn = document.getElementById('confirmAccept');
+    const confirmCancelBtn = document.getElementById('confirmCancel');
+
+    const showConfirmation = (message) => {
+        return new Promise((resolve) => {
+            if (!confirmationModal || !confirmMessageEl || !confirmAcceptBtn || !confirmCancelBtn) {
+                resolve(window.confirm(message));
+                return;
+            }
+
+            confirmMessageEl.textContent = message;
+            confirmationModal.classList.add('is-visible');
+            confirmationModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+
+            const cleanup = (result) => {
+                confirmationModal.classList.remove('is-visible');
+                confirmationModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                confirmAcceptBtn.removeEventListener('click', onAccept);
+                confirmCancelBtn.removeEventListener('click', onCancel);
+                confirmationModal.removeEventListener('click', onBackdrop);
+                document.removeEventListener('keydown', onKeyDown);
+                resolve(result);
+            };
+
+            const onAccept = () => cleanup(true);
+            const onCancel = () => cleanup(false);
+            const onBackdrop = (event) => { if (event.target === confirmationModal) cleanup(false); };
+            const onKeyDown = (event) => { if (event.key === 'Escape') cleanup(false); };
+
+            confirmAcceptBtn.addEventListener('click', onAccept);
+            confirmCancelBtn.addEventListener('click', onCancel);
+            confirmationModal.addEventListener('click', onBackdrop);
+            document.addEventListener('keydown', onKeyDown);
+        });
+    };
+
+    const deletePacienteBtn = document.getElementById('deletePacienteBtn');
+    const deletePacienteForm = document.getElementById('deletePacienteForm');
+    if (deletePacienteBtn && deletePacienteForm) {
+        deletePacienteBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const ok = await showConfirmation('Esta acción eliminará permanentemente todos tus datos y consultas. ¿Deseas continuar?');
+            if (ok) {
+                deletePacienteForm.submit();
+            }
+        });
+    }
     const pacForm = document.getElementById('pacienteForm');
     const discardBtn = document.getElementById('discardPaciente');
     const pacInputs = pacForm ? Array.from(pacForm.querySelectorAll('input, textarea, select')) : [];

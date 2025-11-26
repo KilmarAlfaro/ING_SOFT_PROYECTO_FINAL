@@ -105,20 +105,6 @@
         </noscript>
     </div>
 
-    <section class="container mission-vision">
-        <div class="vision-card">
-            <h3>Nuestra misión</h3>
-            <p>
-                Conectar pacientes y doctores en un entorno seguro para que las consultas se gestionen sin filas, con historial clínico disponible y una comunicación clara antes de llegar a la cita presencial.
-            </p>
-        </div>
-        <div class="vision-card">
-            <h3>Nuestra visión</h3>
-            <p>
-                Convertirnos en la plataforma de referencia que garantice citas agendadas, seguimiento digital y tranquilidad tanto para pacientes como para profesionales de la salud en todo el país.
-            </p>
-        </div>
-    </section>
 
     <!-- Layout 3 columnas en una sola fila -->
 

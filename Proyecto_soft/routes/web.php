@@ -123,6 +123,7 @@ Route::get('/consulta-doctor/{id}', [doctorController::class, 'consulta'])->name
 */
 Route::get('/perfil/paciente', [PerfilPacienteController::class, 'edit'])->name('perfil.paciente');
 Route::post('/perfil/paciente', [PerfilPacienteController::class, 'update'])->name('perfil.paciente.update');
+Route::delete('/perfil/paciente', [PerfilPacienteController::class, 'destroy'])->name('perfil.paciente.destroy');
 
 // Avatares servidos desde BD o almacenamiento (acceso público)
 Route::get('/media/doctores/{id}', [MediaController::class, 'doctorAvatar'])->name('avatar.doctor');

@@ -21,13 +21,13 @@ body {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
   text-align: center;
   max-width: 900px;
-  margin-bottom: 250px;
+  margin-bottom: 90px;
   width: 90%;
 }
 
 .valores-wrapper {
   width: min(1100px, 92%);
-  margin: clamp(30px, 6vw, 60px) auto;
+  margin: clamp(6px, 4vw, 32px) auto clamp(30px, 6vw, 60px);
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 420px));
   justify-content: space-between;

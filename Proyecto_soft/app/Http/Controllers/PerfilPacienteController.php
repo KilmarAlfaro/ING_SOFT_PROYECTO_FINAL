@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Paciente;
+use App\Models\Consulta;
 
 class PerfilPacienteController extends Controller
 {
@@ -118,5 +119,46 @@ class PerfilPacienteController extends Controller
         $paciente->save();
 
         return redirect()->route('perfil.paciente')->with('success', 'Perfil actualizado correctamente.');
+    }
+
+    public function destroy(Request $request)
+    {
+        if (! Session::has('paciente_id')) {
+            return redirect()->route('loginPac')->with('error', 'Debes iniciar sesión como paciente.');
+        }
+
+        $request->validate([
+            'confirm_delete' => 'required|in:yes',
+        ]);
+
+        $pacienteId = Session::get('paciente_id');
+        $paciente = Paciente::find($pacienteId);
+
+        if (! $paciente) {
+            Session::forget(['paciente_id', 'paciente']);
+            return redirect()->route('inicio')->with('error', 'Tu cuenta ya no existe.');
+        }
+
+        $disk = config('avatar.disk', 'public');
+        $folder = config('avatar.folder', 'profile_pics');
+        if (! empty($paciente->foto_perfil) && Storage::disk($disk)->exists($folder . '/' . $paciente->foto_perfil)) {
+            try {
+                Storage::disk($disk)->delete($folder . '/' . $paciente->foto_perfil);
+            } catch (\Exception $e) {
+                // ignore cleanup failures
+            }
+        }
+
+        $consultas = Consulta::where('paciente_id', $pacienteId)->get();
+        foreach ($consultas as $consulta) {
+            $consulta->mensajes()->delete();
+            $consulta->delete();
+        }
+
+        $paciente->delete();
+
+        Session::forget(['paciente_id', 'paciente']);
+
+        return redirect()->route('inicio')->with('success', 'Tu cuenta y todos tus datos fueron eliminados correctamente.');
     }
 }
