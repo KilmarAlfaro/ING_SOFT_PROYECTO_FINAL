@@ -9,6 +9,22 @@
   <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
 <body>
+    <nav class="inicio-navbar">
+      <div class="inicio-brand">
+        <img src="https://cdn0.iconfinder.com/data/icons/coronavirus-67/100/coronavirus-04-512.png" alt="Logo institucional">
+        <div class="inicio-brand__text">
+          <span class="brand-title">MedTech HUB</span>
+          <small class="brand-subtitle">Clínica digital</small>
+        </div>
+      </div>
+      <a href="{{ route('soporte') }}" class="inicio-support-btn">
+        <img src="https://cdn-icons-png.flaticon.com/512/1660/1660165.png" alt="Icono de ayuda">
+        <div class="support-text">
+          <span class="support-title">¿Necesitas ayuda?</span>
+          <small>Estamos aquí para ti</small>
+        </div>
+      </a>
+    </nav>
   <div class="inicio-contenedor">
     <h1 class="titulo">Bienvenido a <span class="empresa">MedTech HUB</span></h1>
 

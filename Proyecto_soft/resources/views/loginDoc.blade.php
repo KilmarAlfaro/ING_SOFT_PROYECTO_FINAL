@@ -33,7 +33,7 @@
     }
   </style>
 </head>
-<body>
+<body class="auth-body">
   <div class="login-contenedor">
     <h1 class="titulo">Iniciar Sesión</h1>
 

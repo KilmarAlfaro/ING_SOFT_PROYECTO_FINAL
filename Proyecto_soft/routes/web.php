@@ -16,6 +16,10 @@ Route::get('/', function () {
     return view('inicio');
 })->name('inicio');
 
+Route::get('/soporte', function () {
+    return view('soporte');
+})->name('soporte');
+
 Route::get('/mainpage', function () {
     return view('mainpage');
 })->name('mainpage');

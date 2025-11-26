@@ -106,7 +106,7 @@
         <span class="mensaje-error">{{ $message }}</span>
       @enderror
 
-  <label for="descripcion">BREVE DESCRIPCIÓN (Será):</label>
+  <label for="descripcion">BREVE DESCRIPCIÓN (Será visible en su perfil):</label>
   <textarea id="descripcion" name="descripcion" rows="4" maxlength="1000" placeholder="Ej: Especialista en cardiología con 10 años de experiencia...">{{ old('descripcion') }}</textarea>
       @error('descripcion')
         <span class="mensaje-error">{{ $message }}</span>
