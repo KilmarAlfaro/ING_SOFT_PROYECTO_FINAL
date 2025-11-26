@@ -9,6 +9,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PerfilDoctorController;
 use App\Http\Controllers\PerfilPacienteController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Middleware\RequireSessionOrAuth;
 
 /* Rutas públicas */
@@ -23,6 +25,19 @@ Route::get('/soporte', function () {
 Route::get('/mainpage', function () {
     return view('mainpage');
 })->name('mainpage');
+
+Route::get('/verificacion/email', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+Route::post('/verificacion/email', [EmailVerificationController::class, 'resend'])->name('verification.resend');
+Route::get('/verificacion/email/{token}', [EmailVerificationController::class, 'verify'])
+    ->middleware('signed')
+    ->name('verification.verify');
+Route::post('/verificacion/otp/enviar', [EmailVerificationController::class, 'sendOtp'])->name('verification.otp.send');
+Route::post('/verificacion/otp/validar', [EmailVerificationController::class, 'validateOtp'])->name('verification.otp.validate');
+
+Route::get('/password/olvidada', [PasswordResetController::class, 'requestForm'])->name('password.request');
+Route::post('/password/olvidada', [PasswordResetController::class, 'sendLink'])->name('password.email');
+Route::get('/password/restablecer/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/restablecer', [PasswordResetController::class, 'reset'])->name('password.update');
 
 /* LOGIN Paciente */
 Route::get('/login/paciente', function () {
@@ -43,6 +58,9 @@ Route::get('/registro/paciente', function () {
 Route::get('/registro/doctor', function () {
     return view('registroDoc');
 })->name('registroDoc');
+
+Route::post('/registro/paciente/prevalidar', [LoginRegistroController::class, 'preValidarPaciente'])->name('registroPac.prevalidate');
+Route::post('/registro/doctor/prevalidar', [LoginRegistroController::class, 'preValidarDoctor'])->name('registroDoc.prevalidate');
 
 // Procesar login Paciente
 Route::post('/login/paciente', [App\Http\Controllers\loginController::class, 'loginPac'])->name('loginPac.submit');

@@ -146,3 +146,104 @@ body {
   font-size: 0.9rem;
   margin-top: -5px;
 }
+
+.verify-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.verify-overlay.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.verify-modal {
+  background: #ffffff;
+  width: min(440px, 90%);
+  padding: 34px;
+  border-radius: 22px;
+  text-align: center;
+  box-shadow: 0 25px 45px rgba(15, 23, 42, 0.25);
+}
+
+.verify-modal h2 {
+  margin-top: 8px;
+  color: #0f172a;
+}
+
+.verify-modal p {
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.verify-email {
+  display: inline-block;
+  margin: 12px 0 20px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.25);
+  font-weight: 600;
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.otp-inputs input {
+  width: 58px;
+  height: 58px;
+  text-align: center;
+  font-size: 1.5rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: #f8fafc;
+}
+
+.verify-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.change-btn,
+.verify-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.change-btn {
+  background: rgba(148, 163, 184, 0.2);
+  color: #0f172a;
+}
+
+.verify-btn {
+  background: linear-gradient(120deg, #0ea5e9, #2563eb);
+  color: #fff;
+}
+
+.verify-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.otp-feedback {
+  min-height: 20px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}

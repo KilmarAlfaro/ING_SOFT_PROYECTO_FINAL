@@ -7,14 +7,6 @@
   <link rel="stylesheet" href="{{ asset('css/registroDoc.css') }}">
   <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro Doctor</title>
-  <link rel="stylesheet" href="{{ asset('css/registroDoc.css') }}">
-</head>
 <body>
   <div class="registro-contenedor">
     <h1 class="titulo">Registro de Doctor</h1>
@@ -30,7 +22,9 @@
       </div>
     @endif
 
-    <form action="{{ route('registroDoc.submit') }}" method="POST" class="formulario" autocomplete="off">
+    <div class="alerta-error" id="doctorPrevalidateErrors" style="display:none;"></div>
+
+    <form id="doctorRegistroForm" action="{{ route('registroDoc.submit') }}" method="POST" class="formulario" autocomplete="off">
       @csrf
 
       <!-- DATOS PERSONALES -->
@@ -140,11 +134,36 @@
       @enderror
 
       <!-- BOTONES -->
+      <input type="hidden" name="otp_code" id="doctorOtpHidden" value="">
+
       <div class="acciones" style="gap:12px;">
         <a href="{{ url('/') }}" class="btn btn-danger">REGRESAR</a>
         <button type="submit" class="btn btn-primario">REGISTRARSE</button>
       </div>
+      @error('otp_code')
+        <span class="mensaje-error">{{ $message }}</span>
+      @enderror
     </form>
+  </div>
+
+  <div class="verify-overlay" id="doctorVerifyOverlay">
+    <div class="verify-modal">
+      <h2>Confirma tu correo</h2>
+      <p>Ingresa el código de 4 dígitos enviado a:</p>
+      <span class="verify-email" id="doctorVerifyEmail">tu correo</span>
+      <div class="otp-inputs" aria-label="Código de verificación">
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" autocomplete="one-time-code" aria-label="Dígito 1" />
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" aria-label="Dígito 2" />
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" aria-label="Dígito 3" />
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" aria-label="Dígito 4" />
+      </div>
+      <div class="verify-actions">
+        <button type="button" class="change-btn" id="doctorChangeEmailBtn">Cambiar gmail</button>
+        <button type="button" class="verify-btn" id="doctorVerifyBtn" disabled>Verificar</button>
+      </div>
+      <p style="margin-top:14px; font-size:0.95rem; color:#64748b;">Revise también su carpeta de spam si no ve el código inmediatamente.</p>
+      <p class="otp-feedback" id="doctorOtpFeedback"></p>
+    </div>
   </div>
 
   <script>
@@ -203,6 +222,244 @@
         input.value = formatPhone(input.value);
       });
     });
+
+    const otpApi = {
+      prevalidate: "{{ route('registroDoc.prevalidate') }}",
+      validate: "{{ route('verification.otp.validate') }}",
+      token: "{{ csrf_token() }}",
+    };
+
+    const collectErrorMessages = (errors) => {
+      if (!errors) {
+        return [];
+      }
+      const messages = [];
+      Object.values(errors).forEach((value) => {
+        if (Array.isArray(value)) {
+          value.forEach((msg) => messages.push(msg));
+        } else if (value) {
+          messages.push(value);
+        }
+      });
+      return messages;
+    };
+
+    const postJson = async (url, payload = {}) => {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': otpApi.token,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (error) {
+        data = {};
+      }
+
+      if (!response.ok) {
+        const details = data.errors || null;
+        const firstError = collectErrorMessages(details)[0];
+        const err = new Error(firstError || data.message || 'Ocurrió un error inesperado.');
+        err.details = details;
+        throw err;
+      }
+
+      return data;
+    };
+
+    const buildPayload = (form) => {
+      const formData = new FormData(form);
+      formData.delete('otp_code');
+      formData.delete('_token');
+      return Object.fromEntries(formData.entries());
+    };
+
+    const doctorOtpConfig = {
+      form: document.getElementById('doctorRegistroForm'),
+      overlay: document.getElementById('doctorVerifyOverlay'),
+      emailInput: document.getElementById('correo'),
+      emailBadge: document.getElementById('doctorVerifyEmail'),
+      otpInputs: document.querySelectorAll('#doctorVerifyOverlay .otp-input'),
+      changeButton: document.getElementById('doctorChangeEmailBtn'),
+      verifyButton: document.getElementById('doctorVerifyBtn'),
+      hiddenField: document.getElementById('doctorOtpHidden'),
+      feedbackElement: document.getElementById('doctorOtpFeedback'),
+      formErrorBox: document.getElementById('doctorPrevalidateErrors'),
+    };
+
+    const initOtpOverlay = (config) => {
+      const {
+        form,
+        overlay,
+        emailInput,
+        emailBadge,
+        otpInputs,
+        changeButton,
+        verifyButton,
+        hiddenField,
+        feedbackElement,
+        formErrorBox,
+      } = config;
+      if (!form || !overlay || !otpInputs?.length || !changeButton || !verifyButton) {
+        return;
+      }
+
+      let allowSubmit = false;
+      let currentEmail = '';
+
+      const renderFormErrors = (details, fallbackMessage = '') => {
+        if (!formErrorBox) {
+          if (fallbackMessage) {
+            alert(fallbackMessage);
+          }
+          return;
+        }
+        const messages = collectErrorMessages(details);
+        if (!messages.length && fallbackMessage) {
+          messages.push(fallbackMessage);
+        }
+
+        if (!messages.length) {
+          formErrorBox.innerHTML = '';
+          formErrorBox.style.display = 'none';
+          return;
+        }
+
+        const list = document.createElement('ul');
+        messages.forEach((msg) => {
+          const item = document.createElement('li');
+          item.textContent = msg;
+          list.appendChild(item);
+        });
+        formErrorBox.innerHTML = '';
+        formErrorBox.appendChild(list);
+        formErrorBox.style.display = 'block';
+      };
+
+      const clearFormErrors = () => {
+        if (!formErrorBox) {
+          return;
+        }
+        formErrorBox.innerHTML = '';
+        formErrorBox.style.display = 'none';
+      };
+
+      const showFeedback = (message = '', isError = false) => {
+        if (!feedbackElement) {
+          return;
+        }
+        feedbackElement.textContent = message;
+        feedbackElement.style.color = isError ? '#b91c1c' : '#15803d';
+      };
+
+      const clearOtp = () => {
+        otpInputs.forEach((input) => input.value = '');
+        if (hiddenField) {
+          hiddenField.value = '';
+        }
+        verifyButton.disabled = true;
+        showFeedback('');
+      };
+
+      const collectOtp = () => Array.from(otpInputs).map((input) => input.value.trim()).join('');
+
+      const handleInput = (event, index) => {
+        const onlyDigit = event.target.value.replace(/\D/g, '').slice(-1);
+        event.target.value = onlyDigit;
+        if (onlyDigit && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+        verifyButton.disabled = collectOtp().length !== otpInputs.length;
+      };
+
+      otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (event) => handleInput(event, index));
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Backspace' && !input.value && index > 0) {
+            otpInputs[index - 1].focus();
+          }
+        });
+      });
+
+      const requestPrevalidation = async () => {
+        const payload = buildPayload(form);
+        return postJson(otpApi.prevalidate, payload);
+      };
+
+      const validateOtpRemotely = async (email, code) => {
+        showFeedback('Validando código...', false);
+        await postJson(otpApi.validate, { email, code });
+        showFeedback('Código validado correctamente.', false);
+      };
+
+      const openOverlay = async () => {
+        const emailValue = (emailInput?.value || '').trim();
+        if (!emailValue) {
+          renderFormErrors(null, 'Ingresa un correo válido antes de continuar.');
+          emailInput?.focus();
+          return;
+        }
+
+        try {
+          clearFormErrors();
+          const response = await requestPrevalidation();
+          currentEmail = response.email || emailValue;
+          if (emailBadge) {
+            emailBadge.textContent = currentEmail;
+          }
+          clearOtp();
+          overlay.classList.add('is-visible');
+          otpInputs[0]?.focus();
+          showFeedback('Código enviado. Revisa tu correo.', false);
+        } catch (error) {
+          renderFormErrors(error.details, error.message);
+        }
+      };
+
+      changeButton.addEventListener('click', () => {
+        overlay.classList.remove('is-visible');
+        clearOtp();
+        emailInput?.focus();
+      });
+
+      verifyButton.addEventListener('click', async () => {
+        const code = collectOtp();
+        if (code.length !== otpInputs.length) {
+          showFeedback('Ingresa los cuatro dígitos.', true);
+          return;
+        }
+        verifyButton.disabled = true;
+
+        try {
+          await validateOtpRemotely(currentEmail, code);
+          if (hiddenField) {
+            hiddenField.value = code;
+          }
+          allowSubmit = true;
+          overlay.classList.remove('is-visible');
+          form.submit();
+        } catch (error) {
+          verifyButton.disabled = false;
+          showFeedback(error.message, true);
+        }
+      });
+
+      form.addEventListener('submit', async (event) => {
+        if (allowSubmit) {
+          return;
+        }
+        event.preventDefault();
+        await openOverlay();
+      });
+    };
+
+    initOtpOverlay(doctorOtpConfig);
   </script>
 </body>
 </html>

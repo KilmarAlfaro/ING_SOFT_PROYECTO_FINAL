@@ -31,11 +31,51 @@
       flex-direction: column;
       gap: 8px;
     }
+    .mensaje-exito {
+      color: #15803d;
+      background: rgba(34,197,94,0.15);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .forgot-link {
+      text-align: right;
+      margin-top: -6px;
+    }
+    .forgot-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .resend-form {
+      margin-top: 8px;
+      display: inline-block;
+    }
+    .resend-form button {
+      border: none;
+      background: transparent;
+      color: #2563eb;
+      font-weight: 600;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="auth-body">
   <div class="login-contenedor">
     <h1 class="titulo">Iniciar Sesión</h1>
+
+    @if(session('status'))
+      <div class="mensaje-exito">{{ session('status') }}</div>
+    @endif
+
+    @if(session('email_no_verificado'))
+      <div class="mensaje-error">Debes verificar tu correo antes de iniciar sesión.</div>
+      <form action="{{ route('verification.resend') }}" method="POST" class="resend-form">
+        @csrf
+        <input type="hidden" name="email" value="{{ session('pending_email') }}">
+        <button type="submit">Reenviar correo de verificación</button>
+      </form>
+    @endif
 
     <form action="{{ route('loginDoc.submit') }}" method="POST" class="formulario" autocomplete="off">
       @csrf
@@ -57,6 +97,10 @@
       <div class="password-container">
         <input type="password" id="password" name="password" placeholder="********" required autocomplete="new-password">
         <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePassword">
+      </div>
+
+      <div class="forgot-link">
+        <a href="{{ route('password.request', ['role' => 'doctor']) }}">¿Olvidaste tu contraseña?</a>
       </div>
 
       @if(session('password_incorrecta'))
