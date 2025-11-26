@@ -32,12 +32,12 @@ class ValidDui implements ValidationRule, DataAwareRule
 
         $digits = DuiService::digits($value);
         if (strlen($digits) !== 9) {
-            $fail('El DUI debe contener exactamente 9 dígitos (formato ########-#).');
+            $fail('El DUI debe contener exactamente 9 dígitos (sin guion).');
             return;
         }
 
         if (! DuiService::isValid($value)) {
-            $fail('Ingresa un DUI salvadoreño válido (8 dígitos + guion + dígito verificador).');
+            $fail('Ingresa un DUI salvadoreño válido.');
         }
     }
 }

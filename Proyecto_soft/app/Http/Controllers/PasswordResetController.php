@@ -54,10 +54,20 @@ class PasswordResetController extends Controller
 
     public function reset(Request $request)
     {
+        if (! $request->filled('password') && $request->filled('password_visible')) {
+            $request->merge([
+                'password' => $request->input('password_visible'),
+                'password_confirmation' => $request->input('password_confirmation_visible'),
+            ]);
+        }
+
         $request->validate([
             'email' => 'required|email',
             'token' => 'required|string',
             'password' => 'required|string|min:6|confirmed',
+        ], [
+            'password.min' => 'Se necesita al menos 6 caracteres en tu contraseña.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();

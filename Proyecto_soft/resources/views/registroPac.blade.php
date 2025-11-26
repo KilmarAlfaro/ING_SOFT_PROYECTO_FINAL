@@ -6,24 +6,76 @@
   <title>Registro Paciente</title>
   <link rel="stylesheet" href="{{ asset('css/repaci.css') }}" />
   <link rel="stylesheet" href="{{ asset('css/global.css') }}" />
+  <style>
+    .alerta-form {
+      border-radius: 18px;
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(254, 242, 242, 0.95), rgba(254, 226, 226, 0.9));
+      box-shadow: 0 18px 40px rgba(248, 113, 113, 0.25);
+      color: #991b1b;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .alerta-form .alerta-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: #fee2e2;
+      color: #b91c1c;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      box-shadow: inset 0 0 0 1px rgba(185, 28, 28, 0.15);
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .alerta-form p {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .alerta-form ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .alerta-form li {
+      margin-bottom: 4px;
+    }
+    .inline-error-bubble {
+      margin-top: 6px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(254, 226, 226, 0.8);
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      color: #b91c1c;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(248, 113, 113, 0.2);
+    }
+  </style>
 </head>
 <body>
   <div class="registro-contenedor">
 
     @if ($errors->any())
-      <div class="alerta-error">
-        <p>Por favor corrige los siguientes campos:</p>
-        <ul>
-          @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-          @endforeach
-        </ul>
+      <div class="alerta-error alerta-form" id="registroPacServerErrors" tabindex="-1">
+        <div class="alerta-icon" aria-hidden="true">!</div>
+        <div>
+          <p>Necesitamos corregir lo siguiente antes de continuar:</p>
+          <ul>
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
       </div>
     @endif
 
-    <div class="alerta-error" id="pacientePrevalidateErrors" style="display:none;"></div>
+    <div class="alerta-error alerta-form" id="pacientePrevalidateErrors" style="display:none;"></div>
 
-    <form id="pacienteRegistroForm" action="{{ route('registroPac.submit') }}" method="POST" autocomplete="off">
+    <form id="pacienteRegistroForm" action="{{ route('registroPac.submit') }}" method="POST" autocomplete="off" novalidate>
       @csrf
 
       <h2 class="subtitulo">Datos personales</h2>
@@ -81,7 +133,7 @@
 
       <label for="password">Contraseña:</label>
       <div class="password-container">
-        <input type="password" id="password" name="password" placeholder="********" required autocomplete="new-password" />
+        <input type="password" id="password" name="password" placeholder="********" required autocomplete="new-password" minlength="6" data-min-message="Se necesita al menos 6 caracteres en tu contraseña." />
         <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePassword" />
       </div>
       @error('password')
@@ -90,7 +142,7 @@
 
       <label for="password_confirmation">Confirmar contraseña:</label>
       <div class="password-container">
-        <input type="password" id="password_confirmation" name="password_confirmation" placeholder="********" required autocomplete="new-password" />
+        <input type="password" id="password_confirmation" name="password_confirmation" placeholder="********" required autocomplete="new-password" minlength="6" data-min-message="Se necesita al menos 6 caracteres en tu contraseña." data-required-message="Repite tu contraseña para continuar." />
         <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePasswordConfirm" />
       </div>
       @error('password_confirmation')
@@ -165,6 +217,109 @@
         input.value = formatPhone(input.value);
       });
     });
+
+    const scrollToAlert = (element) => {
+      if (!element) {
+        return;
+      }
+      if (!element.hasAttribute('tabindex')) {
+        element.setAttribute('tabindex', '-1');
+      }
+      requestAnimationFrame(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try {
+          element.focus({ preventScroll: true });
+        } catch (error) {
+          element.focus();
+        }
+      });
+    };
+
+    const serverErrorBox = document.getElementById('registroPacServerErrors');
+    if (serverErrorBox) {
+      setTimeout(() => scrollToAlert(serverErrorBox), 100);
+    }
+
+    const buildAlertContent = (box, messages, title = 'Revisa lo siguiente:') => {
+      box.innerHTML = '';
+      const icon = document.createElement('div');
+      icon.className = 'alerta-icon';
+      icon.textContent = '!';
+      const content = document.createElement('div');
+      const heading = document.createElement('p');
+      heading.textContent = title;
+      const list = document.createElement('ul');
+      messages.forEach((msg) => {
+        const item = document.createElement('li');
+        item.textContent = msg;
+        list.appendChild(item);
+      });
+      content.appendChild(heading);
+      content.appendChild(list);
+      box.appendChild(icon);
+      box.appendChild(content);
+      box.style.display = 'flex';
+      scrollToAlert(box);
+    };
+
+    const initInlineValidation = (form) => {
+      if (!form) {
+        return;
+      }
+
+      const getBubbleAnchor = (field) => field.closest('.password-container') || field;
+
+      const removeBubble = (field) => {
+        const anchor = getBubbleAnchor(field);
+        const next = anchor.nextElementSibling;
+        if (next && next.classList.contains('inline-error-bubble')) {
+          next.remove();
+        }
+      };
+
+      const showBubble = (field, message) => {
+        removeBubble(field);
+        const bubble = document.createElement('div');
+        bubble.className = 'inline-error-bubble';
+        bubble.textContent = message;
+        const anchor = getBubbleAnchor(field);
+        anchor.insertAdjacentElement('afterend', bubble);
+      };
+
+      form.addEventListener('invalid', (event) => {
+        event.preventDefault();
+        const field = event.target;
+        if (!(field instanceof HTMLElement)) {
+          return;
+        }
+        let message = 'Completa este campo para continuar.';
+        if (field.validity.valueMissing) {
+          message = field.dataset.requiredMessage || message;
+        } else if (field.validity.tooShort) {
+          message = field.dataset.minMessage || 'Se necesita al menos 6 caracteres en tu contraseña.';
+        } else if (field.validity.typeMismatch && field.type === 'email') {
+          message = field.dataset.emailMessage || 'Ingresa un correo electrónico válido.';
+        } else if (field.validationMessage) {
+          message = field.validationMessage;
+        }
+        showBubble(field, message);
+      }, true);
+
+      form.addEventListener('input', (event) => {
+        if (event.target instanceof HTMLElement) {
+          removeBubble(event.target);
+        }
+      });
+
+      form.addEventListener('focusout', (event) => {
+        const field = event.target;
+        if (field instanceof HTMLElement && field.checkValidity()) {
+          removeBubble(field);
+        }
+      });
+    };
+
+    initInlineValidation(document.getElementById('pacienteRegistroForm'));
 
     const otpApi = {
       prevalidate: "{{ route('registroPac.prevalidate') }}",
@@ -273,16 +428,7 @@
           formErrorBox.style.display = 'none';
           return;
         }
-
-        const list = document.createElement('ul');
-        messages.forEach((msg) => {
-          const item = document.createElement('li');
-          item.textContent = msg;
-          list.appendChild(item);
-        });
-        formErrorBox.innerHTML = '';
-        formErrorBox.appendChild(list);
-        formErrorBox.style.display = 'block';
+        buildAlertContent(formErrorBox, messages, 'Antes de enviar el formulario:');
       };
 
       const clearFormErrors = () => {
@@ -398,6 +544,12 @@
           return;
         }
         event.preventDefault();
+        const invalidField = form.querySelector(':invalid');
+        if (invalidField) {
+          invalidField.dispatchEvent(new Event('invalid', { bubbles: true }));
+          invalidField.focus();
+          return;
+        }
         await openOverlay();
       });
     };

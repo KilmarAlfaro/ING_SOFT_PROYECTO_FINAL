@@ -39,13 +39,24 @@
       margin-bottom: 12px;
     }
     .forgot-link {
-      text-align: right;
-      margin-top: -6px;
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-start;
     }
-    .forgot-link a {
-      color: #2563eb;
-      text-decoration: none;
+    .forgot-link .btn-reset {
+      border: none;
+      background: rgba(37, 99, 235, 0.12);
+      color: #1d4ed8;
+      font-weight: 600;
       font-size: 0.9rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .forgot-link .btn-reset:hover {
+      background: rgba(37, 99, 235, 0.2);
     }
     .resend-form {
       margin-top: 8px;
@@ -99,12 +110,11 @@
         <img src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-eye-64.png" alt="Mostrar/Ocultar" id="togglePassword">
       </div>
 
-      <div class="forgot-link">
-        <a href="{{ route('password.request', ['role' => 'doctor']) }}">¿Olvidaste tu contraseña?</a>
-      </div>
-
       @if(session('password_incorrecta'))
         <span class="mensaje-error">Contraseña incorrecta</span>
+        <div class="forgot-link">
+          <a class="btn-reset" href="{{ route('password.request', ['role' => 'doctor']) }}">¿Quieres restablecer tu contraseña?</a>
+        </div>
       @endif
 
       <div class="acciones">

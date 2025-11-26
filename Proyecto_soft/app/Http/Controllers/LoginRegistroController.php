@@ -219,10 +219,11 @@ class LoginRegistroController extends Controller
 
     private function pacienteMessages(): array
     {
-        return [
-            'numero_dui.regex' => 'El DUI debe escribirse como 8 digitos, un guion y el digito verificador (########-#).',
+            return [
             'numero_dui.unique' => 'El DUI ingresado ya esta registrado.',
             'correo.unique' => 'El correo ingresado ya esta registrado.',
+            'password.min' => 'Se necesita al menos 6 caracteres en tu contraseña.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ];
     }
 
@@ -233,7 +234,7 @@ class LoginRegistroController extends Controller
             'apellido' => 'required|string|max:255',
             'telefono' => 'required|string|max:20',
             'fecha_nacimiento' => 'required|date',
-            'numero_dui' => ['required', 'string', 'regex:/^\\d{8}-?\\d$/', new ValidDui, 'unique:users,dui', 'unique:pacientes,numero_dui'],
+                'numero_dui' => ['required', 'string', new ValidDui, 'unique:users,dui', 'unique:pacientes,numero_dui'],
             'sexo' => 'required|string|in:Masculino,Femenino',
             'direccion' => 'nullable|string|max:255',
             'correo' => 'required|email|unique:users,email|unique:pacientes,correo',
@@ -255,9 +256,10 @@ class LoginRegistroController extends Controller
     private function doctorMessages(): array
     {
         return [
-            'numero_dui.regex' => 'El DUI debe escribirse como 8 digitos, un guion y el digito verificador (########-#).',
             'numero_dui.unique' => 'El DUI ingresado ya esta registrado.',
             'correo.unique' => 'El correo ingresado ya esta registrado.',
+            'password.min' => 'Se necesita al menos 6 caracteres en tu contraseña.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ];
     }
 
@@ -267,7 +269,7 @@ class LoginRegistroController extends Controller
             'nombre' => 'required|string|max:255',
             'apellido' => 'nullable|string|max:255',
             'telefono' => 'required|string|max:20',
-            'numero_dui' => ['required', 'string', 'regex:/^\\d{8}-?\\d$/', new ValidDui, 'unique:users,dui', 'unique:doctors,numero_dui'],
+                'numero_dui' => ['required', 'string', new ValidDui, 'unique:users,dui', 'unique:doctors,numero_dui'],
             'fecha_nacimiento' => 'nullable|date',
             'sexo' => 'nullable|string|in:Masculino,Femenino',
             'especialidad' => 'required|string|max:255',
