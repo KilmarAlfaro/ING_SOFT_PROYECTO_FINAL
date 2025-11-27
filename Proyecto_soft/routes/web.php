@@ -22,6 +22,14 @@ Route::get('/soporte', function () {
     return view('soporte');
 })->name('soporte');
 
+Route::get('/soporte/paciente', function () {
+    return view('soportePac');
+})->name('soporte.paciente');
+
+Route::get('/soporte/doctor', function () {
+    return view('soporteDoc');
+})->name('soporte.doctor');
+
 Route::get('/mainpage', function () {
     return view('mainpage');
 })->name('mainpage');

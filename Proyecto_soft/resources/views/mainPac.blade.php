@@ -9,19 +9,116 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ asset('css/buscar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
+    <style>
+        .dashboard-navbar {
+            background: linear-gradient(120deg, #0f6fc6, #0bb4d4);
+            color: #f8fafc;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 20px 35px rgba(15, 111, 198, 0.22);
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+        .dashboard-navbar .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .dashboard-navbar .navbar-logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+            transition: none;
+        }
+        .dashboard-navbar .navbar-logo:hover {
+            transform: none;
+        }
+        .dashboard-navbar .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+        .dashboard-navbar .brand-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .dashboard-navbar .brand-subtitle {
+            font-size: 0.85rem;
+            color: rgba(248, 250, 252, 0.9);
+        }
+        .dashboard-navbar .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .dashboard-navbar .help-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(248, 250, 252, 0.35);
+            background: rgba(15, 23, 42, 0.08);
+            color: #f8fafc;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.92rem;
+            transition: background 0.2s ease;
+        }
+        .dashboard-navbar .help-chip:hover {
+            background: rgba(15, 23, 42, 0.16);
+        }
+        .dashboard-navbar .help-chip .help-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: rgba(248, 250, 252, 0.2);
+            font-weight: 700;
+        }
+        .dashboard-navbar .profile-thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid rgba(248, 250, 252, 0.65);
+            object-fit: cover;
+        }
+        @media (max-width: 768px) {
+            .dashboard-navbar {
+                flex-direction: column;
+                gap: 14px;
+            }
+            .dashboard-navbar .navbar-actions {
+                width: 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 
 </head>
 <body>
-    <!-- NAVBAR estilo similar a mainDoc -->
-    <nav class="mainpac-nav">
-        <div class="nav-left mainpac-brand">
-            <img class="brand-logo" src="https://cdn0.iconfinder.com/data/icons/coronavirus-67/100/coronavirus-04-512.png" alt="Logo" />
-            <span class="brand-title">MEDTECH HUB</span>
+    <!-- NAVBAR -->
+    <nav class="dashboard-navbar">
+        <div class="navbar-brand">
+            <img class="navbar-logo" src="https://cdn0.iconfinder.com/data/icons/coronavirus-67/100/coronavirus-04-512.png" alt="Logo MedTech" />
+            <div class="brand-text">
+                <span class="brand-title">MedTech HUB</span>
+                <small class="brand-subtitle">Panel de pacientes</small>
+            </div>
         </div>
-        <div class="nav-right" style="display:flex;align-items:center;gap:12px;">
-            <!-- Botón Cerrar Sesión -->
-            <button type="button" id="openLogout" class="logout-btn">Cerrar sesión</button>
-
+        <div class="navbar-actions">
+            <a href="{{ route('soporte.paciente') }}" class="help-chip">
+                <span class="help-icon">?</span>
+                <span>Centro de soporte</span>
+            </a>
+            <button type="button" id="openLogout" class="logout-btn logout-btn--danger">Cerrar sesión</button>
             <a href="{{ route('perfil.paciente') }}" style="display:inline-block;">
                 @php
                     $pacienteId = session('paciente_id');
@@ -32,9 +129,9 @@
                     }
                 @endphp
                 @if($pacienteId)
-                    <img src="{{ route('avatar.paciente', $pacienteId) }}?v={{ $ver }}" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
+                    <img src="{{ route('avatar.paciente', $pacienteId) }}?v={{ $ver }}" alt="Perfil" class="profile-thumb">
                 @else
-                    <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil" style="width:40px;height:40px;border-radius:50%">
+                    <img src="https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png" alt="Perfil" class="profile-thumb">
                 @endif
             </a>
         </div>

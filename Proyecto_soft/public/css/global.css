@@ -30,6 +30,19 @@ pre, code, kbd, samp {
 /* Buttons should not keep text caret/selection */
 button { -webkit-user-select: none; user-select: none; }
 
+.logout-btn {
+  background: #dc3545 !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+.logout-btn:hover {
+  background: #c82333 !important;
+}
+
 /* Make images non-draggable/non-selectable unless explicitly overridden */
 img {
   -webkit-user-drag: none;

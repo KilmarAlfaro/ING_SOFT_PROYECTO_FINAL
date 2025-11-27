@@ -15,6 +15,7 @@
     </header>
 
     @php
+      $returnRoute = 'inicio';
       $faqs = [
         [
           'question' => '¿En qué te puede ayudar esta página como doctor?',
@@ -56,7 +57,7 @@
       <p>Contáctanos en <a href="mailto:medtechsupport@gmail.com">medtechsupport@gmail.com</a></p>
     </footer>
     <div class="faq-back">
-      <a href="{{ route('inicio') }}" class="faq-back__btn">Volver a inicio</a>
+      <a href="{{ route($returnRoute) }}" class="faq-back__btn">Volver al inicio</a>
     </div>
   </section>
 
