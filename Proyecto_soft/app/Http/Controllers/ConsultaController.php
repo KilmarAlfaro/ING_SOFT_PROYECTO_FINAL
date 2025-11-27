@@ -8,6 +8,7 @@ use App\Models\Doctor;
 use App\Models\Paciente;
 use App\Models\ConsultaMensaje;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
 
 class ConsultaController extends Controller
 {
@@ -203,6 +204,8 @@ class ConsultaController extends Controller
                     'doctor_id' => $consulta->doctor_id,
                     'status' => $consulta->status,
                     'motivo' => $consulta->mensaje,
+                    'tag_label' => $consulta->tag_label,
+                    'tag_color' => $consulta->tag_color,
                 ],
                 'data' => $data
             ]);
@@ -240,6 +243,42 @@ class ConsultaController extends Controller
                 'body' => $msg->body,
                 'created_at' => $msg->created_at ? $msg->created_at->timezone('America/El_Salvador')->format('Y-m-d H:i:s') : null,
             ]
+        ]);
+    }
+
+    public function updateTag(Request $request, Consulta $consulta)
+    {
+        $doctorId = Session::get('doctor_id');
+        if (! $doctorId || $consulta->doctor_id !== $doctorId) {
+            abort(403);
+        }
+
+        $allowedColors = ['#2563eb', '#dc2626', '#16a34a', '#7c3aed', '#0891b2', '#f97316'];
+
+        $request->validate([
+            'label' => 'nullable|string|max:20',
+            'color' => ['nullable', 'string', Rule::in($allowedColors)],
+        ]);
+
+        $label = trim((string) $request->label);
+
+        if ($label === '') {
+            $consulta->tag_label = null;
+            $consulta->tag_color = null;
+        } else {
+            $color = $request->color ?: '#2563eb';
+            $consulta->tag_label = $label;
+            $consulta->tag_color = $color;
+        }
+
+        $consulta->save();
+
+        return response()->json([
+            'data' => [
+                'id' => $consulta->id,
+                'tag_label' => $consulta->tag_label,
+                'tag_color' => $consulta->tag_color,
+            ],
         ]);
     }
 }

@@ -122,6 +122,7 @@ Route::middleware([RequireSessionOrAuth::class])->group(function () {
     Route::get('/consultas/paciente', [App\Http\Controllers\ConsultaController::class, 'pacienteIndex'])->name('consultas.paciente');
     Route::post('/consultas/{consulta}/responder', [App\Http\Controllers\ConsultaController::class, 'responder'])->name('consultas.responder');
     Route::post('/consultas/{consulta}/finalizar', [App\Http\Controllers\ConsultaController::class, 'finalizar'])->name('consultas.finalizar');
+    Route::post('/consultas/{consulta}/tag', [App\Http\Controllers\ConsultaController::class, 'updateTag'])->name('consultas.tag');
     Route::post('/consultas/{consulta}/ocultar-paciente', [App\Http\Controllers\ConsultaController::class, 'ocultarParaPaciente'])->name('consultas.ocultarPaciente');
     Route::delete('/consultas/{consulta}', [App\Http\Controllers\ConsultaController::class, 'eliminar'])->name('consultas.eliminar');
     Route::get('/consultas/{consulta}/mensajes', [App\Http\Controllers\ConsultaController::class, 'mensajes'])->name('consultas.mensajes');

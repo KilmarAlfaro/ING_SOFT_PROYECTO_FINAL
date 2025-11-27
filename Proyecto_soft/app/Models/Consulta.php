@@ -17,6 +17,8 @@ class Consulta extends Model
         'mensaje',
         'respuesta',
         'status',
+        'tag_label',
+        'tag_color',
     ];
 
     public function doctor()

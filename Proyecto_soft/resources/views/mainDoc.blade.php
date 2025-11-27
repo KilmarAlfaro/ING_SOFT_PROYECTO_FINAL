@@ -31,28 +31,11 @@
             user-select: none;
             transition: none;
         }
-        .dashboard-navbar .navbar-logo:hover {
-            transform: none;
-        }
-        .dashboard-navbar .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-        .dashboard-navbar .brand-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-        }
-        .dashboard-navbar .brand-subtitle {
-            font-size: 0.85rem;
-            color: rgba(248, 250, 252, 0.9);
-        }
-        .dashboard-navbar .navbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .dashboard-navbar .navbar-logo:hover { transform: none; }
+        .dashboard-navbar .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+        .dashboard-navbar .brand-title { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.03em; }
+        .dashboard-navbar .brand-subtitle { font-size: 0.85rem; color: rgba(248, 250, 252, 0.9); }
+        .dashboard-navbar .navbar-actions { display: flex; align-items: center; gap: 16px; }
         .dashboard-navbar .help-chip {
             display: inline-flex;
             align-items: center;
@@ -67,9 +50,7 @@
             font-size: 0.92rem;
             transition: background 0.2s ease;
         }
-        .dashboard-navbar .help-chip:hover {
-            background: rgba(15, 23, 42, 0.16);
-        }
+        .dashboard-navbar .help-chip:hover { background: rgba(15, 23, 42, 0.16); }
         .dashboard-navbar .help-chip .help-icon {
             width: 22px;
             height: 22px;
@@ -87,16 +68,121 @@
             object-fit: cover;
         }
         @media (max-width: 768px) {
-            .dashboard-navbar {
-                flex-direction: column;
-                gap: 14px;
-            }
-            .dashboard-navbar .navbar-actions {
-                width: 100%;
-                justify-content: flex-end;
-                flex-wrap: wrap;
-            }
+            .dashboard-navbar { flex-direction: column; gap: 14px; }
+            .dashboard-navbar .navbar-actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
         }
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: none;
+            background: #e2e8f0;
+            color: #fff;
+            margin-left: 6px;
+        }
+        .tag-badge--muted { background: #e2e8f0; color: #475569; }
+        .tag-anchor { display: inline-flex; align-items: center; min-height: 18px; }
+        .filter-mode-toggle {
+            display: inline-flex;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .filter-mode-toggle button {
+            border: none;
+            background: transparent;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0f172a;
+            cursor: pointer;
+        }
+        .filter-mode-toggle button.is-active { background: rgba(15, 23, 42, 0.08); }
+        .tag-manager {
+            background: #f8fafc;
+            border: 1px dashed #cbd5f5;
+            border-radius: 14px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+        .tag-manager.is-disabled { opacity: 0.55; }
+        .tag-manager__summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .tag-manager__summary-label { font-size: 0.85rem; color: #1f2937; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .tag-manager__summary-label .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #0f6fc6;
+            display: inline-block;
+        }
+        .tag-manager__toggle {
+            border: none;
+            background: transparent;
+            color: #0f6fc6;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 0;
+        }
+        .tag-manager__toggle .chevron { transition: transform 0.2s ease; }
+        .tag-manager.is-open .tag-manager__toggle .chevron { transform: rotate(180deg); }
+        .tag-manager__status {
+            font-size: 0.78rem;
+            color: #475569;
+            margin: 4px 0 0;
+            min-height: 1em;
+        }
+        .tag-popover {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #cbd5f5;
+        }
+        .tag-popover.is-open { display: block; }
+        .tag-panel__help { font-size: 0.78rem; color: #475569; margin: 6px 0; }
+        .tag-panel__presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+        .tag-chip {
+            border: none;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+        }
+        .tag-custom-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        #tagCustomInput { flex: 1; min-width: 200px; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5f5; }
+        .tag-color-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag-color-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+            cursor: pointer;
+        }
+        .tag-color-dot.is-selected { outline: 2px solid #0f172a; }
+        .tag-panel__actions { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .tag-inline { margin-top: 4px; }
+        .section-heading { margin: 18px 0 8px; font-size: 1.2rem; color: #0f172a; }
+        .filter-wrap { display: flex; align-items: center; gap: 10px; }
+        .filter-wrap--block { margin-bottom: 14px; }
+        .filter-wrap .list-filter { min-width: 240px; flex: 1; }
     </style>
     <!-- Chat styles moved to global CSS for consistency -->
 </head>
@@ -143,15 +229,20 @@
     <div id="dashboard" class="dashboard">
         <!-- Columna Izquierda: lista de consultas activas -->
         <aside class="sidebar-left">
-            <h2 style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                <span>Consultas</span>
-                <span class="filter-wrap">
-                    <input id="filtroActivas" type="text" class="list-filter" placeholder="Filtrar por paciente" style="flex:1;max-width:180px;">
-                    <button type="button" class="clear-filter-btn" aria-label="Limpiar filtro" onclick="limpiarFiltro('filtroActivas')">
-                        <img src="https://cdn2.iconfinder.com/data/icons/css-vol-3/24/trash-256.png" alt="Borrar" />
-                    </button>
-                </span>
-            </h2>
+            <h2 class="section-heading">Consultas</h2>
+            <div class="filter-mode-toggle" role="group" aria-label="Modo de filtrado" id="filterModeToggle">
+                <button type="button" class="is-active" data-mode="nombre">Por nombre</button>
+                <button type="button" data-mode="tag">Por etiqueta</button>
+            </div>
+            <div class="filter-wrap filter-wrap--block">
+                <input id="filtroActivas" type="text" class="list-filter" placeholder="Filtrar por paciente">
+                <select id="selectorActivas" class="list-filter" style="display:none;">
+                    <option value="">Todas las etiquetas</option>
+                </select>
+                <button type="button" class="clear-filter-btn" aria-label="Limpiar filtro" onclick="limpiarFiltro('filtroActivas','selectorActivas')">
+                    <img src="https://cdn2.iconfinder.com/data/icons/css-vol-3/24/trash-256.png" alt="Borrar" />
+                </button>
+            </div>
             @php
                 $doctorId = session('doctor_id');
                 $consultasActivas = collect();
@@ -178,6 +269,8 @@
                         $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
                         $ver = optional($pac?->updated_at)->timestamp ?? time();
                         $fotoUrl = ($pac && $pac->id) ? route('avatar.paciente', $pac->id) . '?v=' . $ver : $defaultAvatar;
+                        $tagLabel = $c->tag_label;
+                        $tagColor = $c->tag_color ?: '#2563eb';
                     @endphp
                     <li class="chat-item"
                         data-id="{{ $c->id }}"
@@ -185,10 +278,19 @@
                         data-foto="{{ $fotoUrl }}"
                         data-mensaje="{{ e($c->mensaje) }}"
                         data-respuesta="{{ e($c->respuesta) }}"
-                        data-status="{{ $c->status ?? 'nuevo' }}">
+                        data-status="{{ $c->status ?? 'nuevo' }}"
+                        data-tag-label="{{ $tagLabel }}"
+                        data-tag-color="{{ $c->tag_color ?? '' }}">
                         <div class="thumb"><img src="{{ $fotoUrl }}" alt="avatar"></div>
                         <div class="meta">
-                            <div class="name">{{ $fn }} {{ $fl }}</div>
+                            <div class="name">
+                                {{ $fn }} {{ $fl }}
+                                <span class="tag-anchor">
+                                    @if($tagLabel)
+                                        <span class="tag-badge" style="background: {{ $tagColor }}">{{ $tagLabel }}</span>
+                                    @endif
+                                </span>
+                            </div>
                             <div class="sub">Consulta #{{ $loop->iteration }}</div>
                         </div>
                         <div class="actions">
@@ -231,15 +333,20 @@
 
         <!-- Columna Derecha: Consultas finalizadas -->
         <aside id="sidebarRight" class="sidebar-right">
-            <h2 style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                <span>Consultas finalizadas</span>
-                <span class="filter-wrap">
-                    <input id="filtroFinalizadas" type="text" class="list-filter" placeholder="Filtrar por paciente" style="flex:1;max-width:180px;">
-                    <button type="button" class="clear-filter-btn" aria-label="Limpiar filtro" onclick="limpiarFiltro('filtroFinalizadas')">
-                        <img src="https://cdn2.iconfinder.com/data/icons/css-vol-3/24/trash-256.png" alt="Borrar" />
-                    </button>
-                </span>
-            </h2>
+            <h2 class="section-heading">Consultas finalizadas</h2>
+            <div class="filter-mode-toggle" role="group" aria-label="Modo de filtrado" id="filterModeToggleFinal">
+                <button type="button" class="is-active" data-mode="nombre">Por nombre</button>
+                <button type="button" data-mode="tag">Por etiqueta</button>
+            </div>
+            <div class="filter-wrap filter-wrap--block">
+                <input id="filtroFinalizadas" type="text" class="list-filter" placeholder="Filtrar por paciente">
+                <select id="selectorFinalizadas" class="list-filter" style="display:none;">
+                    <option value="">Todas las etiquetas</option>
+                </select>
+                <button type="button" class="clear-filter-btn" aria-label="Limpiar filtro" onclick="limpiarFiltro('filtroFinalizadas','selectorFinalizadas')">
+                    <img src="https://cdn2.iconfinder.com/data/icons/css-vol-3/24/trash-256.png" alt="Borrar" />
+                </button>
+            </div>
             <ul class="consultas-list chat-list" id="listaFinalizadas">
                 @forelse($consultasFinalizadas as $c)
                     @php
@@ -249,11 +356,26 @@
                         $defaultAvatar = 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
                         $ver = optional($pac?->updated_at)->timestamp ?? time();
                         $fotoUrl = ($pac && $pac->id) ? route('avatar.paciente', $pac->id) . '?v=' . $ver : $defaultAvatar;
+                        $tagLabel = $c->tag_label;
+                        $tagColor = $c->tag_color ?: '#2563eb';
                     @endphp
-                    <li class="chat-item" data-id="{{ $c->id }}" data-paciente="{{ $fn }} {{ $fl }}" data-foto="{{ $fotoUrl }}" data-status="finalizado">
+                    <li class="chat-item"
+                        data-id="{{ $c->id }}"
+                        data-paciente="{{ $fn }} {{ $fl }}"
+                        data-foto="{{ $fotoUrl }}"
+                        data-status="finalizado"
+                        data-tag-label="{{ $tagLabel }}"
+                        data-tag-color="{{ $c->tag_color ?? '' }}">
                         <div class="thumb"><img src="{{ $fotoUrl }}" alt="avatar"></div>
                         <div class="meta">
-                            <div class="name">{{ $fn }} {{ $fl }}</div>
+                            <div class="name">
+                                {{ $fn }} {{ $fl }}
+                                <span class="tag-anchor">
+                                    @if($tagLabel)
+                                        <span class="tag-badge" style="background: {{ $tagColor }}">{{ $tagLabel }}</span>
+                                    @endif
+                                </span>
+                            </div>
                             <div class="sub">ID #{{ $c->id }}</div>
                         </div>
                         <div class="actions">
@@ -301,6 +423,20 @@
     </div>
 
     <script>
+        const TAG_PRESETS = [
+            { label: 'Urgente', color: '#dc2626' },
+            { label: 'Seguimiento', color: '#2563eb' },
+            { label: 'Revisión pendiente', color: '#f97316' },
+            { label: 'Laboratorios', color: '#7c3aed' },
+            { label: 'Coordinar cita', color: '#16a34a' },
+        ];
+        const TAG_COLORS = ['#2563eb', '#dc2626', '#16a34a', '#7c3aed', '#0891b2', '#f97316'];
+        const filterConfigs = [];
+        const CONSULTAS_BASE = `{{ url('/consultas') }}`;
+        let currentConsultaId = null;
+        let currentTagLabel = '';
+        let currentTagColor = '#2563eb';
+        let tagCustomColor = TAG_COLORS[0];
         function openModal() {
             document.getElementById("logoutModal").style.display = "flex";
         }
@@ -357,12 +493,215 @@
             requestAnimationFrame(apply);
         }
 
+        function setCurrentConsultaContext(id, label, color){
+            currentConsultaId = id;
+            currentTagLabel = label || '';
+            currentTagColor = color || '#2563eb';
+        }
+
+        function setTagPanelMessage(message, persistent = false){
+            const statusEl = document.getElementById('tagPanelStatus');
+            if (!statusEl) return;
+            statusEl.dataset.persistent = persistent ? 'true' : 'false';
+            statusEl.textContent = message || '';
+            if (!persistent && message){
+                setTimeout(() => {
+                    if (statusEl.dataset.persistent === 'true') return;
+                    statusEl.textContent = '';
+                }, 4000);
+            }
+        }
+
+        function updateDetailTagBadge(label, color){
+            const holder = document.getElementById('docChatTagHolder');
+            const badge = document.getElementById('tagCurrentBadge');
+            const resolvedColor = color || '#2563eb';
+            if (holder){
+                holder.innerHTML = label ? `<span class="tag-badge" style="background:${resolvedColor}">${escapeHtml(label)}</span>` : '';
+            }
+            if (badge){
+                if (label){
+                    badge.classList.remove('tag-badge--muted');
+                    badge.style.background = resolvedColor;
+                    badge.textContent = label;
+                } else {
+                    badge.classList.add('tag-badge--muted');
+                    badge.style.background = '';
+                    badge.textContent = 'Sin etiqueta';
+                }
+            }
+        }
+
+        function closeTagPopover(){
+            const panel = document.getElementById('tagPanel');
+            const popover = document.getElementById('tagPopover');
+            const toggleBtn = document.getElementById('tagToggleBtn');
+            if (popover) popover.classList.remove('is-open');
+            if (panel) panel.classList.remove('is-open');
+            if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function renderTagPresetButtons(disabled){
+            const presetsContainer = document.getElementById('tagPresetButtons');
+            if (!presetsContainer) return;
+            presetsContainer.innerHTML = TAG_PRESETS.map(p => `<button type="button" class="tag-chip" data-label="${p.label}" data-color="${p.color}" style="background:${p.color}">${p.label}</button>`).join('');
+            const buttons = presetsContainer.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = disabled;
+                if (!disabled){
+                    btn.addEventListener('click', () => applyTag(btn.dataset.label, btn.dataset.color));
+                }
+            });
+        }
+
+        function renderTagColorPicker(disabled){
+            const picker = document.getElementById('tagColorPicker');
+            if (!picker) return;
+            picker.innerHTML = TAG_COLORS.map(color => `<button type="button" class="tag-color-dot${color === tagCustomColor ? ' is-selected' : ''}" data-color="${color}" style="background:${color}"></button>`).join('');
+            picker.querySelectorAll('button').forEach(btn => {
+                btn.disabled = disabled;
+                if (!disabled){
+                    btn.addEventListener('click', () => {
+                        tagCustomColor = btn.dataset.color;
+                        picker.querySelectorAll('button').forEach(b => b.classList.toggle('is-selected', b === btn));
+                    });
+                }
+            });
+        }
+
+        function setupTagPanel({ id, status, label, color }){
+            const normalizedLabel = label || '';
+            const normalizedColor = color || '#2563eb';
+            setCurrentConsultaContext(id, normalizedLabel, normalizedColor);
+            const panel = document.getElementById('tagPanel');
+            const popover = document.getElementById('tagPopover');
+            const toggleBtn = document.getElementById('tagToggleBtn');
+            if (!panel) return;
+            closeTagPopover();
+            const disabled = status === 'finalizado';
+            panel.classList.toggle('is-disabled', disabled);
+            panel.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+            if (toggleBtn){
+                toggleBtn.disabled = disabled;
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                toggleBtn.onclick = () => {
+                    if (toggleBtn.disabled || !popover) return;
+                    const open = !popover.classList.contains('is-open');
+                    popover.classList.toggle('is-open', open);
+                    panel.classList.toggle('is-open', open);
+                    toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                };
+            }
+            if (normalizedLabel && TAG_COLORS.includes(normalizedColor)){
+                tagCustomColor = normalizedColor;
+            } else if (!normalizedLabel) {
+                tagCustomColor = TAG_COLORS[0];
+            }
+            if (disabled){
+                setTagPanelMessage('Esta consulta está finalizada; la etiqueta es de solo lectura.', true);
+            } else {
+                setTagPanelMessage('', false);
+            }
+            const customInput = document.getElementById('tagCustomInput');
+            if (customInput){
+                customInput.value = '';
+                customInput.disabled = disabled;
+            }
+            renderTagPresetButtons(disabled);
+            renderTagColorPicker(disabled);
+            const applyBtn = document.getElementById('applyCustomTag');
+            if (applyBtn){
+                applyBtn.disabled = disabled;
+                applyBtn.onclick = () => {
+                    if (disabled) return;
+                    const value = customInput ? (customInput.value || '').trim() : '';
+                    if (!value){
+                        setTagPanelMessage('Ingresa una etiqueta personalizada antes de guardar.', false);
+                        return;
+                    }
+                    if (value.length > 20){
+                        setTagPanelMessage('La etiqueta no puede exceder 20 caracteres.', false);
+                        return;
+                    }
+                    applyTag(value, tagCustomColor);
+                };
+            }
+            const clearBtn = document.getElementById('clearTagBtn');
+            if (clearBtn){
+                clearBtn.disabled = disabled;
+                clearBtn.onclick = () => {
+                    if (disabled) return;
+                    applyTag('', null);
+                };
+            }
+            updateDetailTagBadge(normalizedLabel, normalizedColor);
+        }
+
+        function applyTag(label, color){
+            if (!currentConsultaId) return;
+            const trimmed = (label || '').trim();
+            if (trimmed && trimmed.length > 20){
+                setTagPanelMessage('La etiqueta no puede exceder 20 caracteres.', false);
+                return;
+            }
+            persistTag(trimmed, trimmed ? (color || tagCustomColor || '#2563eb') : null);
+        }
+
+        async function persistTag(label, color){
+            try {
+                const response = await fetch(`${CONSULTAS_BASE}/${currentConsultaId}/tag`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ label: label || null, color: label ? (color || '#2563eb') : null })
+                });
+                if (!response.ok) {
+                    throw new Error('No se pudo actualizar la etiqueta.');
+                }
+                const payload = await response.json();
+                const payloadData = payload && payload.data ? payload.data : {};
+                const updatedLabel = payloadData.tag_label || '';
+                const updatedColor = payloadData.tag_color || '#2563eb';
+                setCurrentConsultaContext(currentConsultaId, updatedLabel, updatedColor);
+                tagCustomColor = updatedColor || TAG_COLORS[0];
+                updateDetailTagBadge(updatedLabel, updatedColor);
+                syncTagBadgeForItems(currentConsultaId, updatedLabel, updatedColor);
+                setTagPanelMessage(updatedLabel ? 'Etiqueta aplicada correctamente.' : 'Etiqueta eliminada.', false);
+                const customInput = document.getElementById('tagCustomInput');
+                if (customInput) customInput.value = '';
+                closeTagPopover();
+                renderTagColorPicker(false);
+            } catch (error) {
+                console.error(error);
+                setTagPanelMessage('Error al guardar la etiqueta. Inténtelo de nuevo.', false);
+            }
+        }
+
+        function syncTagBadgeForItems(id, label, color){
+            document.querySelectorAll(`.chat-item[data-id="${id}"]`).forEach(li => {
+                li.dataset.tagLabel = label || '';
+                li.dataset.tagColor = color || '';
+                const anchor = li.querySelector('.tag-anchor');
+                if (anchor){
+                    anchor.innerHTML = label ? `<span class="tag-badge" style="background:${color || '#2563eb'}">${escapeHtml(label)}</span>` : '';
+                }
+            });
+            refreshAllTagSelectOptions();
+            if (filterMode === 'tag') reapplyFilters();
+        }
+
         async function mostrarDetalle(id){
             const item = document.querySelector('.chat-item[data-id="'+id+'"]');
             if (!item) return;
             const nombre = item.dataset.paciente || 'Paciente';
             const foto = item.dataset.foto || 'https://cdn4.iconfinder.com/data/icons/glyphs/24/icons_user2-64.png';
             const status = item.dataset.status || 'nuevo';
+            const initialTagLabel = item.dataset.tagLabel || '';
+            const initialTagColor = item.dataset.tagColor || '';
+            setCurrentConsultaContext(id, initialTagLabel, initialTagColor || '#2563eb');
 
             const detalle = document.getElementById('consulta-detalle');
             detalle.innerHTML = `
@@ -371,11 +710,41 @@
                         <img id="docChatFoto" src="${foto}" alt="avatar" class="avatar" width="44" height="44">
                         <div>
                             <div class="name" id="docChatTitle">Consulta de ${nombre}</div>
+                            <div class="tag-inline" id="docChatTagHolder"></div>
                             <div class="subtle" id="docChatId">ID #${id}</div>
                             <div class="subtle" id="motivoLinea" style="margin-top:2px;"></div>
                         </div>
                     </div>
                     <span style="flex:1"></span>
+                </div>
+                <div class="tag-manager" id="tagPanel" aria-live="polite">
+                    <div class="tag-manager__summary">
+                        <div class="tag-manager__summary-label">
+                            <span class="dot" aria-hidden="true"></span>
+                            <span>Gestor de etiquetas:</span>
+                            <span id="tagCurrentBadge" class="tag-badge tag-badge--muted">Sin etiqueta</span>
+                        </div>
+                        <button type="button" class="tag-manager__toggle" id="tagToggleBtn" aria-expanded="false">
+                            Gestionar etiqueta
+                            <span class="chevron">▾</span>
+                        </button>
+                    </div>
+                    <p class="tag-panel__help">Úsala solo si necesitas ordenar o priorizar tus consultas.</p>
+                    <p class="tag-manager__status" id="tagPanelStatus"></p>
+                    <div class="tag-popover" id="tagPopover">
+                        <div class="tag-panel__presets" id="tagPresetButtons"></div>
+                        <div class="tag-panel__custom">
+                            <label for="tagCustomInput">Etiqueta personalizada</label>
+                            <div class="tag-custom-row">
+                                <input id="tagCustomInput" type="text" maxlength="20" placeholder="Ej. Control mensual">
+                                <div class="tag-color-picker" id="tagColorPicker"></div>
+                            </div>
+                            <div class="tag-panel__actions">
+                                <button type="button" class="btn btn-primario btn-sm" id="applyCustomTag">Guardar</button>
+                                <button type="button" class="btn btn-secundario btn-sm" id="clearTagBtn">Quitar</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="docChatEmpty" class="text-muted" style="padding:8px 4px;display:none;">Sin mensajes todavía.</div>
                 <div class="chat-box" id="chatBox" aria-live="polite"></div>
@@ -385,11 +754,13 @@
                 <div class="acciones-consulta" id="accionesConsulta"></div>
                 <div id="docChatNote" class="subtle" style="display:none">Consulta finalizada (solo lectura)</div>
             `;
+            setupTagPanel({ id, status, label: initialTagLabel, color: initialTagColor });
 
             // cargar mensajes
             try {
                 const res = await fetch(`{{ url('/consultas') }}/${id}/mensajes`, { headers:{ 'Accept':'application/json' } });
                 const data = await res.json();
+                const consultaInfo = data && data.consulta ? data.consulta : null;
                 const box = document.getElementById('chatBox');
                 if (box && data && Array.isArray(data.data)){
                     const sameChat = box.dataset.chatId === String(id);
@@ -409,7 +780,7 @@
                 // Set Motivo: prefer explicit consulta.motivo from backend; fallback to first patient message
                 const motivoEl = document.getElementById('motivoLinea');
                 if (motivoEl){
-                    const motivoFromConsulta = data && data.consulta && data.consulta.motivo ? data.consulta.motivo : null;
+                    const motivoFromConsulta = consultaInfo && consultaInfo.motivo ? consultaInfo.motivo : null;
                     if (motivoFromConsulta){
                         motivoEl.textContent = 'Motivo: ' + motivoFromConsulta;
                     } else if (data && Array.isArray(data.data)){
@@ -419,6 +790,15 @@
                     } else {
                         motivoEl.textContent = '';
                     }
+                }
+                if (consultaInfo){
+                    setupTagPanel({
+                        id,
+                        status: consultaInfo.status || status,
+                        label: consultaInfo.tag_label || '',
+                        color: consultaInfo.tag_color || ''
+                    });
+                    syncTagBadgeForItems(id, consultaInfo.tag_label || '', consultaInfo.tag_color || '');
                 }
             } catch(e){ console.error(e); }
 
@@ -508,14 +888,20 @@
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
-        function limpiarFiltro(inputId){
-            const inp = document.getElementById(inputId);
-            if (!inp) return;
-            inp.value = '';
-            // Disparar el filtrado para mostrar todos
-            const evt = new Event('input', { bubbles: true });
-            inp.dispatchEvent(evt);
-            inp.focus();
+        function limpiarFiltro(textId, selectId){
+            const textInput = textId ? document.getElementById(textId) : null;
+            const select = selectId ? document.getElementById(selectId) : null;
+            if (textInput){
+                textInput.value = '';
+                textInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (select){
+                select.value = '';
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            const selectVisible = select && select.style.display !== 'none';
+            if (selectVisible) select.focus();
+            else if (textInput) textInput.focus();
         }
 
         // Formatea a HH:mm en hora local si es posible
@@ -530,16 +916,97 @@
             }catch(_){ return ''; }
         }
 
+        function applyFilterForConfig(config){
+            const listUl = config && config.listUl;
+            if (!listUl) return;
+            const mode = config.mode === 'tag' ? 'tag' : 'nombre';
+            if (mode === 'tag'){
+                const selected = (config.tagSelect ? config.tagSelect.value : '').toLowerCase();
+                listUl.querySelectorAll('.chat-item').forEach(li => {
+                    const label = (li.dataset.tagLabel || '').toLowerCase();
+                    li.style.display = !selected || label === selected ? '' : 'none';
+                });
+            } else {
+                const query = (config.textInput ? config.textInput.value : '').trim().toLowerCase();
+                listUl.querySelectorAll('.chat-item').forEach(li => {
+                    const haystack = (li.dataset.paciente || '').toLowerCase();
+                    li.style.display = haystack.includes(query) ? '' : 'none';
+                });
+            }
+        }
+
+        function reapplyFilters(){
+            filterConfigs.forEach(applyFilterForConfig);
+        }
+
+        function collectTagOptions(listUl){
+            const tags = new Set();
+            if (!listUl) return [];
+            listUl.querySelectorAll('.chat-item').forEach(li => {
+                const label = (li.dataset.tagLabel || '').trim();
+                if (label) tags.add(label);
+            });
+            return Array.from(tags).sort((a,b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+        }
+
+        function rebuildTagOptions(config){
+            if (!config || !config.tagSelect) return;
+            const select = config.tagSelect;
+            const current = select.value;
+            const options = collectTagOptions(config.listUl);
+            let html = '<option value="">Todas las etiquetas</option>';
+            options.forEach(label => { html += `<option value="${label}">${label}</option>`; });
+            select.innerHTML = html;
+            if (options.includes(current)){
+                select.value = current;
+            } else {
+                select.value = '';
+            }
+        }
+
+        function refreshAllTagSelectOptions(){
+            filterConfigs.forEach(config => {
+                rebuildTagOptions(config);
+                if (config.mode === 'tag') applyFilterForConfig(config);
+            });
+        }
+
+        function updateFilterControlVisibility(config){
+            if (!config || !config.textInput || !config.tagSelect) return;
+            const showTag = config.mode === 'tag';
+            config.textInput.style.display = showTag ? 'none' : '';
+            config.tagSelect.style.display = showTag ? '' : 'none';
+        }
+
+        function bindToggle(config, toggle){
+            if (!config || !toggle) return;
+            const buttons = toggle.querySelectorAll('button[data-mode]');
+            const setActive = (mode) => {
+                buttons.forEach(btn => btn.classList.toggle('is-active', btn.dataset.mode === mode));
+            };
+            toggle.addEventListener('click', (event) => {
+                const btn = event.target.closest('button[data-mode]');
+                if (!btn || btn.classList.contains('is-active')) return;
+                const mode = btn.dataset.mode === 'tag' ? 'tag' : 'nombre';
+                config.mode = mode;
+                setActive(mode);
+                updateFilterControlVisibility(config);
+                applyFilterForConfig(config);
+            });
+            setActive(config.mode || 'nombre');
+        }
+
         // Delegar click en toda la fila de consulta activa
         document.addEventListener('DOMContentLoaded', function(){
             const list = document.querySelector('.sidebar-left .chat-list');
-            if (!list) return;
-            list.addEventListener('click', function(e){
-                const item = e.target.closest('.chat-item');
-                if (!item) return;
-                const id = item.getAttribute('data-id');
-                if (id) mostrarDetalle(id);
-            });
+            if (list){
+                list.addEventListener('click', function(e){
+                    const item = e.target.closest('.chat-item');
+                    if (!item) return;
+                    const id = item.getAttribute('data-id');
+                    if (id) mostrarDetalle(id);
+                });
+            }
             const finList = document.querySelector('#sidebarRight .chat-list');
             if (finList){
                 finList.addEventListener('click', function(e){
@@ -550,20 +1017,25 @@
                 });
             }
 
-            // Filtros por nombre
-            const filtra = (input, listUl) => {
-                if (!input || !listUl) return;
-                input.addEventListener('input', () => {
-                    const q = input.value.trim().toLowerCase();
-                    listUl.querySelectorAll('.chat-item').forEach(li => {
-                        const nameEl = li.querySelector('.meta .name');
-                        const name = nameEl ? nameEl.textContent.toLowerCase() : '';
-                        li.style.display = name.includes(q) ? '' : 'none';
-                    });
-                });
+            const registerFilter = (textId, selectId, listId, toggleId) => {
+                const textInput = document.getElementById(textId);
+                const tagSelect = document.getElementById(selectId);
+                const listUl = document.getElementById(listId);
+                const toggle = document.getElementById(toggleId);
+                if (!listUl || !textInput || !tagSelect || !toggle) return;
+                const config = { textInput, tagSelect, listUl, toggle, mode: 'nombre' };
+                if (textInput){ textInput.addEventListener('input', () => applyFilterForConfig(config)); }
+                if (tagSelect){ tagSelect.addEventListener('change', () => applyFilterForConfig(config)); }
+                filterConfigs.push(config);
+                rebuildTagOptions(config);
+                bindToggle(config, toggle);
+                updateFilterControlVisibility(config);
+                applyFilterForConfig(config);
             };
-            filtra(document.getElementById('filtroActivas'), document.getElementById('listaActivas'));
-            filtra(document.getElementById('filtroFinalizadas'), document.getElementById('listaFinalizadas'));
+            registerFilter('filtroActivas', 'selectorActivas', 'listaActivas', 'filterModeToggle');
+            registerFilter('filtroFinalizadas', 'selectorFinalizadas', 'listaFinalizadas', 'filterModeToggleFinal');
+
+            refreshAllTagSelectOptions();
         });
 
         function cerrarDetalle(){
